@@ -26,6 +26,7 @@ import { encodeFixture as base64Fixture } from '../src/examples/base64-encode-de
 import { minifyFixture as jsonMinifyBeautifyFixture, FIXTURE_TEXT as JSON_MINIFY_FIXTURE_TEXT } from '../src/examples/json-minify-beautify.mjs';
 import { convertFixture as textCaseFixture } from '../src/examples/text-case-converter.mjs';
 import { hashFixture } from '../src/examples/hash-generator.mjs';
+import { convertFixture as csvToSqlFixture } from '../src/examples/csv-to-sql-insert.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -356,6 +357,21 @@ test('hash-generator example: the rendered HTML shows the raw input and all five
   assert.ok(html.includes('The quick brown fox jumps over the lazy dog'), 'expected the raw fixture text in the Input block');
   assert.ok(html.includes('9e107d9d372bb6826bd81d3542a419d6'));
   assert.ok(html.includes('d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592'));
+});
+
+test('csv-to-sql-insert example: the fixture converts to the exact expected batched INSERT statement', () => {
+  assert.equal(csvToSqlFixture(), [
+    'INSERT INTO `products` (`id`, `name`, `price`) VALUES',
+    "  (1, 'Widget', 9.99),",
+    "  (2, 'Gadget', 14.50);",
+  ].join('\n'));
+});
+
+test('csv-to-sql-insert example: the rendered HTML shows the raw CSV and the real generated SQL', () => {
+  const html = exampleFor('csv-to-sql-insert');
+  assert.ok(html.includes('id,name,price'), 'expected the raw fixture CSV in the Input block');
+  assert.ok(html.includes('INSERT INTO'));
+  assert.ok(html.includes("'Widget'"));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
