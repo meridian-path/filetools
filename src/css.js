@@ -517,6 +517,51 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   .file-row .file-actions { display: flex; gap: var(--space-1); }
 
+  /* One row per algorithm inside a hash-result block (Hash Generator --
+     src/browser/hashGenerator.client.js). The hash itself is a fixed-width
+     hex string, so unlike .json-preview's multi-line <pre> this stays a
+     single truncatable line with its own copy button -- a wide hash on a
+     narrow viewport scrolls horizontally inside its own box rather than
+     wrapping mid-hex or pushing the copy button off-screen. */
+  .hash-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+  }
+  .hash-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface-alt);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+  .hash-row .hash-label {
+    flex-shrink: 0;
+    width: 5.5rem;
+    font-weight: var(--weight-medium);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .hash-row .hash-value {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+  }
+  .hash-row .btn-secondary {
+    flex-shrink: 0;
+    min-width: 0;
+    padding: var(--space-1) var(--space-3);
+    min-height: 36px;
+  }
+
   .page-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
