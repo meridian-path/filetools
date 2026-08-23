@@ -146,11 +146,18 @@ const DESIGN_TOKENS = {
    * approaches 99 or 20) without shipping 50 tokens to use 15.
    *
    * Role: 1 = wash (backgrounds only), 6 = plate (the filled mark),
-   * 8 = ink (pip ring + pip glyph stroke). Family hue appears in exactly
-   * two places sitewide: inside the icon mark, and as a --family-X-1 wash
-   * disc behind the mark on the tool-page dropzone. Never on text, links,
-   * buttons, borders, or focus rings -- --color-accent keeps sole
-   * ownership of every interactive control.
+   * 8 = ink (pip ring + pip glyph stroke). The binding rule is never on
+   * text, links, buttons, borders, or focus rings -- --color-accent keeps
+   * sole ownership of every interactive control's own chrome. Within that
+   * rule, a --family-X-1 wash disc sits behind the mark in several places
+   * now (updated 2026-08-23; this comment previously said "exactly two
+   * places" and was already stale before this pass -- .transform-diagram-
+   * svg .td-accent had already added a third, --mark-plate-colored, use):
+   * the tool-page dropzone, the homepage hero family index, and the
+   * homepage tool-list rows (src/css.js's .dz-icon-wrap, .family-strip-
+   * icon-wrap, .tool-row-icon-wrap). All of them decorate an icon mark
+   * sitting inside an interactive element, never the element's own
+   * text/background-as-button/border/focus-ring.
    *
    * CONTRAST -- measured, not the spec's approximate arithmetic (which
    * treated OKLCH L as CIE L-star and flagged itself as approximate).
@@ -192,6 +199,12 @@ const DESIGN_TOKENS = {
   // tokenized here rather than left as a raw px value in that stylesheet,
   // per this file's own no-hardcoded-value rule.
   '--icon-wrap-lg': '72px',
+  // Added for the 2026-08-23 homepage composition pass: the same
+  // wash-circle-behind-mark construction as --icon-wrap-lg, sized for a
+  // dense list row instead of a hero/dropzone. 44px doubles as the WCAG
+  // 2.5.8 (2.4.13-adjacent) touch-target minimum this site already used as
+  // .tool-row's own min-height -- see .tool-row-icon-wrap in src/css.js.
+  '--icon-wrap-md': '44px',
 };
 
 /**
