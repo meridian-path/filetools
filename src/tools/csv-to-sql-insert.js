@@ -54,5 +54,5 @@ module.exports = {
       answerHtml: 'A single batched statement (<code>INSERT INTO t (...) VALUES (...), (...), (...);</code>) is faster for a database to execute and is the default. One INSERT per row generates a separate statement for every row instead - useful if you need to run them individually, log each one, or paste them into a tool that only accepts one statement at a time.',
     },
   ],
-  relatedSlugs: ['json-to-csv', 'merge-csv', 'html-table-to-csv'],
+  relatedSlugs: ['json-to-csv', 'merge-csv', 'sql-formatter'],
 };
