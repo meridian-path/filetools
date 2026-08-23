@@ -20,8 +20,9 @@ const { renderPrivacyPage } = require('./pages/privacy.js');
 const { renderToolPage } = require('./pages/toolPage.js');
 const { render404Page } = require('./shell.js');
 const { TOOLS } = require('./tools/index.js');
-const { renderSitemapXml, robotsTxtContent } = require('./sitemap.js');
+const { sitemapPathsFor, renderSitemapXml, robotsTxtContent } = require('./sitemap.js');
 const { renderRssXml } = require('./rss.js');
+const { INDEXNOW_KEY } = require('./indexnow.js');
 const { ICON_SVG } = require('./icon.js');
 const { assembleBrowserClients } = require('./browserClients.js');
 
@@ -174,10 +175,17 @@ async function build() {
 
   // 6. sitemap.xml / robots.txt / ads.txt, derived from what was actually
   // written above.
-  const sitemapPaths = ['', 'how-this-works/', 'privacy/', ...TOOLS.map((t) => `${t.category}/${t.slug}/`)];
+  const sitemapPaths = sitemapPathsFor(TOOLS);
   fs.writeFileSync(path.join(OUT_DIR, 'sitemap.xml'), renderSitemapXml(sitemapPaths), 'utf8');
   fs.writeFileSync(path.join(OUT_DIR, 'robots.txt'), robotsTxtContent(), 'utf8');
   fs.writeFileSync(path.join(OUT_DIR, 'ads.txt'), adsTxtContent(), 'utf8');
+
+  // 6b. IndexNow key file -- IndexNow (Bing/Yandex/Naver/Seznam/Yep) proves
+  // this site's ownership of a ping by finding the exact key it was pinged
+  // with at <key>.txt on the site root (indexnow.org/documentation). The
+  // key itself lives in src/indexnow.js so scripts/indexnow-ping.js (run
+  // post-deploy in CI) can never send a key that doesn't match this file.
+  fs.writeFileSync(path.join(OUT_DIR, `${INDEXNOW_KEY}.txt`), `${INDEXNOW_KEY}\n`, 'utf8');
 
   // 7. feed.xml -- RSS of tool launches (see src/rss.js's header comment).
   fs.writeFileSync(path.join(OUT_DIR, 'feed.xml'), renderRssXml(TOOLS), 'utf8');

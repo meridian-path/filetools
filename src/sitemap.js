@@ -10,6 +10,18 @@
 const { absoluteUrl, BUILD_DATE } = require('./site.js');
 
 /**
+ * @param {Array<{category:string, slug:string}>} tools the TOOLS registry.
+ * @returns {string[]} every root-relative directory path the build writes
+ *   an index.html for (excluding 404.html, a static-hosting error page,
+ *   never a real destination). The one shared source for both
+ *   sitemap.xml (src/build.js) and the post-deploy IndexNow ping
+ *   (scripts/indexnow-ping.js), so the two can never list different URLs.
+ */
+function sitemapPathsFor(tools) {
+  return ['', 'how-this-works/', 'privacy/', ...tools.map((t) => `${t.category}/${t.slug}/`)];
+}
+
+/**
  * @param {string[]} paths root-relative directory paths as written to
  *   dist/ (e.g. '', 'pdf/merge-pdf/', 'privacy/'). '404.html' is filtered.
  * @returns {Array<{path:string, loc:string, lastmod:string}>} sorted for
@@ -47,4 +59,4 @@ function robotsTxtContent() {
   return `User-agent: *\nAllow: /\nSitemap: ${absoluteUrl('sitemap.xml')}\n`;
 }
 
-module.exports = { buildSitemapEntries, renderSitemapXml, robotsTxtContent };
+module.exports = { sitemapPathsFor, buildSitemapEntries, renderSitemapXml, robotsTxtContent };
