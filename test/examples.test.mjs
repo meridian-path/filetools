@@ -24,6 +24,7 @@ import { mergeFixture as statementFixture } from '../src/examples/bank-statement
 import { gridFixture as xlsxToCsvFixture } from '../src/examples/xlsx-to-csv.mjs';
 import { encodeFixture as base64Fixture } from '../src/examples/base64-encode-decode.mjs';
 import { minifyFixture as jsonMinifyBeautifyFixture, FIXTURE_TEXT as JSON_MINIFY_FIXTURE_TEXT } from '../src/examples/json-minify-beautify.mjs';
+import { convertFixture as textCaseFixture } from '../src/examples/text-case-converter.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -320,6 +321,26 @@ test('json-minify-beautify example: the rendered HTML shows the pretty-printed i
   const html = exampleFor('json-minify-beautify');
   assert.ok(html.includes('&quot;name&quot;: &quot;Ada&quot;'), 'expected the raw pretty-printed fixture in the Input block');
   assert.ok(html.includes('{&quot;user&quot;:{&quot;name&quot;:&quot;Ada&quot;'), 'expected the real minified result in the Output block');
+});
+
+test('text-case-converter example: the fixture converts to all six real cases', () => {
+  const outcomes = textCaseFixture();
+  const byKey = Object.fromEntries(outcomes.map((o) => [o.key, o.result]));
+  assert.equal(byKey.upper, 'HELLO WORLD');
+  assert.equal(byKey.lower, 'hello world');
+  assert.equal(byKey.title, 'Hello World');
+  assert.equal(byKey.camel, 'helloWorld');
+  assert.equal(byKey.snake, 'hello_world');
+  assert.equal(byKey.kebab, 'hello-world');
+});
+
+test('text-case-converter example: the rendered HTML shows the raw input and all six real results', () => {
+  const html = exampleFor('text-case-converter');
+  assert.ok(html.includes('hello world'), 'expected the raw fixture text in the Input block');
+  assert.ok(html.includes('HELLO WORLD'));
+  assert.ok(html.includes('helloWorld'));
+  assert.ok(html.includes('hello_world'));
+  assert.ok(html.includes('hello-world'));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
