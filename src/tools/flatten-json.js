@@ -54,5 +54,5 @@ module.exports = {
       answerHtml: 'Every field seen across any record becomes a column; a record that doesn’t have a given field just gets an empty cell there, the same way a missing or <code>null</code> value is shown.',
     },
   ],
-  relatedSlugs: ['html-table-to-csv', 'remove-duplicate-lines', 'sort-lines'],
+  relatedSlugs: ['html-table-to-csv', 'json-minify-beautify', 'remove-duplicate-lines'],
 };
