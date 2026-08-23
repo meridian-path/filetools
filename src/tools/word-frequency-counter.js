@@ -58,5 +58,5 @@ module.exports = {
       answerHtml: 'Yes, by default a run of digits counts as a word, so <code>2026</code> is counted. Turn on “exclude numbers” to drop number-only entries from the table.',
     },
   ],
-  relatedSlugs: ['sort-lines', 'remove-duplicate-lines', 'html-table-to-csv'],
+  relatedSlugs: ['sort-lines', 'remove-duplicate-lines', 'text-case-converter'],
 };

@@ -736,6 +736,24 @@ ${designTokensCss(DESIGN_TOKENS)}
     .dual-result-row > .table-block { flex: 1 1 0; min-width: 0; }
   }
 
+  /* Six live result panels (Text Case Converter --
+     src/browser/textCaseConverter.client.js) -- same stacked-first,
+     wide-before-columns reasoning as .dual-result-row above, but with more
+     panels than one row comfortably fits: 1 column by default, 2 at
+     >=768px, 3 at >=1024px (six panels divides evenly at both). */
+  .case-result-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+  @media (min-width: 768px) {
+    .case-result-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .case-result-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
   /* -------------------------------------------------------------------
      Cell-level CSV diff table (compare-csv --
      src/browser/csvDiff.client.js). Row-level tint from a shared
