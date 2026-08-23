@@ -241,13 +241,18 @@ ${designTokensCss(DESIGN_TOKENS)}
      is aria-hidden inline SVG that draws itself from three custom
      properties (--mark-plate / --mark-wash / --mark-ink); these classes
      are the only place those get a value, and the only place any
-     var(--family-*) token is referenced. By design, a family hue appears
-     in exactly two places sitewide -- inside the mark, and as this wash
-     behind it on the tool-page dropzone -- and nowhere else: never on
-     text, a link, a button, or a focus ring. .mark--(family) carries
-     plate + wash (the format); a second class, .mark-ink--(family),
-     carries ink (the pip) so a converter can mix two different families
-     on one mark.
+     var(--family-*) token is referenced. .mark--(family) carries plate +
+     wash (the format); a second class, .mark-ink--(family), carries ink
+     (the pip) so a converter can mix two different families on one mark.
+     The binding rule (see tokens.js's family-ramp comment for the fuller
+     history) is never on text, a link, a button, or a focus ring --
+     --color-accent keeps sole ownership of every interactive element's
+     own chrome. A --family-X-1 wash disc behind the mark, reusing this
+     same .mark--<family> class on the wrapping element, now appears on
+     the tool-page dropzone (.dz-icon-wrap) AND, as of the 2026-08-23
+     homepage pass, the hero family index (.family-strip-icon-wrap) and
+     the tool-list rows (.tool-row-icon-wrap) -- all three decorate a mark
+     sitting inside an interactive element, never the element itself.
      ------------------------------------------------------------------- */
   .mark--pdf   { --mark-plate: var(--family-pdf-6);   --mark-wash: var(--family-pdf-1); }
   .mark--csv   { --mark-plate: var(--family-csv-6);   --mark-wash: var(--family-csv-1); }
@@ -1149,10 +1154,101 @@ ${designTokensCss(DESIGN_TOKENS)}
      group (design-standards.md's Distinctiveness Gate names a centered
      hero over a card grid an automatic NO-GO; this also makes the
      homepage's silhouette differ from every tool page by construction).
+     2026-08-23 composition pass (human feedback: the page read as flat/
+     generic): the hero becomes a two-column grid on a declared 12-column
+     track -- copy at 7 columns, a real functional element (not
+     decorative -- see design-standards.md) at 5: a family-index strip
+     linking straight to one representative tool per format family,
+     giving the accent-starved hero its first real color story. The page
+     also now renders wide (page-shell-app, home.js) instead of the
+     narrow reading width -- the homepage is a directory/app hub, not a
+     prose page, and every tool page it links to already uses this width.
+
+     References (docs/design/REFERENCE_LIBRARY.md, entries by number):
+     #23 (Linear) puts a real working product view directly in the hero as
+     proof instead of a feature-card grid -- taken as "put something real
+     and functional beside the headline," diverged on the mechanism: five
+     working tool pages can't embed live in one hero without a much larger
+     rebuild, so the family-index strip is real navigation (each icon is a
+     working link into an actual tool page) rather than an embedded demo.
+     #2 (Cobalt) argues against any hero at all for a single-tool page --
+     diverged deliberately, since this homepage indexes 22 distinct tools
+     rather than being one tool's own landing page, so it keeps a hero as
+     the wayfinding layer while still rejecting Cobalt's true target (a
+     feature grid or marketing block with no real function).
      ------------------------------------------------------------------- */
-  .hero { padding: var(--space-6) 0 var(--space-4); text-align: left; }
+  .hero { padding: var(--space-7) 0 var(--space-6); text-align: left; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .hero-copy, .hero-families { grid-column: 1 / -1; }
+  @media (min-width: 768px) {
+    .hero-grid { grid-template-columns: repeat(6, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .hero-grid { grid-template-columns: repeat(12, 1fr); gap: var(--space-7); align-items: center; }
+    .hero-copy { grid-column: span 7; }
+    .hero-families { grid-column: span 5; }
+  }
+  .hero-kicker {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 var(--space-3);
+  }
   .hero h1 { margin-bottom: var(--space-3); max-width: var(--measure); }
-  .hero .deck { margin: 0; }
+  .hero .deck { margin: 0 0 var(--space-5); }
+  .hero-cta { margin-top: var(--space-2); }
+
+  /* Family index -- a compact wayfinding strip, not a feature grid: no
+     card border/background/shadow per item (the taste guardrails call out
+     repeated identical card chrome as a generic default), just an icon and
+     a one-word label so it reads as an index rather than marketing copy.
+     Each item is a real link to that family's first tool page. */
+  .family-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-5) var(--space-6);
+  }
+  @media (min-width: 1024px) {
+    .family-strip { justify-content: flex-end; }
+  }
+  .family-strip-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    width: 84px;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .family-strip-item:hover .family-strip-label,
+  .family-strip-item:focus-visible .family-strip-label { color: var(--color-accent); }
+  .family-strip-icon-wrap {
+    width: var(--icon-wrap-lg); height: var(--icon-wrap-lg);
+    border-radius: var(--radius-pill);
+    background: var(--mark-wash);
+    display: flex; align-items: center; justify-content: center;
+    transition: box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .family-strip-item:hover .family-strip-icon-wrap,
+  .family-strip-item:focus-visible .family-strip-icon-wrap {
+    box-shadow: 0 0 0 3px var(--color-accent-tint);
+  }
+  .family-strip-icon { width: var(--icon-lg); height: var(--icon-lg); }
+  .family-strip-label {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
 
   .tool-group { margin: var(--space-7) 0; padding: var(--space-4); border-radius: var(--radius-lg); }
   .tool-group h2 { margin-top: 0; margin-bottom: var(--space-4); }
@@ -1163,7 +1259,7 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   .tool-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) 0;
     border-bottom: var(--border-hairline) solid var(--color-border);
@@ -1174,7 +1270,18 @@ ${designTokensCss(DESIGN_TOKENS)}
   .tool-list > .tool-row:last-child,
   .tool-list > .tool-row:nth-last-child(2):nth-child(odd) { border-bottom: none; }
   .tool-row:hover .tool-row-name { color: var(--color-accent); }
-  .tool-row-icon { width: var(--icon-md); height: var(--icon-md); flex-shrink: 0; margin-top: 2px; }
+  /* Wash-disc treatment (see the Icon marks comment above) -- gives each
+     row's family color real presence instead of a small near-monochrome
+     glyph, at a size (--icon-wrap-md, tokens.js) matched to this row's own
+     existing 44px min-height so the list doesn't grow taller. */
+  .tool-row-icon-wrap {
+    width: var(--icon-wrap-md); height: var(--icon-wrap-md);
+    border-radius: var(--radius-pill);
+    background: var(--mark-wash);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .tool-row-icon { width: var(--icon-md); height: var(--icon-md); }
   .tool-row-text { display: flex; flex-direction: column; gap: 2px; }
   .tool-row-name {
     font-family: var(--font-display);
