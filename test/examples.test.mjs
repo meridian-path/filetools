@@ -25,6 +25,7 @@ import { gridFixture as xlsxToCsvFixture } from '../src/examples/xlsx-to-csv.mjs
 import { encodeFixture as base64Fixture } from '../src/examples/base64-encode-decode.mjs';
 import { minifyFixture as jsonMinifyBeautifyFixture, FIXTURE_TEXT as JSON_MINIFY_FIXTURE_TEXT } from '../src/examples/json-minify-beautify.mjs';
 import { convertFixture as textCaseFixture } from '../src/examples/text-case-converter.mjs';
+import { hashFixture } from '../src/examples/hash-generator.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -341,6 +342,20 @@ test('text-case-converter example: the rendered HTML shows the raw input and all
   assert.ok(html.includes('helloWorld'));
   assert.ok(html.includes('hello_world'));
   assert.ok(html.includes('hello-world'));
+});
+
+test('hash-generator example: the fixture hashes to the well-known pangram test vectors', () => {
+  const byKey = Object.fromEntries(hashFixture().map((h) => [h.key, h.hash]));
+  assert.equal(byKey.md5, '9e107d9d372bb6826bd81d3542a419d6');
+  assert.equal(byKey.sha1, '2fd4e1c67a2d28fced849ee1bb76e7391b93eb12');
+  assert.equal(byKey.sha256, 'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592');
+});
+
+test('hash-generator example: the rendered HTML shows the raw input and all five real hashes', () => {
+  const html = exampleFor('hash-generator');
+  assert.ok(html.includes('The quick brown fox jumps over the lazy dog'), 'expected the raw fixture text in the Input block');
+  assert.ok(html.includes('9e107d9d372bb6826bd81d3542a419d6'));
+  assert.ok(html.includes('d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592'));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {

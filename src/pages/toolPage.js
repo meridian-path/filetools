@@ -70,8 +70,15 @@ function renderToolPage(tool, example = {}) {
     .map((t) => `<a class="related-link" href="${escapeHtml(url(`${t.category}/${t.slug}/`))}">${markFor(t.slug)}${escapeHtml(t.navLabel)}</a>`)
     .join('\n      ');
 
-  const fileTypeLabel = tool.fileTypeLabel || 'PDF';
-  const dzTitle = tool.multiple ? `Drop your ${fileTypeLabel} files here` : `Drop your ${fileTypeLabel} here`;
+  // Explicit '' (a tool that accepts any file type, e.g. hash-generator.js)
+  // is deliberately distinct from the field being omitted entirely (every
+  // PDF tool -- default 'PDF') -- '' means "no type name in the copy",
+  // producing "Drop your files here" rather than a doubled-up "Drop your
+  // file files here".
+  const fileTypeLabel = tool.fileTypeLabel === undefined ? 'PDF' : tool.fileTypeLabel;
+  const dzTitle = tool.multiple
+    ? (fileTypeLabel ? `Drop your ${fileTypeLabel} files here` : 'Drop your files here')
+    : (fileTypeLabel ? `Drop your ${fileTypeLabel} here` : 'Drop a file here');
   const chooseLabel = tool.multiple ? 'Choose files' : 'Choose file';
 
   const pasteHtml = tool.pasteInput
