@@ -23,6 +23,7 @@ import { extractFixture as pdfToCsvFixture } from '../src/examples/pdf-to-csv.mj
 import { mergeFixture as statementFixture } from '../src/examples/bank-statement-to-csv.mjs';
 import { gridFixture as xlsxToCsvFixture } from '../src/examples/xlsx-to-csv.mjs';
 import { encodeFixture as base64Fixture } from '../src/examples/base64-encode-decode.mjs';
+import { minifyFixture as jsonMinifyBeautifyFixture, FIXTURE_TEXT as JSON_MINIFY_FIXTURE_TEXT } from '../src/examples/json-minify-beautify.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -308,6 +309,17 @@ test('url-encode-decode example: the rendered HTML shows the raw input and the p
   const html = exampleFor('url-encode-decode');
   assert.ok(html.includes('café &amp; code'), 'expected the raw fixture text (with & escaped) in the Input block');
   assert.ok(html.includes('caf%C3%A9%20%26%20code'));
+});
+
+test('json-minify-beautify example: the fixture minifies to exactly what JSON.stringify with no indent produces', () => {
+  assert.equal(jsonMinifyBeautifyFixture(), JSON.stringify(JSON.parse(JSON_MINIFY_FIXTURE_TEXT)));
+  assert.equal(jsonMinifyBeautifyFixture(), '{"user":{"name":"Ada","roles":["admin","editor"]}}');
+});
+
+test('json-minify-beautify example: the rendered HTML shows the pretty-printed input and the real minified output', () => {
+  const html = exampleFor('json-minify-beautify');
+  assert.ok(html.includes('&quot;name&quot;: &quot;Ada&quot;'), 'expected the raw pretty-printed fixture in the Input block');
+  assert.ok(html.includes('{&quot;user&quot;:{&quot;name&quot;:&quot;Ada&quot;'), 'expected the real minified result in the Output block');
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
