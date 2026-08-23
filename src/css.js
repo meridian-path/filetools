@@ -154,10 +154,46 @@ ${designTokensCss(DESIGN_TOKENS)}
   .brand:hover { color: var(--color-text); }
   .brand .brand-tail { color: var(--color-accent); }
 
+  /* Below 768px the 22-tool nav collapses behind a native <details>
+     toggle -- Cobalt (REFERENCE_LIBRARY.md entry 2) demotes secondary nav
+     to small text rather than pushing primary content down; the same
+     shape applies here so the header takes one line above the fold at
+     360x800 instead of the whole viewport. At 768px+ the override below
+     forces the nav open regardless of the [open] attribute, matching the
+     unchanged flat desktop layout. */
+  .site-nav-disclosure { width: 100%; }
+  .site-nav-summary {
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    margin-left: calc(-1 * var(--space-3));
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+  }
+  .site-nav-summary:hover { color: var(--color-accent); background: var(--color-accent-tint); }
+  .site-nav-summary::-webkit-details-marker { display: none; }
+  .site-nav-summary::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-right: var(--border-control) solid currentColor;
+    border-bottom: var(--border-control) solid currentColor;
+    transform: rotate(45deg);
+    transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .site-nav-disclosure[open] .site-nav-summary::after { transform: rotate(-135deg); }
+
   .site-nav {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
+    padding-top: var(--space-1);
   }
   .site-nav a {
     display: inline-flex;
@@ -172,6 +208,12 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   .site-nav a:hover { color: var(--color-accent); background: var(--color-accent-tint); }
   .site-nav a[aria-current="page"] { color: var(--color-accent); }
+
+  @media (min-width: 768px) {
+    .site-nav-disclosure { display: contents; }
+    .site-nav-summary { display: none; }
+    .site-nav-disclosure .site-nav { display: flex !important; padding-top: 0; }
+  }
 
   /* -------------------------------------------------------------------
      Page shell / breadcrumb

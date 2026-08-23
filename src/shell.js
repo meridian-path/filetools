@@ -96,14 +96,23 @@ function documentHead(opts) {
 function renderHeader(activeSlug) {
   const links = TOOLS.map((t) =>
     `<a href="${escapeHtml(url(`${t.category}/${t.slug}/`))}"${activeSlug === t.slug ? ' aria-current="page"' : ''}>${escapeHtml(t.navLabel)}</a>`
-  ).join('\n      ');
+  ).join('\n        ');
 
+  // Native <details>/<summary> disclosure, same zero-JS pattern as the FAQ
+  // accordion in toolPage.js. Below the .site-nav-disclosure breakpoint
+  // (src/css.js) this stays closed by default so the header takes one line
+  // above the fold at 360x800; at and above that breakpoint CSS forces the
+  // nav open regardless of the [open] attribute, so desktop keeps today's
+  // flat layout unchanged.
   return `<header class="site-header">
     <a class="brand" href="${escapeHtml(url())}">file<span class="brand-tail">tools</span></a>
-    <nav class="site-nav" aria-label="Tools">
-      ${links}
-      <a href="${escapeHtml(url('how-this-works/'))}"${activeSlug === 'how-this-works' ? ' aria-current="page"' : ''}>How this works</a>
-    </nav>
+    <details class="site-nav-disclosure">
+      <summary class="site-nav-summary">Tools</summary>
+      <nav class="site-nav" aria-label="Tools">
+        ${links}
+        <a href="${escapeHtml(url('how-this-works/'))}"${activeSlug === 'how-this-works' ? ' aria-current="page"' : ''}>How this works</a>
+      </nav>
+    </details>
   </header>`;
 }
 
