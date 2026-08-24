@@ -37,7 +37,7 @@ test('familyOf() falls back to the default family for an unrecognized slug, neve
   assert.equal(familyOf(undefined), DEFAULT_FAMILY);
 });
 
-test('the taxonomy is exactly the spec\'s 5-family, 25-slug assignment', () => {
+test('the taxonomy is exactly the spec\'s 5-family, 26-slug assignment', () => {
   assert.deepEqual(FAMILY_BY_SLUG, {
     'merge-pdf': 'pdf',
     'split-pdf': 'pdf',
@@ -50,6 +50,7 @@ test('the taxonomy is exactly the spec\'s 5-family, 25-slug assignment', () => {
     'split-csv': 'csv',
     'transpose-csv': 'csv',
     'html-table-to-csv': 'csv',
+    'csv-to-sql-insert': 'csv',
 
     'json-to-csv': 'json',
     'flatten-json': 'json',
