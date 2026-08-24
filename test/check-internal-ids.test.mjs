@@ -48,6 +48,11 @@ test('findLeakedIds: catches a task-id split across a line-wrapped JSDoc comment
   assert.deepEqual(findLeakedIds(file), ['task-mt6jcfwr-ed62cc']);
 });
 
+test('findLeakedIds: catches a task-id split across a line wrap with extra alignment indentation on the continuation line (real miss found in src/structuredData.js -- a "@returns" continuation indented past the marker)', () => {
+  const file = tmpFile(' * @returns one per folder page (redesign, task-\n *   mt6jcfwr-ed62cc section 3.4), alongside\n');
+  assert.deepEqual(findLeakedIds(file), ['task-mt6jcfwr-ed62cc']);
+});
+
 test('findLeakedIds: catches a task-id split across a line-wrapped // comment', () => {
   const file = tmpFile('  // three-level path, task-mt6jcfwr-\n  // ed62cc section 1.4\n');
   assert.deepEqual(findLeakedIds(file), ['task-mt6jcfwr-ed62cc']);

@@ -75,9 +75,19 @@ function findLeakedIds(filePath) {
   // pass) would reassemble as "task-mt6jcfwr- * ed62cc" instead of
   // "task-mt6jcfwr-ed62cc", silently defeating the very check meant to
   // catch it.
+  // trim() after stripping the marker (not just one optional space): a
+  // JSDoc continuation line is often indented several spaces past the
+  // marker for alignment (e.g. " *   mt6jcfwr-..." under a wrapped
+  // "@returns" line) -- leaving that indentation in place defeated the
+  // very adjacent-line-pair concatenation below (real miss, caught by
+  // this file's own check missing a genuine leak in src/structuredData.js:
+  // concatenating "...task-" with "  mt6jcfwr-..." left a two-space gap
+  // inside the id, which ID_RE's no-internal-whitespace shape can't
+  // match). Trimming is safe for the per-line pass too, since match()
+  // doesn't care about surrounding whitespace either way.
   const strippedLines = content
     .split(/\r?\n/)
-    .map((line) => line.replace(/^\s*(?:\*|\/\/)\s?/, ''));
+    .map((line) => line.replace(/^\s*(?:\*|\/\/)\s?/, '').trim());
 
   const matches = [];
   for (const line of strippedLines) {

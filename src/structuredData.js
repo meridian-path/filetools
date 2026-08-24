@@ -75,8 +75,8 @@ function faqPageJsonLd(faqs) {
 /**
  * @param {{name:string, description:string, url:string, items: Array<{name:string, url:string}>}} opts
  * @returns {string} a CollectionPage carrying an ItemList of the folder's
- *   tools -- one per folder page (site-wide navigation/IA redesign, task-
- *   mt6jcfwr-ed62cc section 3.4), alongside that page's own
+ *   tools -- one per folder page (site-wide navigation/IA redesign, see
+ *   the folder taxonomy/nav spec section 3.4), alongside that page's own
  *   breadcrumbJsonLd() call.
  */
 function collectionPageJsonLd({ name, description, url, items }) {
