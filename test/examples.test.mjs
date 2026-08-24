@@ -27,6 +27,7 @@ import { minifyFixture as jsonMinifyBeautifyFixture, FIXTURE_TEXT as JSON_MINIFY
 import { convertFixture as textCaseFixture } from '../src/examples/text-case-converter.mjs';
 import { hashFixture } from '../src/examples/hash-generator.mjs';
 import { convertFixture as csvToSqlFixture } from '../src/examples/csv-to-sql-insert.mjs';
+import { generateFixture as uuidV5Fixture, FIXTURE_NAME as UUID_FIXTURE_NAME } from '../src/examples/uuid-generator.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -372,6 +373,16 @@ test('csv-to-sql-insert example: the rendered HTML shows the raw CSV and the rea
   assert.ok(html.includes('id,name,price'), 'expected the raw fixture CSV in the Input block');
   assert.ok(html.includes('INSERT INTO'));
   assert.ok(html.includes("'Widget'"));
+});
+
+test('uuid-generator example: the fixture v5 UUID matches the same DNS-namespace RFC 4122 vector the pure module\'s own unit tests use', () => {
+  assert.equal(uuidV5Fixture(), 'cfbff0d1-9375-5685-968c-48ce8b15ae17');
+});
+
+test('uuid-generator example: the rendered HTML shows the namespace/name input and the real generated v5 UUID', () => {
+  const html = exampleFor('uuid-generator');
+  assert.ok(html.includes(UUID_FIXTURE_NAME), 'expected the raw fixture name in the Input block');
+  assert.ok(html.includes('cfbff0d1-9375-5685-968c-48ce8b15ae17'));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
