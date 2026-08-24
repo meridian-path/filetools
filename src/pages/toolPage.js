@@ -43,13 +43,16 @@ function formatMb(bytes) {
 function renderToolPage(tool, example = {}) {
   const { exampleHtml = '', exampleAriaLabel = '', exampleNote = '' } = example;
   const canonical = absoluteUrl(`${tool.category}/${tool.slug}/`);
-  // A generator tool (e.g. uuid-generator.js) has no file/text INPUT at all
-  // -- it produces output from options alone -- so it skips the entire
-  // dropzone/paste-input block below and loads its own client file
-  // directly instead of going through ./dropzone.client.js's file-driven
-  // PROCESSORS routing. Every other tool on the site is input-driven, so
-  // this stays a single boolean flag rather than its own page template.
-  const isGenerator = !!tool.generatorMode;
+  // A custom-panel tool (e.g. uuid-generator.js, regex-tester.js) has no
+  // FILE input at all -- either no input whatsoever (a generator) or a
+  // live pattern/text pair that should update on every keystroke, not
+  // wait for a "Convert" click (a live tool like the regex tester) -- so
+  // it skips the entire dropzone/paste-input block below and loads its own
+  // client file directly instead of going through ./dropzone.client.js's
+  // file-driven PROCESSORS routing. That client file owns 100% of its own
+  // interactive surface. Every other tool on the site is file/paste-driven,
+  // so this stays a single boolean flag rather than its own page template.
+  const isCustomPanel = !!tool.customPanelMode;
 
   const howItems = tool.howSteps.map((s) => `<li>${escapeHtml(s)}</li>`).join('\n        ');
   // Native <details>/<summary> disclosure, not a JS accordion -- zero extra
@@ -88,7 +91,7 @@ function renderToolPage(tool, example = {}) {
     : (fileTypeLabel ? `Drop your ${fileTypeLabel} here` : 'Drop a file here');
   const chooseLabel = tool.multiple ? 'Choose files' : 'Choose file';
 
-  const pasteHtml = (!isGenerator && tool.pasteInput)
+  const pasteHtml = (!isCustomPanel && tool.pasteInput)
     ? `<div class="or-divider" role="separator" aria-label="or"><span>or</span></div>
       <div class="paste-input">
         <label for="paste-textarea">${escapeHtml(tool.pasteInput.label)}</label>
@@ -97,7 +100,7 @@ function renderToolPage(tool, example = {}) {
       </div>`
     : '';
 
-  const dropzoneHtml = isGenerator ? '' : `<div class="dropzone" data-state="idle">
+  const dropzoneHtml = isCustomPanel ? '' : `<div class="dropzone" data-state="idle">
         <div class="dz-icon-wrap mark--${escapeHtml(familyOf(tool.slug))}">
           ${markFor(tool.slug, 'dz-icon')}
           <svg class="dz-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.5 9.5 18 20 6"/></svg>
@@ -169,7 +172,7 @@ function renderToolPage(tool, example = {}) {
 
     <p class="caption">Files are processed locally in your browser and never uploaded. Read more on the <a href="${escapeHtml(url('privacy/'))}">privacy page</a>.</p>
 
-    ${isGenerator
+    ${isCustomPanel
       ? `<script type="module" src="${escapeHtml(url(`js/${tool.clientEntry}.client.js`))}"></script>`
       : `<script type="module" src="${escapeHtml(url('js/dropzone.client.js'))}"></script>`}
 `;

@@ -125,7 +125,13 @@ async function build() {
   const jsDir = path.join(OUT_DIR, 'js');
   fs.mkdirSync(jsDir, { recursive: true });
   const { CLIENT_FILES, MAX_BYTES_BY_CLIENT, PASTE_FILE } = assembleBrowserClients();
-  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js'];
+  // regexTester.worker.js: the regex tester's own Web Worker (see that
+  // file's header comment for why matching runs off the main thread) --
+  // not a per-tool `<slug>.client.js` CLIENT_FILES already copies (it's
+  // never referenced by a <script> tag, only by regexTester.client.js's
+  // own `new Worker(...)` call), so it needs the same fixed-list treatment
+  // dropzone.client.js/newsletter.client.js get.
+  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js'];
   for (const file of [...ALWAYS_COPY_CLIENT_FILES, ...CLIENT_FILES]) {
     fs.copyFileSync(path.join(ROOT, 'src', 'browser', file), path.join(jsDir, file));
   }
@@ -146,7 +152,13 @@ async function build() {
   const pureDir = path.join(OUT_DIR, 'pure');
   fs.mkdirSync(pureDir, { recursive: true });
   const pureModules = new Set();
-  for (const file of CLIENT_FILES) {
+  // Also scans ALWAYS_COPY_CLIENT_FILES (not just CLIENT_FILES): regexTester.worker.js
+  // is the one file in that list that itself imports a pure module
+  // (regexTester.client.js hands its actual matching work off to the
+  // worker rather than importing the pure module directly -- see that
+  // worker's header comment), so its own pure-module dependency has to be
+  // discovered the same way any client file's is.
+  for (const file of [...CLIENT_FILES, ...ALWAYS_COPY_CLIENT_FILES]) {
     const src = fs.readFileSync(path.join(ROOT, 'src', 'browser', file), 'utf8');
     for (const m of src.matchAll(/\.\.\/pure\/([\w.-]+\.mjs)/g)) pureModules.add(m[1]);
   }

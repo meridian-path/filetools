@@ -16,15 +16,15 @@ module.exports = {
   // `family` field for what these mean and how they're assembled.
   family: 'text',
   mark: { verb: 'convert' },
-  // generatorMode (src/pages/toolPage.js): this tool has no file/text
-  // INPUT at all -- it produces UUIDs from options alone -- so the fields
-  // below that every other (input-driven) tool relies on are either unused
+  // customPanelMode (src/pages/toolPage.js): this tool has no FILE input
+  // at all -- it produces UUIDs from options alone -- so the fields below
+  // that every other (file/paste-driven) tool relies on are either unused
   // placeholders or simply not applicable. maxBytes/accepts/multiple stay
   // present only because src/browserClients.js requires a numeric maxBytes
-  // for any tool that declares a clientEntry; toolPage.js's isGenerator
+  // for any tool that declares a clientEntry; toolPage.js's isCustomPanel
   // branch never renders the dropzone/file-input markup that would
   // otherwise read accepts/multiple/fileTypeLabel/pasteInput.
-  generatorMode: true,
+  customPanelMode: true,
   maxBytes: 1024,
   mode: 'uuid-generator',
   fileTypeLabel: '',

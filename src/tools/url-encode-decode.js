@@ -58,5 +58,5 @@ module.exports = {
       answerHtml: 'Yes. Text is encoded as UTF-8 bytes first, then each byte is percent-encoded, so <code>café</code> becomes <code>caf%C3%A9</code> and decodes back to exactly the same text, multi-byte characters included.',
     },
   ],
-  relatedSlugs: ['remove-duplicate-lines', 'sort-lines'],
+  relatedSlugs: ['remove-duplicate-lines', 'sort-lines', 'regex-tester'],
 };

@@ -2,9 +2,9 @@
 // file, this is NOT dynamically imported by ./dropzone.client.js's
 // PROCESSORS map -- there is no file or pasted text to convert, only
 // options to pick, so src/pages/toolPage.js loads this file directly as
-// the page's <script type="module"> for a tool with `generatorMode: true`
+// the page's <script type="module"> for a tool with `customPanelMode: true`
 // (see that flag's comment in src/tools/uuid-generator.js and the
-// isGenerator branch in src/pages/toolPage.js). It builds its own control
+// isCustomPanel branch in src/pages/toolPage.js). It builds its own control
 // row and result panel entirely client-side and generates a first batch
 // immediately on load, reusing the same .table-block/.table-block-head/
 // .json-preview/.download-btn-row classes every other tool's result panel

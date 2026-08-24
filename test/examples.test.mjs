@@ -28,6 +28,7 @@ import { convertFixture as textCaseFixture } from '../src/examples/text-case-con
 import { hashFixture } from '../src/examples/hash-generator.mjs';
 import { convertFixture as csvToSqlFixture } from '../src/examples/csv-to-sql-insert.mjs';
 import { generateFixture as uuidV5Fixture, FIXTURE_NAME as UUID_FIXTURE_NAME } from '../src/examples/uuid-generator.mjs';
+import { matchFixture as regexMatchFixture, FIXTURE_TEST_STRING as REGEX_FIXTURE_TEST_STRING } from '../src/examples/regex-tester.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -383,6 +384,23 @@ test('uuid-generator example: the rendered HTML shows the namespace/name input a
   const html = exampleFor('uuid-generator');
   assert.ok(html.includes(UUID_FIXTURE_NAME), 'expected the raw fixture name in the Input block');
   assert.ok(html.includes('cfbff0d1-9375-5685-968c-48ce8b15ae17'));
+});
+
+test('regex-tester example: the fixture finds exactly 2 matches, each with 2 capture groups (name and domain)', () => {
+  const matches = regexMatchFixture();
+  assert.equal(matches.length, 2);
+  assert.equal(matches[0].match, 'hello@example.com');
+  assert.deepEqual(matches[0].groups.map((g) => g.value), ['hello', 'example.com']);
+  assert.equal(matches[1].match, 'support@example.org');
+  assert.deepEqual(matches[1].groups.map((g) => g.value), ['support', 'example.org']);
+});
+
+test('regex-tester example: the rendered HTML shows the raw test string and both real matches with their groups', () => {
+  const html = exampleFor('regex-tester');
+  assert.ok(html.includes(REGEX_FIXTURE_TEST_STRING), 'expected the raw fixture test string in the Input block');
+  assert.ok(html.includes('Match 1: &quot;hello@example.com&quot;'));
+  assert.ok(html.includes('Group 1: &quot;hello&quot;'));
+  assert.ok(html.includes('Group 2: &quot;example.com&quot;'));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
