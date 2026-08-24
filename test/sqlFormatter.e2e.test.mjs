@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the SQL formatter tool: drive the built dist/
@@ -72,9 +73,7 @@ after(async () => {
 
 test('sql-formatter: pasting SQL shows both the beautified and minified panels, updated live', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/sql-formatter/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', 'select id, name from users where active = true');

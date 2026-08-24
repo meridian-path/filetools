@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the XML-to-JSON tool: drive the built dist/ output
@@ -78,9 +79,7 @@ after(async () => {
 // test/yamlToJson.e2e.test.mjs already applies for its own tool.
 test('xml-to-json: uploading an .xml file converts it and downloads matching JSON', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/xml-to-json/`, { waitUntil: 'networkidle' });
   await page.locator('#file-input').setInputFiles(path.join(TMP, 'doc.xml'));
@@ -104,9 +103,7 @@ test('xml-to-json: uploading an .xml file converts it and downloads matching JSO
 
 test('xml-to-json: pasting XML and clicking convert produces the same result', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/xml-to-json/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '<items><item>A</item><item>B</item></items>');

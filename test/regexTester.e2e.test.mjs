@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the regex tester: drive the built dist/ output in a
@@ -67,9 +68,7 @@ after(async () => {
 
 test('regex-tester: the page renders live matches for the default pattern/text immediately on load, no interaction needed', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/regex-tester/`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.result mark.regex-match');
@@ -167,8 +166,7 @@ test('regex-tester: no matches shows "No matches." rather than an empty, silent 
 
 test('regex-tester: catastrophic backtracking is caught and recovered from -- the page stays responsive and shows a friendly error, instead of hanging', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/regex-tester/`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.result mark.regex-match');

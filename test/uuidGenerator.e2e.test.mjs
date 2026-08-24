@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the UUID generator tool: drive the built dist/
@@ -72,9 +73,7 @@ function uuidLines(text) {
 
 test('uuid-generator: the page renders a batch of 5 v4 UUIDs immediately on load, no interaction needed', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/uuid-generator/`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.result .table-block .json-preview');
