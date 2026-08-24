@@ -110,7 +110,7 @@ test('every emitted mark SVG string contains no hex-color literal and no rgb()/r
 
 test('every var(--family-*) referenced anywhere in the stylesheet exists as a design token', () => {
   const refs = [...SITE_CSS.matchAll(/var\((--family-[a-z0-9-]+)\)/g)].map((m) => m[1]);
-  assert.ok(refs.length >= 15, `expected at least the 15 emitted family tokens to be referenced, found ${refs.length}`);
+  assert.ok(refs.length >= 18, `expected at least the 18 emitted family tokens to be referenced (6 families x 3), found ${refs.length}`);
   for (const ref of refs) {
     assert.ok(ref in DESIGN_TOKENS, `${ref} is referenced in css.js but missing from DESIGN_TOKENS`);
   }
@@ -126,7 +126,7 @@ test('every mark--<family> / mark-ink--<family> class in the stylesheet only eve
     assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b/, `hex literal inside ${m[0]}`);
     assert.match(body, /var\(--family-/, `${m[0]} does not set its custom property from a var(--family-*) token`);
   }
-  assert.equal(blocks, 10, `expected 5 .mark--<family> + 5 .mark-ink--<family> blocks, found ${blocks}`);
+  assert.equal(blocks, 12, `expected 6 .mark--<family> + 6 .mark-ink--<family> blocks (5 tool families + the folder-only "dev" family), found ${blocks}`);
 });
 
 test('every mark parses as well-formed XML and carries aria-hidden="true" focusable="false"', () => {

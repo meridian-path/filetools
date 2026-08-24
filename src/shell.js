@@ -13,7 +13,9 @@ const { SITE_CSS, FONT_WOFF2_URL } = require('./css.js');
 const { FAVICON_DATA_URI } = require('./icon.js');
 const { adSlot, adsScriptTag } = require('./ads.js');
 const adConfig = require('./adConfig.js');
-const { TOOLS, CATEGORY_LABELS, toolBySlug } = require('./tools/index.js');
+const { TOOLS, toolBySlug } = require('./tools/index.js');
+const { FOLDERS, toolsInFolder, HOMEPAGE_FOLDER_ROW_CAP_THRESHOLD, HOMEPAGE_FOLDER_ROW_CAP } = require('./folders.js');
+const { folderGlyph } = require('./icons.js');
 
 const GOATCOUNTER_URL = 'https://dg-filetools.goatcounter.com/count';
 const KOFI_URL = 'https://ko-fi.com/flavaa';
@@ -90,43 +92,100 @@ function documentHead(opts) {
 }
 
 /**
- * @param {string|null} activeSlug the current tool's slug, or null on a
- *   non-tool page.
+ * One folder's own disclosure inside the nav tree: a summary row (glyph +
+ * label + count, linking to that folder's index page) above its tool
+ * links. Below 1024px this is a real, independently-toggling disclosure
+ * (grouped via the native `name` attribute so opening one closes any
+ * other open sibling on narrow/touch viewports -- a progressive
+ * enhancement that degrades to independently-toggleable in a browser
+ * that doesn't support grouped <details> yet, never broken). At and
+ * above 1024px, src/css.js forces every folder-group open regardless of
+ * its [open] attribute, laying all five out as columns in one panel --
+ * see that file's own comment on the breakpoint.
+ *
+ * @param {object} folder one FOLDERS entry.
+ * @param {string|null} activeSlug the current page's slug (a tool slug or
+ *   a folder slug -- the two namespaces never collide, see
+ *   test/folders.test.mjs).
+ */
+function renderFolderNavGroup(folder, activeSlug) {
+  const tools = toolsInFolder(folder.key);
+  const folderHref = url(`${folder.slug}/`);
+  const isActiveFolder = activeSlug === folder.slug;
+  const toolLinks = tools.map((t) =>
+    `<li><a href="${escapeHtml(url(`${t.category}/${t.slug}/`))}"${activeSlug === t.slug ? ' aria-current="page"' : ''}>${escapeHtml(t.navLabel)}</a></li>`
+  ).join('\n            ');
+
+  return `<details class="folder-group" name="site-nav-folder-group">
+          <summary class="folder-group-summary">
+            ${folderGlyph(folder.familyKey, 'folder-glyph-nav')}
+            <a class="folder-group-link" href="${escapeHtml(folderHref)}"${isActiveFolder ? ' aria-current="page"' : ''}>${escapeHtml(folder.label)}</a>
+            <span class="folder-group-count">${tools.length}</span>
+          </summary>
+          <ul class="folder-tool-list">
+            ${toolLinks}
+          </ul>
+        </details>`;
+}
+
+/**
+ * @param {string|null} activeSlug the current page's slug -- a tool slug,
+ *   a folder slug, 'how-this-works', or null on a page with none of
+ *   those (home, privacy).
  */
 function renderHeader(activeSlug) {
-  const links = TOOLS.map((t) =>
-    `<a href="${escapeHtml(url(`${t.category}/${t.slug}/`))}"${activeSlug === t.slug ? ' aria-current="page"' : ''}>${escapeHtml(t.navLabel)}</a>`
-  ).join('\n        ');
+  const folderGroups = FOLDERS.map((f) => renderFolderNavGroup(f, activeSlug)).join('\n        ');
 
   // Native <details>/<summary> disclosure, same zero-JS pattern as the FAQ
-  // accordion in toolPage.js. Below the .site-nav-disclosure breakpoint
-  // (src/css.js) this stays closed by default so the header takes one line
-  // above the fold at 360x800; at and above that breakpoint CSS forces the
-  // nav open regardless of the [open] attribute, so desktop keeps today's
-  // flat layout unchanged.
+  // accordion in toolPage.js. Closed by default at every viewport width
+  // (site-wide navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.3):
+  // unlike the old flat 29-link dump, the folder tree is real content
+  // worth a deliberate "open" action even on desktop, not just a mobile
+  // space-saving measure -- src/css.js's >=1024px rule now only changes
+  // how the OPEN panel lays out (five columns instead of one stacked
+  // list), never whether it starts open. No menu/tree/menubar role
+  // anywhere here: the W3C APG's own disclosure-navigation pattern
+  // states site nav should use a plain nav landmark, not a widget role
+  // that implies a different keyboard contract than these plain links
+  // already have.
   return `<header class="site-header">
     <a class="brand" href="${escapeHtml(url())}">file<span class="brand-tail">tools</span></a>
     <details class="site-nav-disclosure">
-      <summary class="site-nav-summary">Tools</summary>
-      <nav class="site-nav" aria-label="Tools">
-        ${links}
-        <a href="${escapeHtml(url('how-this-works/'))}"${activeSlug === 'how-this-works' ? ' aria-current="page"' : ''}>How this works</a>
+      <summary class="site-nav-summary">Browse ~/</summary>
+      <nav class="site-nav-tree" aria-label="Folders">
+        ${folderGroups}
+        <a class="site-nav-tree-extra" href="${escapeHtml(url('how-this-works/'))}"${activeSlug === 'how-this-works' ? ' aria-current="page"' : ''}>How this works</a>
       </nav>
     </details>
   </header>`;
 }
 
 /**
- * @param {Array<{name:string, href?:string}>} crumbs first entry is Home;
- *   the last entry (current page) should omit href.
+ * The path bar's first segment on every page below home (site-wide
+ * navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.4): visible text
+ * is the mono "~" home-directory shorthand, with a real "Home" label for
+ * assistive tech via renderBreadcrumb()'s ariaLabel support below. The
+ * home page itself renders no breadcrumb at all (it doesn't pass one to
+ * renderPage) -- "the window chrome owns '~'" there, per the spec.
+ */
+const HOME_CRUMB = { name: '~', href: url(), ariaLabel: 'Home' };
+
+/**
+ * @param {Array<{name:string, href?:string, ariaLabel?:string}>} crumbs
+ *   first entry is home (see HOME_CRUMB); the last entry (current page)
+ *   should omit href. `ariaLabel`, when present, overrides the linked
+ *   segment's accessible name without changing its visible text -- used
+ *   for HOME_CRUMB's "~" glyph, which needs a real word for a screen
+ *   reader even though its printed form is a path shorthand.
  */
 function renderBreadcrumb(crumbs) {
   const items = crumbs
     .map((c, i) => {
       const isLast = i === crumbs.length - 1;
+      const ariaLabelAttr = c.ariaLabel ? ` aria-label="${escapeHtml(c.ariaLabel)}"` : '';
       const inner = c.href && !isLast
-        ? `<a href="${escapeHtml(c.href)}">${escapeHtml(c.name)}</a>`
-        : `<span aria-current="page">${escapeHtml(c.name)}</span>`;
+        ? `<a href="${escapeHtml(c.href)}"${ariaLabelAttr}>${escapeHtml(c.name)}</a>`
+        : `<span aria-current="page"${ariaLabelAttr}>${escapeHtml(c.name)}</span>`;
       const sep = i > 0 ? '<span class="sep" aria-hidden="true">/</span>' : '';
       return `${sep}${inner}`;
     })
@@ -180,15 +239,29 @@ function renderNewsletterSignup() {
 }
 
 function renderFooter() {
-  const groups = Object.entries(CATEGORY_LABELS)
-    .map(([catKey, catLabel]) => {
-      const items = TOOLS.filter((t) => t.category === catKey)
+  const groups = FOLDERS
+    .map((folder) => {
+      const allTools = toolsInFolder(folder.key);
+      // Scale valve (spec 1.10/1.12): only above HOMEPAGE_FOLDER_ROW_CAP_THRESHOLD
+      // tools total does a footer group cap itself, at HOMEPAGE_FOLDER_ROW_CAP
+      // most-recent-by-launchDate rows plus a link to the folder's own full
+      // page -- reusing the same threshold/cap the homepage's own folder
+      // sections use (src/folders.js), since the spec gives both the
+      // identical numbers. At today's tool count this never trims anything;
+      // every row still renders.
+      const capped = TOOLS.length > HOMEPAGE_FOLDER_ROW_CAP_THRESHOLD
+        ? [...allTools].sort((a, b) => (a.launchDate < b.launchDate ? 1 : -1)).slice(0, HOMEPAGE_FOLDER_ROW_CAP)
+        : allTools;
+      const items = capped
         .map((t) => `<li><a href="${escapeHtml(url(`${t.category}/${t.slug}/`))}">${escapeHtml(t.navLabel)}</a></li>`)
         .join('\n        ');
+      const seeAllItem = capped.length < allTools.length
+        ? `\n        <li><a href="${escapeHtml(url(`${folder.slug}/`))}">All ${escapeHtml(folder.label)} -&gt;</a></li>`
+        : '';
       return `<div class="footer-group">
-        <h3>${escapeHtml(catLabel)}</h3>
+        <h3><a href="${escapeHtml(url(`${folder.slug}/`))}">${escapeHtml(folder.label)}</a></h3>
         <ul>
-        ${items}
+        ${items}${seeAllItem}
         </ul>
       </div>`;
     })
@@ -280,6 +353,7 @@ module.exports = {
   SITE_CSS,
   KOFI_URL,
   BMC_URL,
+  HOME_CRUMB,
   escapeHtml,
   documentHead,
   renderHeader,

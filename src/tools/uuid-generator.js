@@ -15,6 +15,7 @@ module.exports = {
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
   family: 'text',
+  folder: 'developer',
   mark: { verb: 'convert' },
   // customPanelMode (src/pages/toolPage.js): this tool has no FILE input
   // at all -- it produces UUIDs from options alone -- so the fields below

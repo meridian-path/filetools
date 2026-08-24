@@ -72,6 +72,32 @@ function faqPageJsonLd(faqs) {
   });
 }
 
+/**
+ * @param {{name:string, description:string, url:string, items: Array<{name:string, url:string}>}} opts
+ * @returns {string} a CollectionPage carrying an ItemList of the folder's
+ *   tools -- one per folder page (site-wide navigation/IA redesign, task-
+ *   mt6jcfwr-ed62cc section 3.4), alongside that page's own
+ *   breadcrumbJsonLd() call.
+ */
+function collectionPageJsonLd({ name, description, url, items }) {
+  return jsonLdScript({
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: items.map((item, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: item.name,
+        url: item.url,
+      })),
+    },
+  });
+}
+
 function websiteJsonLd() {
   return jsonLdScript({
     '@context': 'https://schema.org',
@@ -87,5 +113,6 @@ module.exports = {
   breadcrumbJsonLd,
   softwareApplicationJsonLd,
   faqPageJsonLd,
+  collectionPageJsonLd,
   websiteJsonLd,
 };

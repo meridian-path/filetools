@@ -8,17 +8,28 @@
  */
 
 const { absoluteUrl, BUILD_DATE } = require('./site.js');
+const { FOLDERS } = require('./folders.js');
 
 /**
  * @param {Array<{category:string, slug:string}>} tools the TOOLS registry.
  * @returns {string[]} every root-relative directory path the build writes
  *   an index.html for (excluding 404.html, a static-hosting error page,
- *   never a real destination). The one shared source for both
- *   sitemap.xml (src/build.js) and the post-deploy IndexNow ping
- *   (scripts/indexnow-ping.js), so the two can never list different URLs.
+ *   never a real destination, and excluding the noindex /data/ helper
+ *   page -- see src/build.js's comment on that page). Folder index paths
+ *   are derived from FOLDERS (src/folders.js), never hand-listed, so a
+ *   future folder addition is automatically picked up here too. The one
+ *   shared source for both sitemap.xml (src/build.js) and the post-deploy
+ *   IndexNow ping (scripts/indexnow-ping.js), so the two can never list
+ *   different URLs.
  */
 function sitemapPathsFor(tools) {
-  return ['', 'how-this-works/', 'privacy/', ...tools.map((t) => `${t.category}/${t.slug}/`)];
+  return [
+    '',
+    'how-this-works/',
+    'privacy/',
+    ...FOLDERS.map((f) => `${f.slug}/`),
+    ...tools.map((t) => `${t.category}/${t.slug}/`),
+  ];
 }
 
 /**

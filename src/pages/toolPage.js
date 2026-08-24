@@ -1,11 +1,12 @@
 'use strict';
 
-const { renderPage, adSlot, escapeHtml } = require('../shell.js');
+const { renderPage, adSlot, escapeHtml, HOME_CRUMB } = require('../shell.js');
 const { breadcrumbJsonLd, softwareApplicationJsonLd, faqPageJsonLd } = require('../structuredData.js');
 const { toolBySlug } = require('../tools/index.js');
 const { url, absoluteUrl } = require('../site.js');
 const { markFor } = require('../icons.js');
 const { familyOf } = require('../families.js');
+const { folderOf, FOLDER_BY_KEY } = require('../folders.js');
 const { assembleBrowserClients } = require('../browserClients.js');
 
 // Assembled (2026-08-22 fragment-pattern refactor) from each tool's own
@@ -177,26 +178,34 @@ function renderToolPage(tool, example = {}) {
       : `<script type="module" src="${escapeHtml(url('js/dropzone.client.js'))}"></script>`}
 `;
 
+  // Three-level path (site-wide navigation/IA redesign, task-mt6jcfwr-
+  // ed62cc section 1.4/3.4): Home -> folder -> tool. The folder segment
+  // links to that folder's own index page even for a /data/-hosted tool
+  // (the display folder never mirrors the physical URL category) -- this
+  // display path deliberately diverges from the physical URL, which
+  // Google's breadcrumb documentation explicitly prefers over mirroring
+  // URL structure (cited in full in src/pages/folder.js).
+  const folder = FOLDER_BY_KEY[folderOf(tool.slug)];
+  const folderUrl = url(`${folder.slug}/`);
+
   const jsonLd = [
     softwareApplicationJsonLd({ name: tool.h1, description: tool.metaDescription, url: canonical }),
     breadcrumbJsonLd([
       { name: 'Home', url: absoluteUrl() },
+      { name: folder.label, url: absoluteUrl(`${folder.slug}/`) },
       { name: tool.h1, url: canonical },
     ]),
     faqPageJsonLd(tool.faqs.map((f) => ({ q: f.q, answerHtml: f.answerHtml }))),
   ];
 
-  // Note: only two breadcrumb levels (Home / <Tool>) -- there's no
-  // dedicated category hub page (e.g. /pdf/) in this build for a "PDF
-  // tools" crumb to link to, and linking structured data at a page that
-  // doesn't exist would be worse than omitting the level.
   return renderPage({
     slug: tool.slug,
     title: tool.title,
     metaDescription: tool.metaDescription,
     breadcrumb: [
-      { name: 'Home', href: url() },
-      { name: tool.h1 },
+      HOME_CRUMB,
+      { name: folder.slug, href: folderUrl },
+      { name: tool.slug },
     ],
     mainHtml,
     jsonLd,

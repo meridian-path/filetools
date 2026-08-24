@@ -97,4 +97,4 @@ function renderHomePage() {
   });
 }
 
-module.exports = { renderHomePage };
+module.exports = { renderHomePage, renderToolRow };
