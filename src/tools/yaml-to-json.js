@@ -15,6 +15,7 @@ module.exports = {
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
   family: 'json',
+  folder: 'data-formats',
   mark: { verb: 'convert', ink: 'json' },
   maxBytes: 20 * 1024 * 1024,
   pasteFile: { name: 'pasted-input.yaml', type: 'application/yaml' },

@@ -15,6 +15,7 @@ module.exports = {
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
   family: 'pdf',
+  folder: 'pdf',
   mark: { verb: 'convert', ink: 'csv', motif: 'bank' },
   maxBytes: 100 * 1024 * 1024,
   mode: 'statement',

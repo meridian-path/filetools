@@ -18,8 +18,10 @@ const { renderHomePage } = require('./pages/home.js');
 const { renderHowThisWorksPage } = require('./pages/howThisWorks.js');
 const { renderPrivacyPage } = require('./pages/privacy.js');
 const { renderToolPage } = require('./pages/toolPage.js');
+const { renderFolderPage, renderDataIndexPage } = require('./pages/folder.js');
 const { render404Page } = require('./shell.js');
 const { TOOLS } = require('./tools/index.js');
+const { FOLDERS } = require('./folders.js');
 const { sitemapPathsFor, renderSitemapXml, robotsTxtContent } = require('./sitemap.js');
 const { renderRssXml } = require('./rss.js');
 const { INDEXNOW_KEY } = require('./indexnow.js');
@@ -112,6 +114,13 @@ async function build() {
       exampleNote: noteFor(tool.slug),
     }));
   });
+  // Folder index pages + the noindex /data/ helper page (site-wide
+  // navigation/IA redesign, task-mt6jcfwr-ed62cc) -- derived from FOLDERS
+  // (src/folders.js), never hand-listed.
+  FOLDERS.forEach((folder) => {
+    writeHtml(folder.slug, renderFolderPage(folder));
+  });
+  writeHtml('data', renderDataIndexPage());
   fs.writeFileSync(path.join(OUT_DIR, '404.html'), render404Page(), 'utf8');
 
   // 2. Browser client modules -> dist/js/ (2026-08-22 fragment-pattern
@@ -202,7 +211,7 @@ async function build() {
   // 7. feed.xml -- RSS of tool launches (see src/rss.js's header comment).
   fs.writeFileSync(path.join(OUT_DIR, 'feed.xml'), renderRssXml(TOOLS), 'utf8');
 
-  console.log(`Built ${TOOLS.length + 3} pages plus 404.html into dist/.`);
+  console.log(`Built ${TOOLS.length + FOLDERS.length + 4} pages plus 404.html into dist/.`);
 }
 
 if (require.main === module) {

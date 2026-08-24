@@ -154,13 +154,19 @@ ${designTokensCss(DESIGN_TOKENS)}
   .brand:hover { color: var(--color-text); }
   .brand .brand-tail { color: var(--color-accent); }
 
-  /* Below 768px the 22-tool nav collapses behind a native <details>
-     toggle -- Cobalt (REFERENCE_LIBRARY.md entry 2) demotes secondary nav
-     to small text rather than pushing primary content down; the same
-     shape applies here so the header takes one line above the fold at
-     360x800 instead of the whole viewport. At 768px+ the override below
-     forces the nav open regardless of the [open] attribute, matching the
-     unchanged flat desktop layout. */
+  /* The folder tree (site-wide navigation/IA redesign, task-mt6jcfwr-
+     ed62cc section 1.3): the OUTER disclosure ("Browse ~/") stays closed
+     by default at EVERY viewport width now -- unlike the old flat
+     29-link dump, the folder tree is real content worth a deliberate
+     open action even on desktop, not just a mobile space-saving measure
+     (Cobalt, REFERENCE_LIBRARY.md entry 2, demotes secondary nav to
+     small text rather than pushing primary content down; that same
+     "closed until asked for" shape now applies at every width). What
+     changes at the INNER folder-group level (>=1024px, below) is layout
+     only: five columns instead of one stacked list. No menu/tree/menubar
+     role anywhere in this markup (src/shell.js's own comment cites the
+     W3C APG disclosure-navigation rationale) -- these are plain
+     details/summary and plain links throughout. */
   .site-nav-disclosure { width: 100%; }
   .site-nav-summary {
     cursor: pointer;
@@ -173,6 +179,7 @@ ${designTokensCss(DESIGN_TOKENS)}
     margin-left: calc(-1 * var(--space-3));
     color: var(--color-text);
     font-weight: var(--weight-medium);
+    font-family: var(--font-mono);
     font-size: var(--text-sm);
     border-radius: var(--radius-sm);
   }
@@ -187,36 +194,111 @@ ${designTokensCss(DESIGN_TOKENS)}
     transform: rotate(45deg);
     transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
   }
-  .site-nav-disclosure[open] .site-nav-summary::after { transform: rotate(-135deg); }
+  .site-nav-disclosure[open] > .site-nav-summary::after { transform: rotate(-135deg); }
 
-  .site-nav {
+  .site-nav-tree {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--space-1);
-    padding-top: var(--space-1);
+    padding: var(--space-2) 0 var(--space-3);
   }
-  .site-nav a {
-    display: inline-flex;
+  .folder-group {
+    border-radius: var(--radius-sm);
+  }
+  .folder-group-summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
     align-items: center;
+    gap: var(--space-2);
     min-height: 44px;
     padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+  }
+  .folder-group-summary:hover { background: var(--color-accent-tint); }
+  .folder-group-summary::-webkit-details-marker { display: none; }
+  .folder-group-summary::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border-right: var(--border-control) solid var(--color-muted);
+    border-bottom: var(--border-control) solid var(--color-muted);
+    transform: rotate(45deg);
+    transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .folder-group[open] > .folder-group-summary::after { transform: rotate(-135deg); }
+  .folder-glyph { width: var(--icon-sm); height: var(--icon-sm); flex-shrink: 0; }
+  .folder-group-link {
     color: var(--color-text);
     text-decoration: none;
     font-weight: var(--weight-medium);
     font-size: var(--text-sm);
+  }
+  .folder-group-link:hover { color: var(--color-accent); }
+  .folder-group-link[aria-current="page"] { color: var(--color-accent); }
+  .folder-group-count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .folder-tool-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--space-2) var(--tree-indent);
+  }
+  .folder-tool-list a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--space-1) var(--space-3);
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--text-sm);
     border-radius: var(--radius-sm);
   }
-  .site-nav a:hover { color: var(--color-accent); background: var(--color-accent-tint); }
-  .site-nav a[aria-current="page"] { color: var(--color-accent); }
+  .folder-tool-list a:hover { color: var(--color-accent); background: var(--color-accent-tint); }
+  .folder-tool-list a[aria-current="page"] { color: var(--color-accent); }
+  .site-nav-tree-extra {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    border-top: var(--border-hairline) solid var(--color-border);
+    margin-top: var(--space-1);
+  }
+  .site-nav-tree-extra:hover { color: var(--color-accent); }
+  .site-nav-tree-extra[aria-current="page"] { color: var(--color-accent); }
 
-  @media (min-width: 768px) {
-    .site-nav-disclosure { display: contents; }
-    .site-nav-summary { display: none; }
-    .site-nav-disclosure .site-nav { display: flex !important; padding-top: 0; }
+  /* >=1024px: the open panel lays all five folders out as columns, all
+     visible at once, instead of one collapsed-by-default stacked list --
+     each folder-group is forced open regardless of its own [open]
+     attribute (same "author CSS overrides the native collapsed-content
+     default" mechanism the old 768px override used for the outer
+     disclosure), and its own toggle affordance is removed since it isn't
+     interactive at this width -- only the folder name link and the tool
+     links underneath it are. */
+  @media (min-width: 1024px) {
+    .site-nav-tree {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0 var(--space-4);
+      padding-top: var(--space-3);
+    }
+    .folder-group > .folder-tool-list { display: block !important; }
+    .folder-group-summary { cursor: default; padding-left: var(--space-1); }
+    .folder-group-summary:hover { background: none; }
+    .folder-group-summary::after { display: none; }
+    .folder-tool-list { padding-left: var(--space-1); }
+    .site-nav-tree-extra { grid-column: 1 / -1; }
   }
 
   /* -------------------------------------------------------------------
-     Page shell / breadcrumb
+     Page shell / breadcrumb (restyled as a mono file path -- site-wide
+     navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.4)
      ------------------------------------------------------------------- */
   .page-shell {
     max-width: var(--width-page);
@@ -226,13 +308,33 @@ ${designTokensCss(DESIGN_TOKENS)}
   .page-shell.page-shell-app { max-width: var(--width-app); }
 
   .breadcrumb {
-    font-size: var(--text-xs);
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
     color: var(--color-muted);
     margin-bottom: var(--space-4);
+    overflow: hidden;
   }
-  .breadcrumb a { color: var(--color-muted); }
+  .breadcrumb a {
+    color: var(--color-muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: var(--space-1) 0;
+  }
   .breadcrumb a:hover { color: var(--color-accent); }
-  .breadcrumb .sep { margin: 0 var(--space-1); }
+  .breadcrumb .sep { margin: 0 var(--space-1); flex-shrink: 0; }
+  /* The current (last, unlinked) segment truncates rather than wraps --
+     NN/g's breadcrumb guidance warns against wrapping on mobile. */
+  .breadcrumb span[aria-current="page"] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
 
   /* -------------------------------------------------------------------
      Buttons
@@ -301,11 +403,13 @@ ${designTokensCss(DESIGN_TOKENS)}
   .mark--json  { --mark-plate: var(--family-json-6);  --mark-wash: var(--family-json-1); }
   .mark--sheet { --mark-plate: var(--family-sheet-6); --mark-wash: var(--family-sheet-1); }
   .mark--text  { --mark-plate: var(--family-text-6);  --mark-wash: var(--family-text-1); }
+  .mark--dev   { --mark-plate: var(--family-dev-6);   --mark-wash: var(--family-dev-1); }
   .mark-ink--pdf   { --mark-ink: var(--family-pdf-8); }
   .mark-ink--csv   { --mark-ink: var(--family-csv-8); }
   .mark-ink--json  { --mark-ink: var(--family-json-8); }
   .mark-ink--sheet { --mark-ink: var(--family-sheet-8); }
   .mark-ink--text  { --mark-ink: var(--family-text-8); }
+  .mark-ink--dev   { --mark-ink: var(--family-dev-8); }
 
   /* -------------------------------------------------------------------
      Drop zone (src/browser/dropzone.client.js)

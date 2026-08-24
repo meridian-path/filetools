@@ -1,6 +1,6 @@
 'use strict';
 
-const { renderPage } = require('../shell.js');
+const { renderPage, HOME_CRUMB } = require('../shell.js');
 const { url, absoluteUrl } = require('../site.js');
 
 function renderPrivacyPage() {
@@ -28,8 +28,8 @@ function renderPrivacyPage() {
     title: 'Privacy - filetools',
     metaDescription: 'What data filetools collects, what it doesn’t, and exactly what happens to the files you process.',
     breadcrumb: [
-      { name: 'Home', href: url() },
-      { name: 'Privacy' },
+      HOME_CRUMB,
+      { name: 'privacy' },
     ],
     mainHtml,
     canonical: absoluteUrl('privacy/'),

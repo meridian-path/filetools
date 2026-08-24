@@ -192,6 +192,33 @@ const DESIGN_TOKENS = {
   '--family-text-6':  'oklch(47% 0.030 250)',
   '--family-text-8':  'oklch(30% 0.022 250)',
 
+  // Sixth family (added for the 2026-08-24 navigation/IA redesign, task-
+  // mt6jcfwr-ed62cc's 'developer' folder -- base64/URL/HTML-entity
+  // encode-decode, hash generator, UUID generator, regex tester, SQL
+  // formatter): same ladder, hue 90 (ochre) -- distinct from pdf 27, csv
+  // 250, json 320, sheet 150, text 250-neutral. Measured with the same
+  // real OKLab/OKLCH -> linear-sRGB -> WCAG relative-luminance conversion
+  // as the CONTRAST comment above (cross-checked against that comment's
+  // own five figures to confirm the conversion code reproduces them
+  // before trusting it here): plate(6) vs white surface 6.85:1 (need
+  // >=3:1, existing range 6.48-7.39:1), ink(8) vs wash(1) 12.51:1 (need
+  // >=4.5:1, existing range 12.20-12.95:1). Both clear with the same
+  // margin as every other family; no L adjustment needed.
+  '--family-dev-1': 'oklch(97% 0.016 90)',
+  '--family-dev-6': 'oklch(47% 0.100 90)',
+  '--family-dev-8': 'oklch(30% 0.070 90)',
+
+  // Navigation/IA redesign tokens (task-mt6jcfwr-ed62cc section 1.11).
+  // --font-mono is a third, system-stack-only typeface (zero network
+  // cost) used exclusively for the path bar, folder/tool Kind chips, and
+  // item counts -- never headings, body text, or controls. Flagged
+  // explicitly for reviewer sign-off against design-standards.md's
+  // 2-typeface cap; see the PR description for the disclosed fallback if
+  // rejected.
+  '--font-mono': 'ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+  '--sidebar-width': '15rem',
+  '--tree-indent': '1.25rem',
+
   '--icon-sm': '24px',
   '--icon-md': '32px',
   '--icon-lg': '56px',

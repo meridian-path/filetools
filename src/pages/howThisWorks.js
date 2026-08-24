@@ -1,6 +1,6 @@
 'use strict';
 
-const { renderPage } = require('../shell.js');
+const { renderPage, HOME_CRUMB } = require('../shell.js');
 const { url, absoluteUrl } = require('../site.js');
 
 function renderHowThisWorksPage() {
@@ -28,8 +28,8 @@ function renderHowThisWorksPage() {
     title: 'How This Works - filetools',
     metaDescription: 'Exactly how filetools processes files entirely in your browser, what data actually leaves your device, and why it’s built this way.',
     breadcrumb: [
-      { name: 'Home', href: url() },
-      { name: 'How this works' },
+      HOME_CRUMB,
+      { name: 'how-this-works' },
     ],
     mainHtml,
     canonical: absoluteUrl('how-this-works/'),

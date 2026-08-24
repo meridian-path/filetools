@@ -28,6 +28,11 @@ module.exports = {
   // changes, so two tool branches can never conflict here.
   //   family: this tool's presentational family (families.js's
   //     familyOf() rule: input format's family, else output's).
+  //   folder: this tool's DISPLAY folder for nav/home/folder-pages/footer
+  //     (folders.js's folderOf()) -- independent of `category` (the URL
+  //     prefix, which never changes) and independent of `family` (the
+  //     icon color axis); see folders.js's own header comment for the
+  //     full taxonomy and why the two axes are kept separate.
   //   mark: { verb, ink?, motif? } -- icons.js's per-slug MARKS row,
   //     minus `plate` (always === family, see icons.js). `ink` defaults
   //     to `family` when omitted (a same-family tool like this one).
@@ -39,6 +44,7 @@ module.exports = {
   //     name/type of the synthetic File a pasted submission is wrapped
   //     in before it reaches this clientEntry's processor.
   family: 'pdf',
+  folder: 'pdf',
   mark: { verb: 'merge', ink: 'pdf' },
   maxBytes: 200 * 1024 * 1024,
   mode: 'merge',

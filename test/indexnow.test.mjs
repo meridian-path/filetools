@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { buildPayload, INDEXNOW_ENDPOINT } from '../scripts/indexnow-ping.js';
 import { INDEXNOW_KEY } from '../src/indexnow.js';
 import { TOOLS } from '../src/tools/index.js';
+import { FOLDERS } from '../src/folders.js';
 
 test('INDEXNOW_ENDPOINT is the real IndexNow API URL', () => {
   assert.equal(INDEXNOW_ENDPOINT, 'https://api.indexnow.org/indexnow');
@@ -17,8 +18,10 @@ test('buildPayload submits the real site host, the key, a matching keyLocation, 
   assert.equal(payload.host, 'usefiletools.com');
   assert.equal(payload.key, INDEXNOW_KEY);
   assert.equal(payload.keyLocation, `https://usefiletools.com/${INDEXNOW_KEY}.txt`);
-  // Root + how-this-works + privacy + one URL per tool.
-  assert.equal(payload.urlList.length, TOOLS.length + 3);
+  // Root + how-this-works + privacy + one URL per folder + one URL per tool.
+  assert.equal(payload.urlList.length, TOOLS.length + FOLDERS.length + 3);
   assert.ok(payload.urlList.includes('https://usefiletools.com/'));
   assert.ok(payload.urlList.every((u) => u.startsWith('https://usefiletools.com/')));
+  assert.ok(payload.urlList.includes('https://usefiletools.com/pdf/'), 'expected the new /pdf/ folder page in the IndexNow ping set');
+  assert.ok(!payload.urlList.includes('https://usefiletools.com/data/'), 'the noindex /data/ helper page must never be pinged');
 });

@@ -83,13 +83,18 @@ test('every internal href/src across the whole built site resolves to a real fil
   assert.deepEqual(broken, [], `broken internal links found:\n${broken.join('\n')}`);
 });
 
-test('every tool page links back to Home in its breadcrumb', () => {
-  const toolPages = HTML_FILES.filter((f) => f.includes(`${path.sep}data${path.sep}`) || f.includes(`${path.sep}pdf${path.sep}`));
+test('every tool page links back to Home ("~") in its breadcrumb', () => {
+  // A real tool page is nested two levels under dist/ (<category>/<slug>/
+  // index.html) -- deliberately excludes the folder index pages
+  // themselves (<category-or-folder>/index.html, one level deep), which
+  // also happen to contain "pdf"/"data" as path substrings but are not
+  // tool pages.
+  const toolPages = HTML_FILES.filter((f) => /[\\/](pdf|data)[\\/][^\\/]+[\\/]index\.html$/.test(f));
   assert.ok(toolPages.length >= 25, `expected at least 25 tool pages, found ${toolPages.length}`);
   const missing = [];
   for (const file of toolPages) {
     const html = fs.readFileSync(file, 'utf8');
-    if (!html.includes('class="breadcrumb"') || !/<a href="\/"[^>]*>Home<\/a>/.test(html)) {
+    if (!html.includes('class="breadcrumb"') || !/<a href="\/" aria-label="Home">~<\/a>/.test(html)) {
       missing.push(path.relative(DIST, file));
     }
   }

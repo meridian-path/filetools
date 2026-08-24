@@ -194,4 +194,28 @@ function markFor(slug, extraClass) {
   return `<svg viewBox="0 0 32 32" class="${classes.join(' ')}" aria-hidden="true" focusable="false">${plateRect()}${motif}${pipRing()}${verb}</svg>`;
 }
 
-module.exports = { markFor, MARKS, VERB_PATHS, PLATE_MOTIFS };
+/**
+ * A folder glyph -- unrelated to the tool-mark system above (no plate
+ * motif, no verb pip: a folder doesn't convert one format into another,
+ * so encoding "becomes" doesn't apply). Single flat folder-tab outline,
+ * stroked var(--mark-plate), for the site-wide navigation/IA redesign's
+ * folder tree, folder pages, and footer groups. Reuses the same
+ * `.mark--<familyKey>` color-context class every tool mark already uses
+ * (src/css.js), so a folder's glyph color always matches its own
+ * familyKey (src/folders.js) with zero new color logic.
+ *
+ * @param {string} familyKey a src/families.js family key, or folders.js's
+ *   'dev' key for the Developer folder.
+ * @param {string} [extraClass] an additional class alongside the
+ *   color-context class, same convention as markFor()'s own param.
+ * @returns {string} inline SVG markup for the folder glyph.
+ */
+function folderGlyph(familyKey, extraClass) {
+  const classes = ['folder-glyph', `mark--${familyKey}`];
+  if (extraClass) classes.push(extraClass);
+  return `<svg viewBox="0 0 24 24" class="${classes.join(' ')}" aria-hidden="true" focusable="false" fill="none" stroke="var(--mark-plate)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a1 1 0 0 1 1-1h4.6l1.8 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>`;
+}
+
+module.exports = {
+  markFor, MARKS, VERB_PATHS, PLATE_MOTIFS, folderGlyph,
+};
