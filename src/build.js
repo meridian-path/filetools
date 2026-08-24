@@ -115,8 +115,8 @@ async function build() {
     }));
   });
   // Folder index pages + the noindex /data/ helper page (site-wide
-  // navigation/IA redesign, task-mt6jcfwr-ed62cc) -- derived from FOLDERS
-  // (src/folders.js), never hand-listed.
+  // navigation/IA redesign) -- derived from FOLDERS (src/folders.js),
+  // never hand-listed.
   FOLDERS.forEach((folder) => {
     writeHtml(folder.slug, renderFolderPage(folder));
   });

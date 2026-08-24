@@ -9,10 +9,11 @@
     "build": "node src/build.js",
     "vendor": "node scripts/copy-vendor.js",
     "serve": "node scripts/serve.js 8080",
-    "pretest": "node scripts/check-em-dash.js",
+    "pretest": "node scripts/check-em-dash.js && node scripts/check-internal-ids.js",
     "test": "node --test test/*.test.mjs",
     "visual-qa": "node scripts/visual-qa.js",
-    "check-em-dash": "node scripts/check-em-dash.js"
+    "check-em-dash": "node scripts/check-em-dash.js",
+    "check-internal-ids": "node scripts/check-internal-ids.js"
   },
   "engines": {
     "node": ">=18"

@@ -192,8 +192,8 @@ const DESIGN_TOKENS = {
   '--family-text-6':  'oklch(47% 0.030 250)',
   '--family-text-8':  'oklch(30% 0.022 250)',
 
-  // Sixth family (added for the 2026-08-24 navigation/IA redesign, task-
-  // mt6jcfwr-ed62cc's 'developer' folder -- base64/URL/HTML-entity
+  // Sixth family (added for the 2026-08-24 navigation/IA redesign's
+  // 'developer' folder -- base64/URL/HTML-entity
   // encode-decode, hash generator, UUID generator, regex tester, SQL
   // formatter): same ladder, hue 90 (ochre) -- distinct from pdf 27, csv
   // 250, json 320, sheet 150, text 250-neutral. Measured with the same
@@ -208,7 +208,7 @@ const DESIGN_TOKENS = {
   '--family-dev-6': 'oklch(47% 0.100 90)',
   '--family-dev-8': 'oklch(30% 0.070 90)',
 
-  // Navigation/IA redesign tokens (task-mt6jcfwr-ed62cc section 1.11).
+  // Navigation/IA redesign tokens (see the folder taxonomy/nav spec section 1.11).
   // --font-mono is a third, system-stack-only typeface (zero network
   // cost) used exclusively for the path bar, folder/tool Kind chips, and
   // item counts -- never headings, body text, or controls. Flagged

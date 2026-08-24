@@ -178,8 +178,8 @@ function renderToolPage(tool, example = {}) {
       : `<script type="module" src="${escapeHtml(url('js/dropzone.client.js'))}"></script>`}
 `;
 
-  // Three-level path (site-wide navigation/IA redesign, task-mt6jcfwr-
-  // ed62cc section 1.4/3.4): Home -> folder -> tool. The folder segment
+  // Three-level path (site-wide navigation/IA redesign, see the folder
+  // taxonomy/nav spec section 1.4/3.4): Home -> folder -> tool. The folder segment
   // links to that folder's own index page even for a /data/-hosted tool
   // (the display folder never mirrors the physical URL category) -- this
   // display path deliberately diverges from the physical URL, which
