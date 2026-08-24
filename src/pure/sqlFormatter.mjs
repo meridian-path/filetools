@@ -215,6 +215,13 @@ export function beautify(sql, dialectKey = 'ansi') {
   // space between a function name and its call, e.g. COUNT(x), but a space
   // after a keyword, e.g. "IN (" or "VALUES (".
   let lastTok = null;
+  // True while the word (or dotted schema.table chain) currently being
+  // built is a DDL/DML object name -- the table in INSERT INTO/CREATE
+  // TABLE/ALTER TABLE -- rather than a function name. A table name's own
+  // column-list paren still gets its usual space ("users (name, email)"),
+  // even though it's syntactically identical (a word immediately followed
+  // by '(') to a function call, which must not.
+  let inObjectNamePosition = false;
   // Only a paren immediately followed by SELECT/WITH (a real subquery) gets
   // its own indented lines; a plain function-call paren (COUNT(x), SUM(x))
   // stays inline at the surrounding line's depth. One boolean per currently
@@ -239,6 +246,7 @@ export function beautify(sql, dialectKey = 'ansi') {
     }
     current = '';
     lastTok = null;
+    inObjectNamePosition = false;
   }
 
   function append(text, { spaceBefore = true } = {}) {
@@ -250,13 +258,26 @@ export function beautify(sql, dialectKey = 'ansi') {
   while (i < tokens.length) {
     const t = tokens[i];
 
-    const clauseLen = clauseStartAt(tokens, i);
+    // A clause keyword (ORDER BY, GROUP BY, ...) only starts a fresh
+    // page-level line when it's a real top-level (or subquery-top-level)
+    // clause. Inside a non-subquery paren -- a function call's argument
+    // list, most importantly a window function's OVER (...) spec -- the
+    // same keywords are part of that inline argument list (PARTITION BY
+    // ..., ORDER BY ... inside OVER (...)) and must stay on the current
+    // line, not force a page-level flush/newline.
+    const insideNonSubqueryParen = depth > 0 && parenIsSubquery.at(-1) === false;
+    const clauseLen = insideNonSubqueryParen ? 0 : clauseStartAt(tokens, i);
     if (clauseLen) {
       flush();
       const phrase = tokens.slice(i, i + clauseLen).map((tok) => tok.value).join(' ');
       current = phrase;
       selectListAtDepth[depth] = tokens[i].value === 'SELECT';
       lastTok = tokens[i + clauseLen - 1];
+      // "INSERT INTO" and "UPDATE" are immediately followed by the target
+      // table's own (possibly dotted) name -- that name's column-list
+      // paren must keep its space, unlike a function call.
+      const lastWord = phrase.split(' ').pop();
+      inObjectNamePosition = lastWord === 'INTO' || phrase === 'UPDATE';
       i += clauseLen;
       continue;
     }
@@ -264,7 +285,14 @@ export function beautify(sql, dialectKey = 'ansi') {
     if (t.type === 'punct' && t.value === '(') {
       const next = tokens[i + 1];
       const isSubquery = !!next && next.type === 'keyword' && (next.value === 'SELECT' || next.value === 'WITH');
-      append('(');
+      // No space between an identifier and its call paren -- COUNT(x), not
+      // COUNT (x) -- unless that identifier is a table/object name rather
+      // than a function name (INSERT INTO users (...), CREATE TABLE foo
+      // (...)), which keeps its usual space. A keyword like IN/VALUES/OVER
+      // always keeps its usual space before the paren regardless.
+      const isCallParen = lastTok && lastTok.type === 'word' && !inObjectNamePosition;
+      append('(', { spaceBefore: !isCallParen });
+      inObjectNamePosition = false;
       lastTok = t;
       if (isSubquery) flush();
       depth += 1;
@@ -301,6 +329,16 @@ export function beautify(sql, dialectKey = 'ansi') {
       continue;
     }
 
+    // CREATE TABLE / ALTER TABLE: the word right after TABLE is the target
+    // table's own name, same object-name-position exception as INSERT
+    // INTO/UPDATE above. Any other keyword ends whatever object-name
+    // position was in effect (e.g. AS, a real column-list has ended).
+    if (t.type === 'keyword' && t.value === 'TABLE') {
+      inObjectNamePosition = true;
+    } else if (t.type === 'keyword') {
+      inObjectNamePosition = false;
+    }
+
     append(t.value);
     lastTok = t;
     i += 1;
@@ -320,13 +358,31 @@ export function beautify(sql, dialectKey = 'ansi') {
 export function minify(sql, dialectKey = 'ansi') {
   const tokens = significantTokens(tokenize(sql, dialectKey)).filter((t) => t.type !== 'comment');
   let out = '';
+  let lastTok = null;
+  // Same object-name exception as beautify: INSERT INTO/UPDATE/CREATE
+  // TABLE/ALTER TABLE's own target table name keeps its usual space
+  // before a column-list paren, even though it's otherwise a word
+  // immediately followed by '(' just like a function call.
+  let inObjectNamePosition = false;
   for (const t of tokens) {
     if (t.type === 'punct' && (t.value === ')' || t.value === ',' || t.value === ';' || t.value === '.')) {
       out += t.value;
+      lastTok = t;
       continue;
     }
-    const needsSpace = out.length > 0 && !/[\s(.]$/.test(out);
+    // No space between an identifier and its call paren -- COUNT(x), not
+    // COUNT (x) -- unless it's a table/object name, per above.
+    const isCallParen = t.type === 'punct' && t.value === '(' && lastTok && lastTok.type === 'word' && !inObjectNamePosition;
+    const needsSpace = out.length > 0 && !isCallParen && !/[\s(.]$/.test(out);
     out += (needsSpace ? ' ' : '') + t.value;
+    if (t.type === 'punct' && t.value === '(') {
+      inObjectNamePosition = false;
+    } else if (t.type === 'keyword' && (t.value === 'INTO' || t.value === 'TABLE' || t.value === 'UPDATE')) {
+      inObjectNamePosition = true;
+    } else if (t.type === 'keyword') {
+      inObjectNamePosition = false;
+    }
+    lastTok = t;
   }
   return out;
 }

@@ -76,10 +76,56 @@ test('beautify: a two-word clause (LEFT JOIN) stays on one line, not split acros
   assert.ok(!/LEFT\s*\n/.test(out), 'LEFT should not be alone on its own line');
 });
 
-test('beautify: a function call stays inline, never broken onto its own line', () => {
+test('beautify: a function call stays inline, with no space before its opening paren', () => {
   const out = beautify('SELECT COUNT(id), SUM(amount) FROM orders');
-  assert.ok(out.includes('COUNT (id)'), `expected COUNT (id) inline, got:\n${out}`);
+  assert.ok(out.includes('COUNT(id)'), `expected COUNT(id) with no space before the paren, got:\n${out}`);
+  assert.ok(out.includes('SUM(amount)'), `expected SUM(amount) with no space before the paren, got:\n${out}`);
   assert.ok(!out.includes('\n  id'), 'function-call argument should not be indented onto its own line');
+});
+
+test('beautify: no-arg and star-arg function calls also get no space before the paren', () => {
+  const out = beautify('SELECT COUNT(*), ROW_NUMBER() FROM t');
+  assert.equal(out, [
+    'SELECT COUNT(*),',
+    '  ROW_NUMBER()',
+    'FROM t',
+  ].join('\n'));
+});
+
+test('beautify: a table name (not a function) keeps its usual space before a column-list paren', () => {
+  const out = beautify("INSERT INTO users (name, email) VALUES ('Ada', 'ada@example.com')");
+  assert.ok(out.startsWith('INSERT INTO users (name, email)'), `expected a space before the column list, got:\n${out}`);
+});
+
+test('beautify: CREATE TABLE keeps its usual space before the column-definition paren', () => {
+  const out = beautify('CREATE TABLE users (id INT, name TEXT)');
+  assert.equal(out, 'CREATE TABLE users (id INT, name TEXT)');
+});
+
+test('beautify: a window function (OVER PARTITION BY / ORDER BY) formats as one clean, correctly indented block, exactly matching a real formatter\'s output', () => {
+  const out = beautify('SELECT ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC), COUNT(*) FROM emp');
+  assert.equal(out, [
+    'SELECT ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC),',
+    '  COUNT(*)',
+    'FROM emp',
+  ].join('\n'));
+});
+
+test('beautify: GROUP BY inside a window function OVER(...) also stays inline, not broken onto a page-level line', () => {
+  const out = beautify('SELECT SUM(amount) OVER (PARTITION BY region GROUP BY dept) FROM sales');
+  assert.equal(out, [
+    'SELECT SUM(amount) OVER (PARTITION BY region GROUP BY dept)',
+    'FROM sales',
+  ].join('\n'));
+});
+
+test('beautify: ORDER BY inside OVER(...) does not corrupt a real top-level ORDER BY that follows it', () => {
+  const out = beautify('SELECT ROW_NUMBER() OVER (ORDER BY dept) AS rn FROM emp ORDER BY rn');
+  assert.equal(out, [
+    'SELECT ROW_NUMBER() OVER (ORDER BY dept) AS rn',
+    'FROM emp',
+    'ORDER BY rn',
+  ].join('\n'));
 });
 
 test('beautify: a real subquery (paren immediately followed by SELECT) gets its own indented block', () => {
@@ -188,6 +234,16 @@ test('minify: no space immediately inside/around ( ) , . but a space still separ
 
 test('minify: uppercases keywords the same way beautify does', () => {
   assert.equal(minify('select id from users'), 'SELECT id FROM users');
+});
+
+test('minify: a function call gets no space before its paren, matching beautify\'s own documented "none at all around ( ) , ." rule', () => {
+  const out = minify('SELECT COUNT(id), SUM(amount) FROM orders');
+  assert.equal(out, 'SELECT COUNT(id), SUM(amount) FROM orders');
+});
+
+test('minify: a table name still keeps its space before a column-list paren', () => {
+  const out = minify("INSERT INTO users (name, email) VALUES ('Ada', 'ada@example.com')");
+  assert.equal(out, "INSERT INTO users (name, email) VALUES ('Ada', 'ada@example.com')");
 });
 
 test('minify: empty input returns an empty string, not a throw', () => {
