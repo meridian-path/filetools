@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Folder index pages (site-wide navigation/IA redesign, task-mt6jcfwr-
- * ed62cc sections 1.6, 3.2, 3.4) -- five new, additive, indexable pages
+ * Folder index pages (site-wide navigation/IA redesign, see the folder
+ * taxonomy/nav spec sections 1.6, 3.2, 3.4) -- five new, additive, indexable pages
  * (/pdf/, /spreadsheets/, /data-formats/, /text/, /developer/), one per
  * src/folders.js entry. Zero existing tool URLs change; these are purely
  * new destinations.

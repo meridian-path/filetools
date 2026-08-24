@@ -138,8 +138,8 @@ function renderHeader(activeSlug) {
 
   // Native <details>/<summary> disclosure, same zero-JS pattern as the FAQ
   // accordion in toolPage.js. Closed by default at every viewport width
-  // (site-wide navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.3):
-  // unlike the old flat 29-link dump, the folder tree is real content
+  // (site-wide navigation/IA redesign, see the folder taxonomy/nav spec
+  // section 1.3): unlike the old flat 29-link dump, the folder tree is real content
   // worth a deliberate "open" action even on desktop, not just a mobile
   // space-saving measure -- src/css.js's >=1024px rule now only changes
   // how the OPEN panel lays out (five columns instead of one stacked
@@ -162,7 +162,7 @@ function renderHeader(activeSlug) {
 
 /**
  * The path bar's first segment on every page below home (site-wide
- * navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.4): visible text
+ * navigation/IA redesign, see the folder taxonomy/nav spec section 1.4): visible text
  * is the mono "~" home-directory shorthand, with a real "Home" label for
  * assistive tech via renderBreadcrumb()'s ariaLabel support below. The
  * home page itself renders no breadcrumb at all (it doesn't pass one to

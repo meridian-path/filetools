@@ -154,8 +154,8 @@ ${designTokensCss(DESIGN_TOKENS)}
   .brand:hover { color: var(--color-text); }
   .brand .brand-tail { color: var(--color-accent); }
 
-  /* The folder tree (site-wide navigation/IA redesign, task-mt6jcfwr-
-     ed62cc section 1.3): the OUTER disclosure ("Browse ~/") stays closed
+  /* The folder tree (site-wide navigation/IA redesign, see the folder
+     taxonomy/nav spec section 1.3): the OUTER disclosure ("Browse ~/") stays closed
      by default at EVERY viewport width now -- unlike the old flat
      29-link dump, the folder tree is real content worth a deliberate
      open action even on desktop, not just a mobile space-saving measure
@@ -179,7 +179,13 @@ ${designTokensCss(DESIGN_TOKENS)}
     margin-left: calc(-1 * var(--space-3));
     color: var(--color-text);
     font-weight: var(--weight-medium);
-    font-family: var(--font-mono);
+    /* --font-mono is scoped to the path bar/counts/disclosure-content
+       only, never a CONTROL like this clickable summary -- the folder
+       taxonomy/nav spec's own declared fallback for an out-of-scope
+       element ("--font-sans at --weight-medium with --tracking-tight")
+       applies here instead. */
+    font-family: var(--font-sans);
+    letter-spacing: var(--tracking-tight);
     font-size: var(--text-sm);
     border-radius: var(--radius-sm);
   }
@@ -298,7 +304,7 @@ ${designTokensCss(DESIGN_TOKENS)}
 
   /* -------------------------------------------------------------------
      Page shell / breadcrumb (restyled as a mono file path -- site-wide
-     navigation/IA redesign, task-mt6jcfwr-ed62cc section 1.4)
+     navigation/IA redesign, see the folder taxonomy/nav spec section 1.4)
      ------------------------------------------------------------------- */
   .page-shell {
     max-width: var(--width-page);

@@ -5,7 +5,7 @@
  * folder pages, footer, sitemap) -- decoupled from `tool.category`, which
  * stays the physical URL prefix ('pdf' | 'data') and NEVER changes for an
  * existing tool. See the site-wide navigation/IA redesign architect spec
- * (task-mt6jcfwr-ed62cc) section 1.1 for the full rationale: the URL is a
+ * section 1.1 for the full rationale: the URL is a
  * permanent identifier, the folder is presentation, and this split is what
  * lets the taxonomy be reorganized later without ever touching a URL.
  *

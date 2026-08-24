@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 
 /**
  * End-to-end coverage for the site-wide navigation/IA redesign's shared
- * shell (task-mt6jcfwr-ed62cc, B1 "IA backbone"): the folder-tree header
+ * shell ("IA backbone"): the folder-tree header
  * nav, the restyled path bar, and the reorganized footer. This touches
  * every page's shared chrome, so per that spec's own open-risks section
  * ("the existing Playwright e2e suite and visual-qa harness must run at

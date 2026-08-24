@@ -7,7 +7,7 @@ import {
 
 /**
  * Regression coverage for the display-taxonomy layer the site-wide
- * navigation/IA redesign (task-mt6jcfwr-ed62cc) introduces -- mirrors
+ * navigation/IA redesign introduces -- mirrors
  * test/families.test.mjs's own shape and reasoning for the same class of
  * bug: a tool merging with no explicit folder row would otherwise fall
  * back silently to DEFAULT_FOLDER forever, which is correct as a
@@ -59,7 +59,7 @@ test('FOLDER_BY_KEY resolves every FOLDERS entry by its own key', () => {
   }
 });
 
-test('the taxonomy is exactly the spec\'s 5-folder, 29-slug assignment (task-mt6jcfwr-ed62cc section 1.1)', () => {
+test('the taxonomy is exactly the spec\'s 5-folder, 29-slug assignment (folder taxonomy/nav spec section 1.1)', () => {
   const byFolder = {};
   for (const f of FOLDERS) byFolder[f.key] = toolsInFolder(f.key).map((t) => t.slug).sort();
   assert.deepEqual(byFolder, {
