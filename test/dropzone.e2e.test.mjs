@@ -18,11 +18,14 @@ import { chromium } from 'playwright';
  * dropzone.client.js building both messages from it. This file drives the
  * BUILT dist/ output in a real headless browser, across several tools with
  * meaningfully different label shapes (a bare word, a bare acronym, a
- * "word file" phrase that needs de-duplicating before pluralizing, and a
- * dotted extension), rather than unit-testing dropzone.client.js's small
- * inline helper functions in isolation -- the actual DOM error text a
- * visitor sees is the thing that regressed, so that's what's asserted
- * against. Requires `npm run build` to have already produced dist/.
+ * "word file" phrase that needs de-duplicating before pluralizing, a
+ * dotted extension, and an acronym-initial letter that's pronounced with a
+ * leading vowel sound despite being a consonant -- "HTML"/"XML", see the
+ * html-table-to-csv/xml-to-json tests below), rather than unit-testing
+ * dropzone.client.js's small inline helper functions in isolation -- the
+ * actual DOM error text a visitor sees is the thing that regressed, so
+ * that's what's asserted against. Requires `npm run build` to have already
+ * produced dist/.
  */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -148,6 +151,22 @@ test('dropzone: xlsx-to-csv (fileTypeLabel: ".xlsx file", a dotted extension) re
   const badFile = path.join(TMP, 'dz-notxlsx.txt');
   fs.writeFileSync(badFile, 'not an xlsx');
   await expectWrongTypeMessage(page, 'data/xlsx-to-csv/', badFile, '"dz-notxlsx.txt" isn\'t a .xlsx file - this tool reads .xlsx files.');
+  await page.close();
+});
+
+test('dropzone: html-table-to-csv (fileTypeLabel: "HTML file") reports "isn\'t an HTML file", not "isn\'t a HTML file" -- H is pronounced "aitch" (a vowel sound) despite being a consonant letter', async () => {
+  const page = await browser.newPage();
+  const badFile = path.join(TMP, 'dz-nothtml.txt');
+  fs.writeFileSync(badFile, 'not html');
+  await expectWrongTypeMessage(page, 'data/html-table-to-csv/', badFile, '"dz-nothtml.txt" isn\'t an HTML file - this tool reads HTML files.');
+  await page.close();
+});
+
+test('dropzone: xml-to-json (fileTypeLabel: "XML file") reports "isn\'t an XML file", not "isn\'t a XML file" -- X is pronounced "eks" (a vowel sound) despite being a consonant letter', async () => {
+  const page = await browser.newPage();
+  const badFile = path.join(TMP, 'dz-notxml.pdf');
+  fs.writeFileSync(badFile, 'not xml');
+  await expectWrongTypeMessage(page, 'data/xml-to-json/', badFile, '"dz-notxml.pdf" isn\'t an XML file - this tool reads XML files.');
   await page.close();
 });
 

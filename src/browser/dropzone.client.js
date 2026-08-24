@@ -43,9 +43,25 @@ if (toolSection) {
   // toolPage.js itself falls back to for an omitted field).
   const fileTypeLabel = toolSection.dataset.fileTypeLabel === undefined ? 'PDF' : toolSection.dataset.fileTypeLabel;
 
-  /** "a CSV file" / "an Excel file" / "a file" -- naive but sufficient a/an choice, since every real fileTypeLabel in this codebase is plain English or a dotted extension, never a word an English speaker would read with an unexpected vowel sound. */
+  // Acronym-initial letters that are PRONOUNCED with a leading vowel sound
+  // despite being consonants ("aitch", "eks", ...), so "a HTML file"/"a XML
+  // file" reads wrong to the ear even though the spelling starts with a
+  // consonant. Matched only when the label actually LOOKS like an acronym
+  // (2+ consecutive leading capital letters, e.g. "HTML"/"XML") so this
+  // never miscategorizes an ordinary capitalized English word that happens
+  // to start with one of these letters ("Log file", "Report file" correctly
+  // stay "a", not "an") -- this is deliberately an explicit exception list,
+  // not a blanket first-letter regex. H and X are the only ones any real
+  // fileTypeLabel in this codebase uses today (see dropzone.e2e.test.mjs);
+  // F, L, M, N, R, S would hit the same issue if a future acronym-shaped
+  // label started with one of those letters, so they're included
+  // pre-emptively rather than waiting for a second bug.
+  const ACRONYM_VOWEL_SOUND = /^[FHLMNRSX][A-Z]/;
+
+  /** "a CSV file" / "an Excel file" / "an HTML file" / "a file" -- a/an choice by first SOUND, not just first letter: a genuine leading vowel letter, or an acronym-shaped label whose leading letter is pronounced starting with a vowel sound ("aitch", "eks", ...). */
   function withArticle(label) {
-    return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
+    const startsWithVowelSound = /^[aeiou]/i.test(label) || ACRONYM_VOWEL_SOUND.test(label);
+    return `${startsWithVowelSound ? 'an' : 'a'} ${label}`;
   }
 
   /** "CSV files" / "Excel files" / "files" -- strips a trailing "file" before adding "files" so "CSV file" doesn't become "CSV file files". */
