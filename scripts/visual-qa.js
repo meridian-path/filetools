@@ -102,6 +102,39 @@ function isHttpUrl(target) {
   return /^https?:\/\//i.test(target);
 }
 
+// A site whose pages reference assets by a ROOT-relative path (e.g.
+// src/site.js's BASE_PATH = '/', so a script tag reads src="/js/foo.js")
+// needs its throwaway server rooted at the actual site root, not at the
+// target page's own parent directory -- otherwise a nested page (e.g.
+// dist/data/some-tool/index.html) can't reach dist/js/ at all, and any
+// script that fails to load silently breaks whatever that page's JS was
+// supposed to render (invisible for a page with real static fallback
+// content, but a fully blank primary panel for one that's entirely
+// client-rendered). SITE_ROOT_MARKERS names the
+// directory (or directories) that only exist at the real site root, never
+// at a leaf page's own directory -- edit this list when reusing this
+// script in a workspace with a different build layout.
+const SITE_ROOT_MARKERS = ['js'];
+
+/**
+ * Walks upward from `startDir` looking for the nearest ancestor (including
+ * itself) that contains one of SITE_ROOT_MARKERS. Falls back to `startDir`
+ * itself if none is found within a few levels (or the walk reaches the
+ * filesystem root first) -- this keeps a flat, non-nested target (e.g.
+ * `dist/index.html`, or any other workspace's simpler layout) working
+ * exactly as before, since `startDir` IS the site root in that case.
+ */
+function findSiteRoot(startDir) {
+  let dir = startDir;
+  for (let i = 0; i < 6; i += 1) {
+    if (SITE_ROOT_MARKERS.some((marker) => fs.existsSync(path.join(dir, marker)))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return startDir;
+}
+
 /** Turns a page path/URL into a filesystem-safe base name for screenshots. */
 function pageNameFor(target) {
   const base = isHttpUrl(target)
@@ -144,10 +177,11 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    const rootDir = path.dirname(absPath);
+    const rootDir = findSiteRoot(path.dirname(absPath));
     server = await startStaticServer(rootDir);
     const port = server.address().port;
-    pageUrl = `http://localhost:${port}/${path.basename(absPath)}`;
+    const relPath = path.relative(rootDir, absPath).split(path.sep).join('/');
+    pageUrl = `http://localhost:${port}/${relPath}`;
   }
 
   const pageName = pageNameFor(target);
@@ -202,4 +236,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { VIEWPORTS, OUTPUT_DIR, isHttpUrl, pageNameFor, formatScoreSummary };
+module.exports = { VIEWPORTS, OUTPUT_DIR, isHttpUrl, pageNameFor, formatScoreSummary, findSiteRoot };
