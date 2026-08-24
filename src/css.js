@@ -827,6 +827,30 @@ ${designTokensCss(DESIGN_TOKENS)}
   .diff-status-cell[data-diff-status="unchanged"] { color: var(--color-muted); }
 
   /* -------------------------------------------------------------------
+     Regex match highlighting (regex tester -- src/browser/regexTester.client.js).
+     Reuses .json-preview's own monospace/pre/scroll-box treatment for the
+     highlighted test string, adding just the <mark> match style.
+     ------------------------------------------------------------------- */
+  .regex-match {
+    background: var(--color-accent-tint);
+    color: var(--color-accent);
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-sm);
+    padding: 0 1px;
+  }
+  /* A zero-width match (e.g. the pattern "a*" against text with no "a") has
+     no text of its own to highlight -- a thin accent-colored caret marks
+     where it matched instead of rendering nothing at all. */
+  .regex-match--empty {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    vertical-align: middle;
+    background: var(--color-accent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* -------------------------------------------------------------------
      Second input path: "paste markup" (html-table-to-csv today; toolPage.js
      only renders this block when a tool config sets pasteInput)
      ------------------------------------------------------------------- */
