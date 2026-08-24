@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 28-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 29-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -90,6 +90,7 @@ test('MARKS is exactly the fixed 28-row plate/verb/ink table, no more, no fewer'
     'csv-to-sql-insert': { plate: 'csv', verb: 'convert', ink: 'csv' },
     'uuid-generator': { plate: 'text', verb: 'convert', ink: 'text' },
     'regex-tester': { plate: 'text', verb: 'convert', ink: 'text' },
+    'sql-formatter': { plate: 'text', verb: 'convert', ink: 'text' },
   });
 });
 

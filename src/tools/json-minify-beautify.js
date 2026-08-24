@@ -58,5 +58,5 @@ module.exports = {
       answerHtml: 'Files up to 20MB are accepted. Both panels show a preview of very large results (with a note that it’s been shortened) so the page itself stays responsive - download or copy the result to get the complete, untruncated text either way.',
     },
   ],
-  relatedSlugs: ['json-to-csv', 'flatten-json', 'yaml-to-json'],
+  relatedSlugs: ['json-to-csv', 'flatten-json', 'sql-formatter'],
 };
