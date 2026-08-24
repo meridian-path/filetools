@@ -49,6 +49,19 @@ test('detectColumnType: an all-empty column defaults to "text"', () => {
   assert.equal(detectColumnType(['', '', '']), 'text');
 });
 
+test('detectColumnType: a leading-zero code like "0042" makes the column "text", not "number"', () => {
+  assert.equal(detectColumnType(['0042', '17']), 'text');
+  assert.equal(detectColumnType(['007']), 'text');
+});
+
+test('detectColumnType: a bare "0" is still "number"', () => {
+  assert.equal(detectColumnType(['0', '5', '10']), 'number');
+});
+
+test('detectColumnType: a leading-zero decimal like "0.5" is still "number"', () => {
+  assert.equal(detectColumnType(['0.5', '1.25']), 'number');
+});
+
 // -- escapeStringLiteral / formatValue -------------------------------------------------------------
 
 test('escapeStringLiteral: doubles a single embedded quote', () => {
@@ -107,6 +120,21 @@ test('generateInsertStatements: a batched multi-row INSERT, mysql dialect, mixed
     'INSERT INTO `products` (`id`, `name`, `price`, `notes`) VALUES',
     "  (1, 'Widget', 9.99, NULL),",
     "  (2, 'O''Brien Gadget', 14.5, 'on sale');",
+  ].join('\n'));
+});
+
+test('generateInsertStatements: a leading-zero-code column stays quoted as text even next to a genuinely numeric column', () => {
+  const rows = [
+    ['id', 'name', 'code', 'note'],
+    ['1', "O'Brien", '0042', ''],
+    ['2', 'Smith', '17', 'fine'],
+  ];
+  const result = generateInsertStatements(rows, { tableName: 'my_table', dialect: 'mysql' });
+  assert.equal(result.ok, true);
+  assert.equal(result.sql, [
+    'INSERT INTO `my_table` (`id`, `name`, `code`, `note`) VALUES',
+    "  (1, 'O''Brien', '0042', NULL),",
+    "  (2, 'Smith', '17', 'fine');",
   ].join('\n'));
 });
 
