@@ -58,5 +58,5 @@ module.exports = {
       answerHtml: 'Yes, for the exact same file content - a cryptographic hash is a pure function of the bytes, so this tool and a command-line tool hashing the identical file always agree. Pasting text is different: this tool hashes exactly the characters you pasted (UTF-8 encoded), so make sure you’re comparing against a hash computed from the same exact text, including any trailing newline or whitespace.',
     },
   ],
-  relatedSlugs: ['base64-encode-decode', 'url-encode-decode', 'html-entity-encode-decode'],
+  relatedSlugs: ['uuid-generator', 'base64-encode-decode', 'url-encode-decode'],
 };
