@@ -102,7 +102,11 @@ export const DIALECTS = {
   oracle: { quoteIdent: (name) => `"${name.replace(/"/g, '""')}"`, label: 'Oracle' },
 };
 
-const NUMBER_RE = /^-?\d+(\.\d+)?$/;
+// Integer part is either a bare "0" or a non-zero digit followed by more
+// digits ("[1-9]\d*") -- this is what excludes a leading-zero code like
+// "0042" or "007" from matching while still accepting "0" itself and a
+// leading-zero decimal like "0.5" (whose integer part is just "0").
+const NUMBER_RE = /^-?(0|[1-9]\d*)(\.\d+)?$/;
 
 /**
  * @param {string[]} values every row's value for one column (header
