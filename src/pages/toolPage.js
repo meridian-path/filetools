@@ -143,7 +143,7 @@ function renderToolPage(tool, example = {}) {
 
   const mainHtml = `    <h1>${escapeHtml(tool.h1)}</h1>
     <p class="deck">${escapeHtml(tool.deck)}</p>
-    <section id="tool" aria-labelledby="tool-h" data-mode="${escapeHtml(tool.mode)}" data-client="${escapeHtml(tool.clientEntry)}" data-accept="${escapeHtml(tool.accepts)}"${tool.multiple ? ' data-multiple="true"' : ''}>
+    <section id="tool" aria-labelledby="tool-h" data-mode="${escapeHtml(tool.mode)}" data-client="${escapeHtml(tool.clientEntry)}" data-accept="${escapeHtml(tool.accepts)}" data-file-type-label="${escapeHtml(fileTypeLabel)}"${tool.multiple ? ' data-multiple="true"' : ''}>
       <h2 id="tool-h" class="sr-only">${escapeHtml(tool.h1)}</h2>
       ${dropzoneHtml}
       ${pasteHtml}

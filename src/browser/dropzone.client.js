@@ -35,6 +35,23 @@ if (toolSection) {
   const clientEntry = toolSection.dataset.client || 'pdfPages';
   const accept = (toolSection.dataset.accept || '').split(',').map((s) => s.trim()).filter(Boolean);
   const multiple = toolSection.dataset.multiple === 'true';
+  // src/pages/toolPage.js's own fileTypeLabel field (see its comment there:
+  // '' is a deliberate "no type name in the copy" value, distinct from the
+  // attribute being entirely absent -- toolPage.js always emits the
+  // attribute now, so a missing one only happens on a page this file
+  // doesn't otherwise recognize, and 'PDF' is the same safe default
+  // toolPage.js itself falls back to for an omitted field).
+  const fileTypeLabel = toolSection.dataset.fileTypeLabel === undefined ? 'PDF' : toolSection.dataset.fileTypeLabel;
+
+  /** "a CSV file" / "an Excel file" / "a file" -- naive but sufficient a/an choice, since every real fileTypeLabel in this codebase is plain English or a dotted extension, never a word an English speaker would read with an unexpected vowel sound. */
+  function withArticle(label) {
+    return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
+  }
+
+  /** "CSV files" / "Excel files" / "files" -- strips a trailing "file" before adding "files" so "CSV file" doesn't become "CSV file files". */
+  function pluralize(label) {
+    return label.endsWith('file') ? `${label.slice(0, -4)}files` : `${label} files`;
+  }
 
   const dropzone = toolSection.querySelector('.dropzone');
   const fileInput = toolSection.querySelector('#file-input');
@@ -159,14 +176,19 @@ if (toolSection) {
 
     if (!multiple && files.length > 1) {
       setState('error');
-      setStatus('This tool works on one file at a time. Choose a single PDF.', 'error');
+      setStatus(`This tool works on one file at a time. Choose a single ${fileTypeLabel || 'file'}.`, 'error');
       return;
     }
 
     const bad = files.find((f) => !fileMatchesAccept(f));
     if (bad) {
       setState('error');
-      setStatus(`"${bad.name}" isn't a PDF - this tool reads PDF files.`, 'error');
+      setStatus(
+        fileTypeLabel
+          ? `"${bad.name}" isn't ${withArticle(fileTypeLabel)} - this tool reads ${pluralize(fileTypeLabel)}.`
+          : `"${bad.name}" isn't a supported file type for this tool.`,
+        'error'
+      );
       return;
     }
 
