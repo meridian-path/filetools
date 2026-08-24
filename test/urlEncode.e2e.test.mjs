@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the URL encode/decode tool: drive the built dist/
@@ -74,9 +75,7 @@ after(async () => {
 
 test('url-encode-decode: pasting text shows both the encoded and decoded panels, updated live', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/url-encode-decode/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', 'a b/c?d=e&f');

@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the YAML-to-JSON tool: drive the built dist/ output
@@ -79,9 +80,7 @@ after(async () => {
 // test/csvDiff.e2e.test.mjs already applies for '.extracted-table'.
 test('yaml-to-json: uploading a .yaml file converts it and downloads matching JSON', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/yaml-to-json/`, { waitUntil: 'networkidle' });
   await page.locator('#file-input').setInputFiles(path.join(TMP, 'doc.yaml'));
@@ -105,9 +104,7 @@ test('yaml-to-json: uploading a .yaml file converts it and downloads matching JS
 
 test('yaml-to-json: pasting YAML and clicking convert produces the same result', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/yaml-to-json/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', 'name: Coffee\nprice: 4.5\ntags:\n  - hot\n  - drink\n');

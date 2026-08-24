@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { collectPageErrors } from './helpers/collectPageErrors.mjs';
 
 /**
  * End-to-end tests for the CSV to SQL INSERT tool: drive the built dist/
@@ -65,9 +66,7 @@ after(async () => {
 
 test('csv-to-sql-insert: pasting CSV shows a batched INSERT statement with correct types', async () => {
   const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-  page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+  const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/csv-to-sql-insert/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', 'id,name,price\n1,Widget,9.99\n2,Gadget,14.50');
