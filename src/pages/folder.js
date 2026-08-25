@@ -7,17 +7,9 @@
  * src/folders.js entry. Zero existing tool URLs change; these are purely
  * new destinations.
  *
- * SCOPE NOTE (builder decision, flagged for reviewer): the architect spec
- * describes folder pages as reusing "the same explorer window as home
- * minus the sidebar" (chrome strip, filter slot, status bar). That
- * chrome depends on filter.client.js and the shared window shell, both
- * explicitly out of scope for this task (B1) and reserved for B2
- * ("Explorer surface"). This file ships the real, functional, accessible
- * core of a folder page now -- path bar, h1, a written intro paragraph,
- * and the existing .tool-list/.tool-row listing (src/pages/home.js's own
- * renderToolRow(), reused verbatim) -- so folder pages are live,
- * indexable, and correct today. B2 can layer the window chrome on top of
- * this same content without changing what a folder page IS.
+ * B2 update: now renders the real explorer window (chrome strip, column
+ * ruler, tool rows with Kind chips, status bar), same shared component the
+ * homepage uses minus the sidebar -- see src/pages/explorerWindow.js.
  *
  * Reference-library grounding (design-standards.md Enforcement, carried
  * from the spec): REFERENCE_LIBRARY.md entry 2 (Cobalt) -- the tool/
@@ -42,7 +34,9 @@ const { breadcrumbJsonLd, collectionPageJsonLd } = require('../structuredData.js
 const { url, absoluteUrl } = require('../site.js');
 const { TOOLS } = require('../tools/index.js');
 const { FOLDERS, toolsInFolder } = require('../folders.js');
-const { renderToolRow } = require('./home.js');
+const {
+  renderToolRow, renderWindowChrome, renderWindowRuler, renderWindowStatusBar, renderExplorerWindow,
+} = require('./explorerWindow.js');
 
 const FOLDER_VERB_SUBSECTION_THRESHOLD = 12;
 
@@ -102,14 +96,27 @@ function renderFolderPage(folder) {
     .map((f) => `<a href="${escapeHtml(url(`${f.slug}/`))}">${escapeHtml(f.label)}</a>`)
     .join(', ');
 
+  const window = renderExplorerWindow({
+    chrome: renderWindowChrome(`~ / ${folder.slug}`, tools.length, 'items'),
+    ruler: renderWindowRuler(),
+    body: `<div class="tool-list" data-window-rows>
+        ${rows}
+      </div>`,
+    statusBar: renderWindowStatusBar(`${tools.length} files · 0 uploads · works offline`),
+  });
+
+  // A visually-hidden h2 (not a visible "All N tools" heading -- the
+  // window's own chrome strip already shows that count) keeps the real
+  // heading order h1 -> h2 -> (footer's h3s) intact. Without it, this
+  // page's own body has no h2 at all and skips straight to h3, the exact
+  // Lighthouse-caught heading-order regression the B1 build already fixed
+  // once -- see .sr-only in src/css.js.
   const mainHtml = `    <h1>${escapeHtml(content.h1)}</h1>
     <p class="deck">${escapeHtml(content.intro)}</p>
-    <section aria-labelledby="folder-tools-h">
-      <h2 id="folder-tools-h">All ${tools.length} tool${tools.length === 1 ? '' : 's'}</h2>
-      <div class="tool-list">
-        ${rows}
-      </div>
-    </section>
+    <h2 id="folder-tools-h" class="sr-only">${escapeHtml(content.h1)}</h2>
+    <div aria-labelledby="folder-tools-h">
+    ${window}
+    </div>
     <p class="caption">Other folders: ${siblingLinks}</p>
 `;
 

@@ -14,7 +14,9 @@ const { FAVICON_DATA_URI } = require('./icon.js');
 const { adSlot, adsScriptTag } = require('./ads.js');
 const adConfig = require('./adConfig.js');
 const { TOOLS, toolBySlug } = require('./tools/index.js');
-const { FOLDERS, toolsInFolder, HOMEPAGE_FOLDER_ROW_CAP_THRESHOLD, HOMEPAGE_FOLDER_ROW_CAP } = require('./folders.js');
+const {
+  FOLDERS, FOLDER_BY_KEY, toolsInFolder, folderOf, HOMEPAGE_FOLDER_ROW_CAP_THRESHOLD, HOMEPAGE_FOLDER_ROW_CAP,
+} = require('./folders.js');
 const { folderGlyph } = require('./icons.js');
 
 const GOATCOUNTER_URL = 'https://dg-filetools.goatcounter.com/count';
@@ -39,6 +41,29 @@ const SOCIAL_ICON_SVG = '<svg width="18" height="18" viewBox="0 0 100 100" xmlns
  */
 function renderFooterCredit() {
   return `<p class="footer-credit">Built by Dylan, also making <a href="https://repertoire-builder.com" rel="noopener noreferrer">Repertoire Builder</a> and <a href="https://lol-practice-system.com" rel="noopener noreferrer">Solo Queue Practice</a>. <a class="footer-social" href="https://x.com/builtittheycome" rel="noopener noreferrer">${SOCIAL_ICON_SVG}Follow @builtittheycome</a></p>`;
+}
+
+/**
+ * The build-time tool index quick-open reads (site-wide navigation/IA
+ * redesign, see the folder taxonomy/nav spec section 1.7): slug/navLabel/
+ * deck/folder label/url for every tool, embedded once per page in a
+ * `<script type="application/json">` block (never `application/ld+json` --
+ * this isn't structured data, just a trusted data source for
+ * filter.client.js's quick-open combobox). `<` escaping matches
+ * structuredData.js's jsonLdScript() precedent, so a future tool deck
+ * containing "</script>" can never break out of the tag even though this
+ * data is build-time trusted, not visitor input.
+ */
+function toolIndexScript() {
+  const items = TOOLS.map((t) => ({
+    slug: t.slug,
+    navLabel: t.navLabel,
+    deck: t.deck,
+    folder: FOLDER_BY_KEY[folderOf(t.slug)].label,
+    url: url(`${t.category}/${t.slug}/`),
+  }));
+  const json = JSON.stringify(items).replace(/</g, '\\u003c');
+  return `<script type="application/json" id="tool-index">${json}</script>`;
 }
 
 function escapeHtml(str) {
@@ -314,36 +339,9 @@ ${documentHead({ title, description: metaDescription, canonical, jsonLd, noindex
 ${mainHtml}
   </main>
   ${renderFooter()}
+  ${toolIndexScript()}
   <script type="module" src="${escapeHtml(url('js/newsletter.client.js'))}"></script>
-</body>
-</html>
-`;
-}
-
-function render404Page() {
-  const title = `Page not found | ${SITE_NAME}`;
-  const description = `The page you followed a link to doesn’t exist on ${SITE_NAME}. Here are the tools you might have been looking for.`;
-  const toolLinks = TOOLS
-    .map((t) => `<li><a href="${escapeHtml(url(`${t.category}/${t.slug}/`))}">${escapeHtml(t.navLabel)}</a></li>`)
-    .join('\n        ');
-  const body = `<div class="not-found">
-      <h1>That page doesn’t exist</h1>
-      <p class="deck">The link you followed may be out of date, or the page may have moved. Here are the tools:</p>
-      <ul>
-        ${toolLinks}
-        <li><a href="${escapeHtml(url())}">All tools</a></li>
-      </ul>
-    </div>`;
-  return `<!doctype html>
-<html lang="en">
-${documentHead({ title, description, canonical: absoluteUrl('404.html'), noindex: true })}
-<body>
-  ${renderHeader(null)}
-  <main id="main" class="page-shell">
-    ${body}
-  </main>
-  ${renderFooter()}
-  <script type="module" src="${escapeHtml(url('js/newsletter.client.js'))}"></script>
+  <script type="module" src="${escapeHtml(url('js/filter.client.js'))}"></script>
 </body>
 </html>
 `;
@@ -355,12 +353,12 @@ module.exports = {
   BMC_URL,
   HOME_CRUMB,
   escapeHtml,
+  toolIndexScript,
   documentHead,
   renderHeader,
   renderFooter,
   renderNewsletterSignup,
   renderBreadcrumb,
   renderPage,
-  render404Page,
   adSlot,
 };

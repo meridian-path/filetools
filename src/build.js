@@ -19,7 +19,7 @@ const { renderHowThisWorksPage } = require('./pages/howThisWorks.js');
 const { renderPrivacyPage } = require('./pages/privacy.js');
 const { renderToolPage } = require('./pages/toolPage.js');
 const { renderFolderPage, renderDataIndexPage } = require('./pages/folder.js');
-const { render404Page } = require('./shell.js');
+const { render404Page } = require('./pages/notFound.js');
 const { TOOLS } = require('./tools/index.js');
 const { FOLDERS } = require('./folders.js');
 const { sitemapPathsFor, renderSitemapXml, robotsTxtContent } = require('./sitemap.js');
@@ -140,7 +140,7 @@ async function build() {
   // never referenced by a <script> tag, only by regexTester.client.js's
   // own `new Worker(...)` call), so it needs the same fixed-list treatment
   // dropzone.client.js/newsletter.client.js get.
-  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js'];
+  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js'];
   for (const file of [...ALWAYS_COPY_CLIENT_FILES, ...CLIENT_FILES]) {
     fs.copyFileSync(path.join(ROOT, 'src', 'browser', file), path.join(jsDir, file));
   }
