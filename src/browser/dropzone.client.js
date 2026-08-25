@@ -43,17 +43,23 @@ if (toolSection) {
   // toolPage.js itself falls back to for an omitted field).
   const fileTypeLabel = toolSection.dataset.fileTypeLabel === undefined ? 'PDF' : toolSection.dataset.fileTypeLabel;
 
-  /** "a CSV file" / "an Excel file" / "an HTML file" / "a file" -- a/an choice by
-   * sound, not just spelling: a plain leading vowel LETTER ("Excel"), or a
-   * leading consonant letter that's pronounced with a vowel sound as part of
-   * an acronym ("HTML" = "aitch-tee-em-el", "XML" = "eks-em-el"). The
-   * acronym check requires 2+ leading capitals so it only fires on real
-   * acronyms, never on an ordinary capitalized word ("Log file") that
-   * happens to start with one of these letters. H and X are the only such
-   * letters any real fileTypeLabel uses today; F/L/M/N/R/S are included
-   * pre-emptively since they read the same way (eff/el/em/en/ar/ess). */
+  /** "a CSV file" / "an Excel file" / "an HTML file" / "a SQL file" -- a/an
+   * choice by sound, not just spelling: a plain leading vowel LETTER
+   * ("Excel"), or a leading consonant letter that's pronounced with a vowel
+   * sound as part of an acronym ("HTML" = "aitch-tee-em-el", "XML" =
+   * "eks-em-el"). Deliberately NOT a general "any 2+-capital acronym
+   * starting with F/H/L/M/N/R/S/X reads as a vowel sound" rule -- that
+   * broader guess was tried and shipped once, then broke on this
+   * codebase's own real "SQL file" label: SQL is conventionally read as
+   * the word "sequel" (this tool's own meta description already says "a
+   * SQL query", establishing the intended pronunciation), not spelled out
+   * as "ess-cue-ell", so S does not universally read as a vowel sound the
+   * way H and X do. Rather than re-guess at more letters, this stays an
+   * explicit allow-list of the two letters actually verified against a
+   * real label today; add a new letter here only once a real fileTypeLabel
+   * needs it, with its pronunciation checked against this exact trap. */
   function withArticle(label) {
-    const vowelSound = /^[aeiou]/i.test(label) || /^[FHLMNRSX][A-Z]/.test(label);
+    const vowelSound = /^[aeiou]/i.test(label) || /^[HX][A-Z]/.test(label);
     return `${vowelSound ? 'an' : 'a'} ${label}`;
   }
 
