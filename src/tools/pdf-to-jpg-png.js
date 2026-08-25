@@ -52,5 +52,5 @@ module.exports = {
       answerHtml: 'A password-protected file can’t be read in the browser without its password, so it’s reported as an error rather than silently producing blank images. Remove the password first, then convert.',
     },
   ],
-  relatedSlugs: ['jpg-png-to-pdf', 'split-pdf', 'rotate-pdf'],
+  relatedSlugs: ['jpg-png-to-pdf', 'split-pdf', 'extract-images-from-pdf'],
 };
