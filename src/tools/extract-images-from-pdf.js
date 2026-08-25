@@ -51,8 +51,5 @@ module.exports = {
       answerHtml: 'It extracts every regular embedded image (the common case: photos, scans, logos placed on a page). Repeated/tiled image patterns and inline images drawn directly in the page’s own content stream are not currently extracted - a real but narrower scope cut, disclosed here rather than silently skipped.',
     },
   ],
-  // pdf-to-jpg-png (its own natural sibling link) is still on its own
-  // unmerged branch as of this commit -- follow-up once both are on
-  // master, same pattern sql-formatter/csv-to-sql-insert used.
-  relatedSlugs: ['split-pdf', 'jpg-png-to-pdf', 'pdf-to-csv'],
+  relatedSlugs: ['split-pdf', 'jpg-png-to-pdf', 'pdf-to-jpg-png'],
 };
