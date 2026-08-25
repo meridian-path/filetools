@@ -43,9 +43,18 @@ if (toolSection) {
   // toolPage.js itself falls back to for an omitted field).
   const fileTypeLabel = toolSection.dataset.fileTypeLabel === undefined ? 'PDF' : toolSection.dataset.fileTypeLabel;
 
-  /** "a CSV file" / "an Excel file" / "a file" -- naive but sufficient a/an choice, since every real fileTypeLabel in this codebase is plain English or a dotted extension, never a word an English speaker would read with an unexpected vowel sound. */
+  /** "a CSV file" / "an Excel file" / "an HTML file" / "a file" -- a/an choice by
+   * sound, not just spelling: a plain leading vowel LETTER ("Excel"), or a
+   * leading consonant letter that's pronounced with a vowel sound as part of
+   * an acronym ("HTML" = "aitch-tee-em-el", "XML" = "eks-em-el"). The
+   * acronym check requires 2+ leading capitals so it only fires on real
+   * acronyms, never on an ordinary capitalized word ("Log file") that
+   * happens to start with one of these letters. H and X are the only such
+   * letters any real fileTypeLabel uses today; F/L/M/N/R/S are included
+   * pre-emptively since they read the same way (eff/el/em/en/ar/ess). */
   function withArticle(label) {
-    return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
+    const vowelSound = /^[aeiou]/i.test(label) || /^[FHLMNRSX][A-Z]/.test(label);
+    return `${vowelSound ? 'an' : 'a'} ${label}`;
   }
 
   /** "CSV files" / "Excel files" / "files" -- strips a trailing "file" before adding "files" so "CSV file" doesn't become "CSV file files". */
