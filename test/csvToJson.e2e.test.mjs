@@ -55,8 +55,14 @@ let baseUrl;
 before(async () => {
   assert.ok(fs.existsSync(DIST), 'dist/ does not exist -- run `npm run build` before `npm test`.');
   fs.mkdirSync(TMP, { recursive: true });
-  fs.writeFileSync(path.join(TMP, 'records.csv'), 'name,price\r\nCoffee,4.5\r\nTea,3.25\r\n');
-  fs.writeFileSync(path.join(TMP, 'blank.csv'), '   \n  ');
+  // Filename is namespaced to this tool (not the shared-looking
+  // "records.csv") -- test/csvToXlsx.e2e.test.mjs independently writes its
+  // own different content to tmp_test/records.csv, and Node's test runner
+  // runs e2e files in parallel by default, so a shared filename in the
+  // shared tmp_test/ dir is a real cross-file race, not just a naming
+  // collision.
+  fs.writeFileSync(path.join(TMP, 'csv-to-json-records.csv'), 'name,price\r\nCoffee,4.5\r\nTea,3.25\r\n');
+  fs.writeFileSync(path.join(TMP, 'csv-to-json-blank.csv'), '   \n  ');
 
   server = await startServer(DIST, BASE_PREFIX);
   baseUrl = `http://localhost:${server.address().port}${BASE_PREFIX}`;
@@ -79,7 +85,7 @@ test('csv-to-json: uploading a .csv file converts it and downloads a matching JS
   const errors = collectPageErrors(page);
 
   await page.goto(`${baseUrl}data/csv-to-json/`, { waitUntil: 'networkidle' });
-  await page.locator('#file-input').setInputFiles(path.join(TMP, 'records.csv'));
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'csv-to-json-records.csv'));
   await page.waitForSelector('.table-block .json-preview');
 
   const previewText = await page.locator('.table-block .json-preview').textContent();
@@ -161,7 +167,7 @@ test('csv-to-json: uploading a whitespace-only file shows this tool\'s own "empt
   // parseCsvInput() "that's empty" branch for real.
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/csv-to-json/`, { waitUntil: 'networkidle' });
-  await page.locator('#file-input').setInputFiles(path.join(TMP, 'blank.csv'));
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'csv-to-json-blank.csv'));
   await page.waitForSelector('.alert-warn');
   const msg = await page.locator('.alert-warn').textContent();
   assert.match(msg, /empty/i);
