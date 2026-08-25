@@ -138,6 +138,49 @@ test('uuid-generator: switching to v5 with the DNS namespace preset and a name p
   await page.close();
 });
 
+test('uuid-generator: typing a name character-by-character into the v5 Name field keeps focus and accumulates every character', async () => {
+  // Regression test for a real bug: render() used to rebuild the entire
+  // control row (including the focused input itself) on every 'input'
+  // event, so a genuine keystroke-by-keystroke typing session lost focus
+  // after the first character and only ever registered that one character.
+  // page.locator(...).fill() (used elsewhere in this file) sets the whole
+  // value in one synthetic 'input' event and would never have caught this -
+  // pressSequentially() is required to dispatch one real event per
+  // keystroke, the same way an actual visitor typing does.
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/uuid-generator/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.result .table-block .json-preview');
+
+  await page.locator('.result select').first().selectOption('v5');
+  await page.waitForSelector('.result input[type="text"]');
+  const nameInput = page.locator('.result input[type="text"]').last();
+  await nameInput.click();
+  await nameInput.pressSequentially('python.org', { delay: 20 });
+
+  assert.equal(await nameInput.inputValue(), 'python.org');
+  assert.ok(await nameInput.evaluate((el) => el === document.activeElement), 'the Name field should still be focused after typing');
+
+  await page.waitForFunction(() => (document.querySelector('.result .table-block .json-preview')?.textContent || '').includes('886313e1-3b8a-5372-9b90-0c9aee199e5d'));
+  await page.close();
+});
+
+test('uuid-generator: typing a custom namespace UUID character-by-character keeps focus and accumulates every character', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/uuid-generator/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.result .table-block .json-preview');
+
+  await page.locator('.result select').first().selectOption('v5');
+  await page.locator('.result select').last().selectOption('custom');
+  await page.waitForSelector('.result input[type="text"]');
+  const customInput = page.locator('.result input[type="text"]').first();
+  await customInput.click();
+  await customInput.pressSequentially('6ba7b810-9dad-11d1-80b4-00c04fd430c8', { delay: 10 });
+
+  assert.equal(await customInput.inputValue(), '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+  assert.ok(await customInput.evaluate((el) => el === document.activeElement), 'the Custom namespace field should still be focused after typing');
+  await page.close();
+});
+
 test('uuid-generator: v5 with a blank name shows a friendly inline error instead of a broken UUID', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/uuid-generator/`, { waitUntil: 'networkidle' });

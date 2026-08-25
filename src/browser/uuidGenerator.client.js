@@ -64,8 +64,13 @@ let renderGeneration = 0;
 /**
  * @param {HTMLElement} resultEl
  * @param {{version:string, count:number, namespaceChoice:string, customNamespace:string, name:string}} state
+ * @param {{focusField?: 'customNamespace'|'name', caret?: number}} [restoreFocus] - render()
+ *   rebuilds the entire subtree on every call, including whichever <input> the visitor is
+ *   actively typing into - passing the field that triggered this render lets it re-focus +
+ *   re-position the caret on the freshly created replacement node right after building it,
+ *   so a keystroke never gets dropped.
  */
-function render(resultEl, state) {
+function render(resultEl, state, restoreFocus) {
   const myGeneration = ++renderGeneration;
   resultEl.innerHTML = '';
 
@@ -136,16 +141,17 @@ function render(resultEl, state) {
     nsLabel.appendChild(nsSelect);
     v5Row.appendChild(nsLabel);
 
+    let customInput = null;
     if (state.namespaceChoice === 'custom') {
       const customLabel = document.createElement('label');
       customLabel.appendChild(document.createTextNode('Custom namespace: '));
-      const customInput = document.createElement('input');
+      customInput = document.createElement('input');
       customInput.type = 'text';
       customInput.placeholder = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
       customInput.value = state.customNamespace;
       customInput.addEventListener('input', () => {
         state.customNamespace = customInput.value;
-        render(resultEl, state);
+        render(resultEl, state, { focusField: 'customNamespace', caret: customInput.selectionStart });
       });
       customLabel.appendChild(customInput);
       v5Row.appendChild(customLabel);
@@ -159,12 +165,23 @@ function render(resultEl, state) {
     nameInput.value = state.name;
     nameInput.addEventListener('input', () => {
       state.name = nameInput.value;
-      render(resultEl, state);
+      render(resultEl, state, { focusField: 'name', caret: nameInput.selectionStart });
     });
     nameLabel.appendChild(nameInput);
     v5Row.appendChild(nameLabel);
 
     resultEl.appendChild(v5Row);
+
+    // Must run after v5Row is attached to resultEl (which is already in the
+    // live document) - an element cannot receive focus while it's still
+    // sitting in a detached DOM subtree.
+    if (restoreFocus && restoreFocus.focusField === 'customNamespace' && customInput) {
+      customInput.focus();
+      customInput.setSelectionRange(restoreFocus.caret, restoreFocus.caret);
+    } else if (restoreFocus && restoreFocus.focusField === 'name') {
+      nameInput.focus();
+      nameInput.setSelectionRange(restoreFocus.caret, restoreFocus.caret);
+    }
   }
 
   const namespace = state.namespaceChoice === 'custom' ? state.customNamespace : state.namespaceChoice;
