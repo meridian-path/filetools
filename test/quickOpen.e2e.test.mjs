@@ -113,16 +113,27 @@ test('quick-open: ArrowDown/ArrowUp move aria-activedescendant, Enter navigates 
 });
 
 test('quick-open: Escape closes the dialog and returns focus to the trigger', async () => {
+  // Regression test for a real bug: the backdrop's own `display: flex` had
+  // equal CSS specificity to its `.quickopen-backdrop[hidden]` override, so
+  // setting the `hidden` attribute alone did not actually hide it -- the
+  // dialog stayed painted on top of the page and kept swallowing clicks
+  // everywhere. Asserting the attribute (as this test used to) passed even
+  // with that bug present; asserting real, rendered visibility -- and that
+  // a click behind where the dialog used to be actually reaches the page --
+  // is what catches it.
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/merge-csv/`, { waitUntil: 'networkidle' });
   await page.locator('.quickopen-trigger').focus();
   await page.keyboard.press('Enter');
   await page.waitForSelector('.quickopen-input:visible');
   await page.keyboard.press('Escape');
-  const dialogHidden = await page.locator('.quickopen-backdrop').getAttribute('hidden');
-  assert.equal(dialogHidden, '');
+  await page.locator('.quickopen-backdrop').waitFor({ state: 'hidden' });
+  assert.equal(await page.locator('.quickopen-backdrop').isVisible(), false);
   const focusedClass = await page.evaluate(() => document.activeElement.className);
   assert.equal(focusedClass, 'quickopen-trigger');
+  // The backdrop used to cover the full viewport even when "hidden" -- a
+  // click where it used to sit must now reach the real page underneath.
+  await page.locator('.site-header').click({ position: { x: 5, y: 5 } });
   await page.close();
 });
 

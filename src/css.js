@@ -1616,6 +1616,11 @@ ${designTokensCss(DESIGN_TOKENS)}
     color: var(--color-muted);
     font-size: var(--text-sm);
   }
+  /* Same specificity trap as .tool-row[hidden] above: filter.client.js sets
+     the hidden attribute (not inline style) on this row, but its own
+     display: flex above has equal specificity, so without this override a
+     "hidden" empty-state row still renders. */
+  .window-empty-row[hidden] { display: none; }
   .window-empty-clear {
     border: var(--border-hairline) solid var(--color-border);
     background: var(--color-surface);
@@ -1677,6 +1682,11 @@ ${designTokensCss(DESIGN_TOKENS)}
     padding: var(--space-7) var(--space-4);
     z-index: 200;
   }
+  /* Same specificity trap as .tool-row[hidden] above: filter.client.js sets
+     backdrop.hidden = true to close the dialog, but this rule's own
+     display: flex has equal specificity, so without this override the
+     dialog never actually closes and keeps swallowing clicks. */
+  .quickopen-backdrop[hidden] { display: none; }
   .quickopen-dialog {
     width: 100%;
     max-width: 480px;
