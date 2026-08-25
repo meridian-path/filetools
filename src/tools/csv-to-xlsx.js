@@ -54,8 +54,5 @@ module.exports = {
       answerHtml: 'Uploads are capped at 20MB. Since everything runs in your browser rather than on a server, a very large CSV is more likely to be limited by your device’s own memory than by that cap.',
     },
   ],
-  // csv-to-json (its own natural sibling link) is still on its own
-  // unmerged branch as of this commit -- follow-up once both are on
-  // master, same pattern sql-formatter/csv-to-sql-insert used.
-  relatedSlugs: ['xlsx-to-csv', 'csv-to-sql-insert', 'xlsx-to-json'],
+  relatedSlugs: ['csv-to-json', 'xlsx-to-csv', 'csv-to-sql-insert', 'xlsx-to-json'],
 };
