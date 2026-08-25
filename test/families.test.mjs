@@ -45,6 +45,7 @@ test('the taxonomy is exactly the spec\'s 5-family, 31-slug assignment', () => {
     'pdf-to-csv': 'pdf',
     'bank-statement-to-csv': 'pdf',
     'jpg-png-to-pdf': 'pdf',
+    'pdf-to-jpg-png': 'pdf',
 
     'merge-csv': 'csv',
     'compare-csv': 'csv',
