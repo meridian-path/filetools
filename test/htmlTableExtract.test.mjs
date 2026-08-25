@@ -119,6 +119,22 @@ test('rowsToJsonRecords de-duplicates blank and repeated header names', () => {
   assert.deepEqual(records, [{ Name: 'a', column_2: 'b', Name_2: 'c' }]);
 });
 
+test('rowsToJsonRecords: a literal header value colliding with a generated dedup suffix does not silently clobber the earlier duplicate\'s column', () => {
+  // ["a", "a", "a_2"]: a naive per-base counter assigns "a" then "a_2" for
+  // the first duplicate, then independently starts counting "a_2"
+  // occurrences from scratch for the third column -- also landing on
+  // "a_2" -- so the second column's data is silently overwritten by the
+  // third. Every key must be checked against the full set of
+  // already-assigned output keys, not just its own base's counter.
+  const grid = [
+    ['a', 'a', 'a_2'],
+    ['first', 'second', 'third'],
+  ];
+  const [record] = rowsToJsonRecords(grid, true);
+  assert.deepEqual(Object.keys(record), ['a', 'a_2', 'a_2_2']);
+  assert.deepEqual(record, { a: 'first', a_2: 'second', a_2_2: 'third' });
+});
+
 test('rowsToJsonRecords on an empty grid returns an empty array', () => {
   assert.deepEqual(rowsToJsonRecords([], true), []);
 });

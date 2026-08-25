@@ -13,10 +13,9 @@
  * isn't a silent choice a visitor has to reverse-engineer from the
  * output): every value becomes a JSON STRING, never auto-coerced to a
  * number or boolean. CSV itself carries no type information - every cell
- * is text - so guessing at a "real" type risks the exact class of bug an
- * independent review already caught elsewhere in this codebase: a
- * leading-zero code like "0042" silently losing its zero once treated as
- * numeric. json-to-csv.js's own reverse direction (this tool's
+ * is text - so guessing at a "real" type risks a leading-zero code like
+ * "0042" silently losing its zero once treated as numeric. json-to-csv.js's
+ * own reverse direction (this tool's
  * counterpart) makes the opposite, also-safe choice for the opposite
  * reason (a JSON value already carries a real type, so it's preserved,
  * not guessed at) - the two tools are consistent in ALWAYS trusting the
@@ -135,8 +134,7 @@ function uniqueKeys(headerRow) {
     // duplicate's generated suffix (e.g. header ["a", "a", "a_2"] -- a
     // naive counter assigns "a", "a_2", then "a_2" again for the third
     // column, since it only ever counted occurrences of "a_2" itself,
-    // never checked "a_2" was already taken). Real bug, caught by
-    // independent review before this shipped.
+    // never checked "a_2" was already taken).
     let candidate = base;
     let suffix = 2;
     while (used.has(candidate)) {
