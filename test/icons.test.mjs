@@ -69,6 +69,7 @@ test('MARKS is exactly the fixed 32-row plate/verb/ink table, no more, no fewer'
     'bank-statement-to-csv': { plate: 'pdf', verb: 'convert', ink: 'csv', motif: 'bank' },
     'jpg-png-to-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'pdf-to-jpg-png': { plate: 'pdf', verb: 'convert', ink: 'pdf' },
+    'extract-images-from-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
     'merge-csv': { plate: 'csv', verb: 'merge', ink: 'csv' },
     'compare-csv': { plate: 'csv', verb: 'compare', ink: 'csv' },
     'split-csv': { plate: 'csv', verb: 'split', ink: 'csv' },
