@@ -167,6 +167,14 @@ test('dropzone: xml-to-json (fileTypeLabel: "XML file", same vowel-sound-acronym
   await page.close();
 });
 
+test('dropzone: sql-formatter (fileTypeLabel: "SQL file", an acronym conventionally read as the word "sequel", a leading consonant sound despite starting with the letter S) reports "isn\'t a SQL file", not "an SQL file"', async () => {
+  const page = await browser.newPage();
+  const badFile = path.join(TMP, 'dz-notasql.pdf');
+  fs.writeFileSync(badFile, 'not sql');
+  await expectWrongTypeMessage(page, 'data/sql-formatter/', badFile, '"dz-notasql.pdf" isn\'t a SQL file - this tool reads SQL files.');
+  await page.close();
+});
+
 test('dropzone: hash-generator (fileTypeLabel: "", accepts every file type) never shows a wrong-type error at all -- every file matches', async () => {
   const page = await browser.newPage();
   const anyFile = path.join(TMP, 'dz-anything.xyz');
