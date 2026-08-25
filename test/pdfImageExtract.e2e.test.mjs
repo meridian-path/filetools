@@ -101,6 +101,18 @@ before(async () => {
   }
   fs.writeFileSync(path.join(TMP, 'two-pages-with-images.pdf'), await twoPageDoc.save());
 
+  // A larger PDF (one image per page, many pages) specifically to give the
+  // per-page scanning loop enough real work to observe an intermediate
+  // "working" frame in -- the 1-2 page fixtures above finish too fast for
+  // that.
+  const manyPagesDoc = await PDFDocument.create();
+  const embeddedMany = await manyPagesDoc.embedJpg(jpegBytes);
+  for (let i = 0; i < 25; i += 1) {
+    const p = manyPagesDoc.addPage([200, 150]);
+    p.drawImage(embeddedMany, { x: 20, y: 20, width: embeddedMany.width, height: embeddedMany.height });
+  }
+  fs.writeFileSync(path.join(TMP, 'many-pages-with-images.pdf'), await manyPagesDoc.save());
+
   // One text-only PDF with no embedded images at all.
   const noImageDoc = await PDFDocument.create();
   const font = await noImageDoc.embedFont(StandardFonts.Helvetica);
@@ -158,6 +170,36 @@ test('extract-images-from-pdf: a two-page PDF with one image per page numbers ea
     'two-pages-with-images-page-1-image-01.png',
     'two-pages-with-images-page-2-image-01.png',
   ]);
+  await page.close();
+});
+
+test('extract-images-from-pdf: scanning many pages shows real per-page progress (determinate bar), the same shared pattern its sibling tools use', async () => {
+  // Real assertion, not a proxy: this loop already produced real "Scanning
+  // page N of M..." text before this pass -- what's new is the determinate
+  // progress bar, reformatted through src/browser/batchProgress.js (the
+  // same shared helper pdfToImages.client.js/imagesToPdf.client.js now use)
+  // so all three read consistently. Would time out for real if
+  // reportBatchProgress() were reverted to a bare setStatus() call.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+  await page.goto(`${baseUrl}pdf/extract-images-from-pdf/`, { waitUntil: 'networkidle' });
+
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'many-pages-with-images.pdf'));
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.dz-status')?.textContent || '';
+    const dz = document.querySelector('.dropzone');
+    return /Scanning page \d+ of 25…/.test(status) && dz?.dataset.state === 'working' && dz?.dataset.determinate === 'true';
+  }, { timeout: 15000 });
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download")').click(),
+  ]);
+  const zipPath = await download.path();
+  const entries = unzipSync(new Uint8Array(fs.readFileSync(zipPath)));
+  assert.equal(Object.keys(entries).length, 25);
+
+  assert.deepEqual(errors, []);
   await page.close();
 });
 

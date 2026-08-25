@@ -62,6 +62,16 @@ async function buildThreePagePdf() {
   return doc.save();
 }
 
+async function buildManyPagePdf(count) {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  for (let i = 0; i < count; i += 1) {
+    const page = doc.addPage([200, 150]);
+    page.drawText(`Page ${i + 1}`, { x: 20, y: 70, size: 18, font, color: rgb(0, 0, 0) });
+  }
+  return doc.save();
+}
+
 async function downloadZip(page, buttonText) {
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 15000 }),
@@ -80,6 +90,7 @@ before(async () => {
   fs.mkdirSync(TMP, { recursive: true });
   fs.writeFileSync(path.join(TMP, 'colors.pdf'), await buildThreePagePdf());
   fs.writeFileSync(path.join(TMP, 'not-a-pdf.pdf'), 'this is not a real pdf');
+  fs.writeFileSync(path.join(TMP, 'many-pages.pdf'), await buildManyPagePdf(30));
 
   server = await startServer(DIST, BASE_PREFIX);
   baseUrl = `http://localhost:${server.address().port}${BASE_PREFIX}`;
@@ -125,6 +136,45 @@ test('pdf-to-jpg-png: selecting PNG downloads a zip of real PNGs instead', async
   for (const bytes of Object.values(entries)) {
     assert.deepEqual([...bytes.subarray(0, 4)], pngSignature);
   }
+  await page.close();
+});
+
+test('pdf-to-jpg-png: rendering many pages shows real per-page progress (determinate bar + "N of M" status) in both the preview and export loops', async () => {
+  // Real assertion, not a proxy: waits for the ACTUAL rendered .dz-status
+  // text to match src/browser/batchProgress.js's real "Rendering page N of
+  // M..." shape while the dropzone is genuinely "working" -- would time out
+  // and fail for real if reportBatchProgress()/setProgress() were removed
+  // from either of pdfToImages.client.js's two loops.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+  await page.goto(`${baseUrl}pdf/pdf-to-jpg-png/`, { waitUntil: 'networkidle' });
+
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'many-pages.pdf'));
+  // Preview-render loop: runs automatically on file selection, before the
+  // page even offers a format choice.
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.dz-status')?.textContent || '';
+    const dz = document.querySelector('.dropzone');
+    return /Rendering page \d+ of 30…/.test(status) && dz?.dataset.determinate === 'true';
+  }, { timeout: 15000 });
+  await page.waitForFunction(() => document.querySelectorAll('.page-grid .page-card').length === 30, { timeout: 15000 });
+
+  // Export loop: the second, separately-triggered pass behind "Convert to
+  // images" -- confirms progress reporting isn't only wired into the first
+  // (preview) loop.
+  await page.locator('button:has-text("Convert to images")').click();
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.dz-status')?.textContent || '';
+    const dz = document.querySelector('.dropzone');
+    return /Rendering page \d+ of 30…/.test(status) && dz?.dataset.state === 'working' && dz?.dataset.determinate === 'true';
+  }, { timeout: 15000 });
+
+  const download = await page.waitForEvent('download', { timeout: 15000 });
+  const zipPath = await download.path();
+  const entries = unzipSync(new Uint8Array(fs.readFileSync(zipPath)));
+  assert.equal(Object.keys(entries).length, 30);
+
+  assert.deepEqual(errors, []);
   await page.close();
 });
 

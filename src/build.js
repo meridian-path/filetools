@@ -140,7 +140,13 @@ async function build() {
   // never referenced by a <script> tag, only by regexTester.client.js's
   // own `new Worker(...)` call), so it needs the same fixed-list treatment
   // dropzone.client.js/newsletter.client.js get.
-  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js'];
+  // batchProgress.js: the shared determinate-batch-progress formatter/
+  // reporter (src/browser/batchProgress.js's own header comment) -- plain
+  // ES-module `import`ed by name from a handful of per-tool client files
+  // (imagesToPdf/pdfToImages/pdfImageExtract), never itself a tool's
+  // `clientEntry`, so CLIENT_FILES never picks it up on its own -- same
+  // fixed-list treatment as the other shared, non-per-tool files here.
+  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js', 'batchProgress.js'];
   for (const file of [...ALWAYS_COPY_CLIENT_FILES, ...CLIENT_FILES]) {
     fs.copyFileSync(path.join(ROOT, 'src', 'browser', file), path.join(jsDir, file));
   }

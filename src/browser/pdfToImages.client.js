@@ -15,6 +15,8 @@
 // documents, and the same synchronous zipSync (no Worker/dynamic-code
 // path needed).
 
+import { reportBatchProgress } from './batchProgress.js';
+
 const PdfJsPromise = import('../vendor/pdfjs-dist/pdf.min.mjs').then((pdfjs) => {
   pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdfjs-dist/pdf.worker.min.mjs', import.meta.url).href;
   return pdfjs;
@@ -113,6 +115,11 @@ export async function run(ctx) {
 
   const pageCount = pdfDoc.numPages;
   for (let i = 1; i <= pageCount; i += 1) {
+    // A real timing check (150 pages) measured this thumbnail loop past 1s
+    // (~2.6s total for both loops combined) -- per-page reporting here is
+    // this pass's real target for that case, not decorative. See
+    // src/browser/batchProgress.js.
+    if (pageCount > 1) reportBatchProgress(ctx, 'Rendering', i, pageCount, 'page');
     // eslint-disable-next-line no-await-in-loop -- pages render in order,
     // same reasoning as pdfPages.client.js's own renderThumbnails().
     const page = await pdfDoc.getPage(i);
@@ -145,6 +152,7 @@ export async function run(ctx) {
       const padWidth = String(pageCount).length;
       const entries = {};
       for (let i = 1; i <= pageCount; i += 1) {
+        if (pageCount > 1) reportBatchProgress(ctx, 'Rendering', i, pageCount, 'page');
         // eslint-disable-next-line no-await-in-loop -- sequential so the
         // status line's own page count stays meaningful, and so a very
         // large document doesn't try to hold every full-resolution canvas

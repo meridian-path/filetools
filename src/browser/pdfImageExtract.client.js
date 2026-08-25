@@ -34,6 +34,8 @@
 // the common real-world case (a photo/scan/logo placed on a page)
 // without the added complexity of the rarer repeat/inline shapes.
 
+import { reportBatchProgress } from './batchProgress.js';
+
 const PdfJsPromise = import('../vendor/pdfjs-dist/pdf.min.mjs').then((pdfjs) => {
   pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdfjs-dist/pdf.worker.min.mjs', import.meta.url).href;
   return pdfjs;
@@ -160,7 +162,13 @@ export async function run(ctx) {
   let imageCount = 0;
 
   for (let pageNum = 1; pageNum <= pageCount; pageNum += 1) {
-    setStatus(`Scanning page ${pageNum} of ${pageCount}…`);
+    // Reformatted through the shared helper (same phrasing shape as
+    // pdfToImages.client.js's own page loop now uses) so this tool's
+    // per-page text and its determinate progress bar read consistently
+    // with its sibling rather than diverging -- this loop already reported
+    // real per-page text before this pass; the determinate bar is what's
+    // new. See src/browser/batchProgress.js.
+    reportBatchProgress(ctx, 'Scanning', pageNum, pageCount, 'page');
     // eslint-disable-next-line no-await-in-loop -- sequential so the
     // status line's own page count stays meaningful, and so a very large
     // document doesn't try to decode every page's images at once.
