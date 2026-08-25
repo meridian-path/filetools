@@ -120,7 +120,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
   })));
   assert.deepEqual(counts, [
     { label: 'PDF', count: '7', rows: 7 },
-    { label: 'CSV & Spreadsheets', count: '9', rows: 9 },
+    { label: 'CSV & Spreadsheets', count: '10', rows: 10 },
     { label: 'JSON & Data Formats', count: '6', rows: 6 },
     { label: 'Text', count: '4', rows: 4 },
     { label: 'Developer', count: '7', rows: 7 },
