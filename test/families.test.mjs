@@ -58,6 +58,7 @@ test('the taxonomy is exactly the spec\'s 5-family, 31-slug assignment', () => {
     'flatten-json': 'json',
     'json-minify-beautify': 'json',
     'yaml-to-json': 'json',
+    'json-to-yaml': 'json',
     'xml-to-json': 'json',
 
     'xlsx-to-csv': 'sheet',
