@@ -54,5 +54,5 @@ module.exports = {
       answerHtml: 'A short row gets an empty string for its missing trailing fields; a long row has its extra trailing fields dropped. No column ever shifts out of place because of a ragged row.',
     },
   ],
-  relatedSlugs: ['json-to-csv', 'csv-to-sql-insert', 'flatten-json'],
+  relatedSlugs: ['csv-to-xlsx', 'json-to-csv', 'csv-to-sql-insert', 'flatten-json'],
 };
