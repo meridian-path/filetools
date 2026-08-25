@@ -119,12 +119,24 @@ export function normalizeTableRows(cellRows) {
  *   "Amount_2") so every JSON record has a stable, non-colliding key set.
  */
 function uniqueKeys(headerRow) {
-  const seen = new Map();
+  const used = new Set();
   return headerRow.map((raw, i) => {
     const base = raw && raw.trim() ? raw.trim() : `column_${i + 1}`;
-    const count = (seen.get(base) || 0) + 1;
-    seen.set(base, count);
-    return count === 1 ? base : `${base}_${count}`;
+    // Checked against the full set of already-assigned OUTPUT keys, not
+    // just a per-base counter: a counter alone can still collide when a
+    // later column's own literal name happens to match an earlier
+    // duplicate's generated suffix (e.g. header ["a", "a", "a_2"] -- a
+    // naive counter assigns "a", "a_2", then "a_2" again for the third
+    // column, since it only ever counted occurrences of "a_2" itself,
+    // never checked "a_2" was already taken).
+    let candidate = base;
+    let suffix = 2;
+    while (used.has(candidate)) {
+      candidate = `${base}_${suffix}`;
+      suffix += 1;
+    }
+    used.add(candidate);
+    return candidate;
   });
 }
 
