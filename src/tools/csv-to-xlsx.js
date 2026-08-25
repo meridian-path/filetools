@@ -39,7 +39,7 @@ module.exports = {
     },
     {
       q: 'Which columns become real Excel numbers?',
-      answerHtml: 'Only a column where every value looks like a plain integer or decimal - a single non-numeric-looking value anywhere in the column, even a leading-zero code like <code>0042</code> that some systems use for IDs, keeps the entire column as text, since a wrongly-converted value would silently drop meaningful digits (a real bug an earlier version of a related tool on this site actually shipped, since fixed).',
+      answerHtml: 'Only a column where every value looks like a plain integer or decimal - a single non-numeric-looking value anywhere in the column keeps the entire column as text, since guessing at a real type risks silently corrupting a value that only looks numeric, like a leading-zero code (<code>0042</code> becoming <code>42</code>).',
     },
     {
       q: 'Is this different from just renaming a .csv file to .xlsx?',
