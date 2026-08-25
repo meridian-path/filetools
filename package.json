@@ -9,13 +9,14 @@
     "build": "node src/build.js",
     "vendor": "node scripts/copy-vendor.js",
     "serve": "node scripts/serve.js 8080",
-    "pretest": "node scripts/check-em-dash.js && node scripts/check-internal-ids.js",
+    "pretest": "node scripts/check-em-dash.js && node scripts/check-internal-ids.js && node scripts/check-copy-tells.js",
     "test": "node --test test/*.test.mjs",
     "visual-qa": "node scripts/visual-qa.js",
     "lineup-squint": "node scripts/lineup-squint.js",
     "capture-competitor-screenshot": "node scripts/capture-competitor-screenshot.js",
     "check-em-dash": "node scripts/check-em-dash.js",
-    "check-internal-ids": "node scripts/check-internal-ids.js"
+    "check-internal-ids": "node scripts/check-internal-ids.js",
+    "check-copy-tells": "node scripts/check-copy-tells.js"
   },
   "engines": {
     "node": ">=18"
