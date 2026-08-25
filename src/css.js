@@ -1255,6 +1255,27 @@ ${designTokensCss(DESIGN_TOKENS)}
   .faq-item p { margin: var(--space-2) 0 0 var(--space-5); color: var(--color-text); }
 
   /* -------------------------------------------------------------------
+     Pro-feature upsell (currently only compare-csv's paid batch/Excel-report add-on)
+     -- reuses .alert/.btn-primary/.btn-secondary/.table-block-head/
+     .table-block/.extracted-table wholesale rather than inventing new
+     visual language for a single feature; only the section's own border
+     accent is new.
+     ------------------------------------------------------------------- */
+  .pro-feature {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-control) solid var(--color-accent);
+  }
+  .pro-feature h2 { margin-bottom: var(--space-3); }
+  .pro-feature .table-block-head { margin-top: var(--space-4); }
+  .pro-feature .table-block-head label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  /* -------------------------------------------------------------------
      Related tools -- one inline glyph+text row under a hairline, not a
      card grid (design-standards.md; see toolPage.js's comment).
      ------------------------------------------------------------------- */

@@ -142,6 +142,21 @@ function renderToolPage(tool, example = {}) {
         ${howItems}
       </ol>`;
 
+  // Pro-feature upsell (currently only compare-csv.js's paid batch/Excel-report add-on):
+  // a self-contained additive section loaded by its own client script,
+  // entirely separate from the free dropzone flow above -- see
+  // src/browser/compareCsvPro.client.js's header comment for the full
+  // design. `gumroadBuyUrl`/`gumroadProductPermalink` stay unset until a
+  // human creates the real Gumroad product; the client script renders an
+  // honest "not listed for sale yet" state until then, never a live-looking
+  // but broken purchase link.
+  const proFeatureHtml = tool.proFeature ? `
+    <section class="pro-feature" aria-labelledby="pro-h"${tool.proFeature.gumroadBuyUrl ? ` data-gumroad-buy-url="${escapeHtml(tool.proFeature.gumroadBuyUrl)}"` : ''}${tool.proFeature.gumroadProductPermalink ? ` data-gumroad-product="${escapeHtml(tool.proFeature.gumroadProductPermalink)}"` : ''}>
+      <h2 id="pro-h">${escapeHtml(tool.h1)} Pro</h2>
+      <div class="pro-feature-body"></div>
+    </section>
+    <script type="module" src="${escapeHtml(url(`js/${tool.proFeature.clientEntry}.client.js`))}"></script>` : '';
+
   const mainHtml = `    <h1>${escapeHtml(tool.h1)}</h1>
     <p class="deck">${escapeHtml(tool.deck)}</p>
     <section id="tool" aria-labelledby="tool-h" data-mode="${escapeHtml(tool.mode)}" data-client="${escapeHtml(tool.clientEntry)}" data-accept="${escapeHtml(tool.accepts)}" data-file-type-label="${escapeHtml(fileTypeLabel)}"${tool.multiple ? ' data-multiple="true"' : ''}>
@@ -161,6 +176,7 @@ function renderToolPage(tool, example = {}) {
       <h2 id="faq-h">Frequently asked questions</h2>
       ${faqItems}
     </section>
+    ${proFeatureHtml}
 
     ${adSlot('inContent')}
 

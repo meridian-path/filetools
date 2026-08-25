@@ -56,6 +56,22 @@ module.exports = {
       q: 'Is the comparison case-sensitive and whitespace-sensitive by default?',
       answerHtml: 'Case-sensitive by default ("Rent" and "rent" count as different) and whitespace-sensitive by default (a leading/trailing space counts as a change) - both are toggles above the table if you want the comparison to ignore either.',
     },
+    {
+      q: 'What does Compare-CSV Pro add?',
+      answerHtml: 'A one-time $3 unlock (no subscription) for two things: batch mode, comparing many file pairs in one pass instead of one at a time, and a combined Excel report - one workbook, one sheet per pair, with changed/added/removed rows highlighted. Everything above stays free and unaffected either way.',
+    },
   ],
   relatedSlugs: ['merge-csv', 'sort-lines', 'remove-duplicate-lines'],
+  // Compare-CSV Pro: a one-time $3 unlock adding
+  // batch multi-pair compare + a combined Excel diff report. See
+  // src/pages/toolPage.js's proFeatureHtml and
+  // src/browser/compareCsvPro.client.js for the full mechanism.
+  // gumroadBuyUrl/gumroadProductPermalink are the two fields a human fills
+  // in once the real Gumroad product exists - until then the client script
+  // renders an honest "not listed for sale yet" state.
+  proFeature: {
+    clientEntry: 'compareCsvPro',
+    gumroadBuyUrl: null,
+    gumroadProductPermalink: null,
+  },
 };
