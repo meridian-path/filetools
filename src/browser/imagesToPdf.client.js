@@ -10,6 +10,8 @@
 // node_modules at build time by scripts/copy-vendor.js) -- never a CDN, so
 // "turn off your Wi-Fi and this page still works" stays true.
 
+import { reportBatchProgress } from './batchProgress.js';
+
 const PDFLibPromise = import('../vendor/pdf-lib/pdf-lib.esm.min.js');
 
 // A PDF point is defined at 72 per inch. Treating 1 image pixel as 1 point
@@ -149,8 +151,17 @@ export async function run(ctx) {
       setStatus('Converting on this device…');
       try {
         const doc = await PDFLib.PDFDocument.create();
+        // A real timing check (30 photos at a realistic 3000x2000) measured
+        // this loop at ~13s -- well past both the 1s "explicit working
+        // state" and 10s "determinate progress" thresholds, unlike this
+        // tool's own file-count-only measurements at smaller/synthetic
+        // sizes. Per-image reporting here is this pass's actual target, not
+        // decorative -- see src/browser/batchProgress.js.
+        let done = 0;
         for (const idx of order) {
           const file = files[idx];
+          done += 1;
+          if (order.length > 1) reportBatchProgress(ctx, 'Converting', done, order.length, 'image');
           const image = await embedImage(doc, file, PDFLib);
           const pageWidth = image.width * POINTS_PER_PIXEL;
           const pageHeight = image.height * POINTS_PER_PIXEL;

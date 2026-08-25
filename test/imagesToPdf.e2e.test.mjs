@@ -218,6 +218,46 @@ test('jpg-png-to-pdf: a corrupt/mislabeled image file gets a clear, file-named e
   await page.close();
 });
 
+test('jpg-png-to-pdf: converting several images shows real per-image progress (determinate bar + "N of M" status), not just a generic spinner', async () => {
+  // Real assertion, not a proxy: waits for the ACTUAL rendered .dz-status
+  // text to match the real "Converting image N of M..." shape produced by
+  // src/browser/batchProgress.js while the dropzone is genuinely still in
+  // its "working" state, and confirms the progress bar's real inline width
+  // moved off its initial empty value -- if reportBatchProgress()/
+  // setProgress() were removed, this would time out and fail for real
+  // (the status would stay the old static "Converting on this device...").
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+  await page.goto(`${baseUrl}pdf/jpg-png-to-pdf/`, { waitUntil: 'networkidle' });
+
+  const files = [];
+  for (let i = 0; i < 3; i += 1) files.push(path.join(TMP, 'photo1.png'), path.join(TMP, 'a-second-photo.png'));
+  await page.locator('#file-input').setInputFiles(files);
+  await page.waitForSelector('.file-list .file-row');
+  assert.equal(await page.locator('.file-list .file-row').count(), 6);
+
+  await page.locator('button:has-text("Convert to PDF")').click();
+
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.dz-status')?.textContent || '';
+    const dz = document.querySelector('.dropzone');
+    return /Converting image \d+ of 6…/.test(status) && dz?.dataset.state === 'working' && dz?.dataset.determinate === 'true';
+  }, { timeout: 15000 });
+
+  const widthDuringWork = await page.locator('.progress-fill').evaluate((el) => el.style.width);
+  assert.notEqual(widthDuringWork, '', 'progress-fill should have a real inline width once determinate progress is reported');
+  assert.notEqual(widthDuringWork, '0%');
+
+  const download = await page.waitForEvent('download', { timeout: 15000 });
+  const outPath = path.join(TMP, 'progress-out.pdf');
+  await download.saveAs(outPath);
+  const doc = await PDFDocument.load(fs.readFileSync(outPath));
+  assert.equal(doc.getPageCount(), 6);
+
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('jpg-png-to-pdf: a filename with an HTML-special character renders as literal text in the file list, not injected markup', async () => {
   const page = await browser.newPage();
   const errors = collectPageErrors(page);

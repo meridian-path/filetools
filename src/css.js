@@ -558,16 +558,23 @@ ${designTokensCss(DESIGN_TOKENS)}
     border-radius: var(--radius-pill);
     transition: width var(--motion-duration-fast) var(--motion-ease-standard);
   }
-  /* Indeterminate loop: no per-processor progress plumbing exists today, so
-     this is a "work is happening" signal, not a real percentage -- the
-     accompanying .dz-status text (already aria-live) carries the real
+  /* Indeterminate loop: the default for any processor that never calls
+     setProgress() -- a "work is happening" signal, not a real percentage --
+     the accompanying .dz-status text (already aria-live) carries the real
      detail a processor knows (e.g. "Reading 4 pages on this device..."). */
-  .dropzone[data-state="working"] .progress-fill {
+  .dropzone[data-state="working"]:not([data-determinate="true"]) .progress-fill {
     animation: dz-progress-loop var(--motion-duration-loop) linear infinite;
   }
   @keyframes dz-progress-loop {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(250%); }
+  }
+  /* Determinate: a batch processor that genuinely knows done/total (see
+     src/browser/batchProgress.js) upgrades to this instead -- real width,
+     no loop animation, driven by dropzone.client.js's own setProgress(). */
+  .dropzone[data-state="working"][data-determinate="true"] .progress-fill {
+    animation: none;
+    transform: none;
   }
 
   .dz-cancel {

@@ -73,6 +73,7 @@ if (toolSection) {
   const statusEl = toolSection.querySelector('.dz-status');
   const resultEl = toolSection.querySelector('.result');
   const cancelBtn = toolSection.querySelector('.dz-cancel');
+  const progressFill = toolSection.querySelector('.progress-fill');
 
   // "working" state timing (design-standards.md's three response-time
   // limits): a generation counter is bumped on every new file selection
@@ -164,12 +165,37 @@ if (toolSection) {
 
   function setState(state) {
     dropzone.dataset.state = state;
+    // Every fresh "working" phase starts indeterminate (the site's default --
+    // most processors never call setProgress at all, and the progress-loop
+    // CSS animation already carries that case). A processor that DOES know a
+    // real done/total (see setProgress below) upgrades to a determinate bar
+    // partway through; clearing here on every transition INTO "working"
+    // means a stale determinate width from a two-step tool's PREVIOUS run
+    // (pick files -> reorder -> press "Merge"/"Convert" again) can never
+    // leak into the next run before its own first setProgress call, if any.
+    if (state === 'working') {
+      delete dropzone.dataset.determinate;
+      if (progressFill) progressFill.style.width = '';
+    }
   }
 
   function setStatus(message, tone) {
     statusEl.textContent = message || '';
     if (tone) statusEl.dataset.tone = tone;
     else delete statusEl.dataset.tone;
+  }
+
+  /** Upgrades the progress bar from indeterminate to a real, determinate
+   * done/total width -- for the handful of batch processors whose loop
+   * genuinely knows both numbers (see src/browser/batchProgress.js). Most
+   * tools never call this; the bar stays indeterminate and that's correct
+   * for them (design-standards.md's "determinate progress past 10s"
+   * requirement only bites once a processor can actually count units). */
+  function setProgress(done, total) {
+    if (!progressFill || !total) return;
+    dropzone.dataset.determinate = 'true';
+    const pct = Math.max(0, Math.min(100, (done / total) * 100));
+    progressFill.style.width = `${pct}%`;
   }
 
   function fileMatchesAccept(file) {
@@ -249,6 +275,7 @@ if (toolSection) {
         resultEl,
         setState: (s) => { if (stillCurrent()) setState(s); },
         setStatus: (m, t) => { if (stillCurrent()) setStatus(m, t); },
+        setProgress: (done, total) => { if (stillCurrent()) setProgress(done, total); },
       });
       if (stillCurrent()) clearSlowTimer();
     } catch (err) {
