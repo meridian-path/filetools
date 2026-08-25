@@ -49,5 +49,5 @@ module.exports = {
       answerHtml: 'No. An encrypted or password-protected .xlsx can’t be read without the password, and this tool never asks for one. Remove the password in Excel first, then convert the file here.',
     },
   ],
-  relatedSlugs: ['pdf-to-csv', 'html-table-to-csv', 'bank-statement-to-csv'],
+  relatedSlugs: ['csv-to-xlsx', 'pdf-to-csv', 'html-table-to-csv', 'bank-statement-to-csv'],
 };
