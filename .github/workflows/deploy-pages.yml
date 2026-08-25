@@ -12,11 +12,20 @@ permissions:
   pages: write
   id-token: write
 
-# Only one deploy at a time; a new push cancels an in-flight deploy rather
-# than queueing behind it, since only the latest commit's build should ever
-# ship.
+# Only one run per ref at a time; a new push to that same ref cancels its
+# own in-flight run rather than queueing behind it, since only the latest
+# commit's build should ever ship. Keyed per-ref (not a bare "pages" group)
+# so this never cancels a DIFFERENT branch's or PR's in-flight run - a bare
+# shared group meant pushing to any one open PR could cancel another PR's
+# still-running build check, or a master push (merge) could cancel a
+# still-running PR check elsewhere in the repo, entirely unrelated to that
+# PR's own commits. That's a real, reproduced mechanism, not a hypothetical:
+# it can make a PR's "checks passed" status reflect a stale, superseded
+# commit rather than its actual current head, which is a plausible
+# contributor to this repo's recurring PR-merged-at-a-stale-commit
+# incidents.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
