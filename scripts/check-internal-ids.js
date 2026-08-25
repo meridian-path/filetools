@@ -112,9 +112,16 @@ function findLeakedIds(filePath) {
 // This checker's own header comment, and its own regression test's
 // literal id-shaped fixtures (needed to actually exercise the matching
 // logic), are the two legitimate places these patterns appear as prose/
-// test data rather than a real leak.
-const EXCLUDED_FILES = [__filename, path.join(ROOT, 'test', 'check-internal-ids.test.mjs')]
-  .map((f) => path.resolve(f));
+// test data rather than a real leak. test/check-copy-tells.test.mjs joins
+// this list for the same reason: it needs literal id-shaped fixtures
+// ("task-mt6jcfwr-ed62cc" etc.) to exercise check-copy-tells.js's own
+// process-talk-marker detection, which reuses this file's ID_RE against
+// rendered dist/ output rather than source.
+const EXCLUDED_FILES = [
+  __filename,
+  path.join(ROOT, 'test', 'check-internal-ids.test.mjs'),
+  path.join(ROOT, 'test', 'check-copy-tells.test.mjs'),
+].map((f) => path.resolve(f));
 
 function main() {
   const files = SCAN_DIRS.flatMap((d) => findFiles(path.join(ROOT, d)))
