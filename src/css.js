@@ -73,15 +73,12 @@ ${designTokensCss(DESIGN_TOKENS)}
   main { display: block; }
 
   h1, h2, h3 {
-    font-family: var(--font-display);
-    font-weight: var(--weight-bold);
     color: var(--color-text);
-    line-height: var(--leading-tight);
     margin: 0 0 var(--space-4);
   }
-  h1 { font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); }
-  h2 { font-size: var(--text-xl); margin-top: var(--space-7); }
-  h3 { font-size: var(--text-lg); }
+  h1 { font: var(--type-h1); letter-spacing: var(--tracking-tight); }
+  h2 { font: var(--type-h2); margin-top: var(--space-7); }
+  h3 { font: var(--type-h3); }
 
   p, li { margin: 0 0 var(--space-4); }
 
@@ -90,13 +87,13 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
 
   .deck {
-    font-size: var(--text-md);
+    font: var(--type-deck);
     color: var(--color-muted);
     max-width: var(--measure);
   }
 
   caption, .caption {
-    font-size: var(--text-xs);
+    font: var(--type-caption);
     color: var(--color-muted);
   }
 
@@ -243,11 +240,7 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   .folder-group-link:hover { color: var(--color-accent); }
   .folder-group-link[aria-current="page"] { color: var(--color-accent); }
-  .folder-group-count {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-  }
+  .folder-group-count { font: var(--type-mono-caption); color: var(--color-muted); }
   .folder-tool-list {
     list-style: none;
     margin: 0;
@@ -1431,7 +1424,12 @@ ${designTokensCss(DESIGN_TOKENS)}
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-3) 0;
+    /* Density move (craft-retrofit Phase 1): a within-group tier (--space-2)
+       between rows reads as one deliberate, instrument-dense list rather
+       than the between-group tier (--space-3) it used before, which read
+       closer to a card list than a file listing. Horizontal padding is
+       unchanged -- only the vertical rhythm tightens. */
+    padding: var(--space-2) 0;
     border-bottom: var(--border-hairline) solid var(--color-border);
     text-decoration: none;
     color: var(--color-text);
@@ -1459,12 +1457,10 @@ ${designTokensCss(DESIGN_TOKENS)}
   .tool-row-icon { width: var(--icon-md); height: var(--icon-md); }
   .tool-row-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
   .tool-row-name {
-    font-family: var(--font-display);
-    font-weight: var(--weight-bold);
-    font-size: var(--text-md);
+    font: var(--type-row-name);
     color: var(--color-text);
   }
-  .tool-row-desc { font-size: var(--text-sm); color: var(--color-muted); }
+  .tool-row-desc { font: var(--type-control); color: var(--color-muted); }
   /* Kind chip (spec 1.5): the tool's own family label, family-6 text on
      family-1 background -- the same ramp pair every mark/glyph already
      uses via .mark--<family>, so no new color logic. Hidden below 768px
@@ -1474,8 +1470,7 @@ ${designTokensCss(DESIGN_TOKENS)}
   .tool-row-kind {
     display: none;
     flex-shrink: 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font: var(--type-mono-caption);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
     background: var(--mark-wash);
@@ -1505,22 +1500,16 @@ ${designTokensCss(DESIGN_TOKENS)}
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    /* Density move: within-group vertical padding (--space-2), matching
+       the tightened row rhythm below -- the chrome strip is the window's
+       own toolbar, not a section header, so it reads as part of the same
+       dense instrument rather than a lighter band above it. */
+    padding: var(--space-2) var(--space-4);
     background: var(--color-surface-alt);
     border-bottom: var(--border-hairline) solid var(--color-border);
   }
-  .window-path {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--color-text);
-    font-weight: var(--weight-medium);
-  }
-  .window-count {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-    white-space: nowrap;
-  }
+  .window-path { font: var(--type-mono-path); color: var(--color-text); }
+  .window-count { font: var(--type-mono-caption); color: var(--color-muted); white-space: nowrap; }
   .window-filter-slot { flex: 1; min-width: 0; display: flex; justify-content: flex-end; }
   .window-filter-input {
     width: 100%;
@@ -1531,14 +1520,12 @@ ${designTokensCss(DESIGN_TOKENS)}
     border-radius: var(--radius-sm);
     background: var(--color-surface);
     color: var(--color-text);
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
+    font: var(--type-control);
   }
   .window-ruler {
     display: none;
     padding: var(--space-2) var(--space-4) 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font: var(--type-mono-caption);
     color: var(--color-muted);
     justify-content: space-between;
   }
@@ -1573,6 +1560,19 @@ ${designTokensCss(DESIGN_TOKENS)}
       padding: var(--space-2) var(--space-3) var(--space-2) 0;
       margin-bottom: 0;
     }
+    /* Found during the craft-retrofit Phase 1 visual-QA pass: the 404
+       page reuses .window-sidebar's row styling for its folder list via
+       .window-sidebar-full, but as BODY content (no actual sidebar next
+       to it -- renderExplorerWindow() gets it as the body parameter,
+       never the sidebar parameter, see notFound.js), not a real two-pane
+       sidebar. Without this override it inherited the fixed
+       --sidebar-width above at >=1024px, leaving a narrow folder list
+       and a large empty pane beside it. */
+    .window-sidebar-full {
+      width: 100%;
+      border-right: none;
+      padding: var(--space-2) 0;
+    }
   }
   .window-sidebar-row {
     display: flex;
@@ -1583,11 +1583,11 @@ ${designTokensCss(DESIGN_TOKENS)}
     border-radius: var(--radius-sm);
     text-decoration: none;
     color: var(--color-text);
-    font-size: var(--text-sm);
+    font: var(--type-control);
   }
   .window-sidebar-row:hover { background: var(--color-accent-tint); color: var(--color-accent); }
   .window-sidebar-label { flex: 1; }
-  .window-sidebar-count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-muted); }
+  .window-sidebar-count { font: var(--type-mono-caption); color: var(--color-muted); }
   .folder-glyph-window { width: var(--icon-sm); height: var(--icon-sm); flex-shrink: 0; }
   .window-main { flex: 1; min-width: 0; }
   .window-section { margin: var(--space-4) 0; }
@@ -1601,12 +1601,7 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   .window-section-heading a { color: var(--color-text); text-decoration: none; }
   .window-section-heading a:hover { color: var(--color-accent); }
-  .window-section-count {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-regular);
-    color: var(--color-muted);
-  }
+  .window-section-count { font: var(--type-mono-caption); color: var(--color-muted); }
   .window-empty-row {
     display: flex;
     align-items: center;
@@ -1614,7 +1609,7 @@ ${designTokensCss(DESIGN_TOKENS)}
     gap: var(--space-3);
     padding: var(--space-4);
     color: var(--color-muted);
-    font-size: var(--text-sm);
+    font: var(--type-control);
   }
   /* Same specificity trap as .tool-row[hidden] above: filter.client.js sets
      the hidden attribute (not inline style) on this row, but its own
@@ -1629,7 +1624,7 @@ ${designTokensCss(DESIGN_TOKENS)}
     padding: var(--space-1) var(--space-3);
     min-height: 36px;
     cursor: pointer;
-    font-size: var(--text-sm);
+    font: var(--type-control);
   }
   .window-empty-clear:hover { border-color: var(--color-border-strong); }
   .window-status-bar {
@@ -1637,17 +1632,22 @@ ${designTokensCss(DESIGN_TOKENS)}
     background: var(--color-surface-alt);
     border-top: var(--border-hairline) solid var(--color-border);
   }
-  .window-status-text {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-  }
+  .window-status-text { font: var(--type-mono-caption); color: var(--color-muted); }
 
   /* -------------------------------------------------------------------
      Quick-open (spec 1.7/1.13) -- a full-screen backdrop + a single
      bordered dialog carrying one combobox input and its listbox. The
      header trigger button only ever exists once filter.client.js runs
      ("no dead control without JS").
+
+     Signature-interaction move (craft-retrofit Phase 1): the trigger
+     itself is unchanged in mechanism (still the one header affordance
+     insertQuickOpenTrigger() appends on every page -- filter.client.js is
+     untouched this phase), but now carries real border weight
+     (--border-control instead of the default --border-hairline) and a
+     slightly stronger background so it reads as a persistent toolbar
+     control rather than a muted afterthought, consistent everywhere the
+     header wraps to its own row on narrow viewports.
      ------------------------------------------------------------------- */
   .quickopen-trigger {
     margin-left: auto;
@@ -1656,18 +1656,16 @@ ${designTokensCss(DESIGN_TOKENS)}
     gap: var(--space-2);
     min-height: 44px;
     padding: var(--space-2) var(--space-3);
-    border: var(--border-hairline) solid var(--color-border);
+    border: var(--border-control) solid var(--color-border-strong);
     border-radius: var(--radius-sm);
     background: var(--color-surface);
-    color: var(--color-muted);
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
+    color: var(--color-text);
+    font: var(--type-control);
     cursor: pointer;
   }
-  .quickopen-trigger:hover { border-color: var(--color-border-strong); color: var(--color-text); }
+  .quickopen-trigger:hover { border-color: var(--color-accent); color: var(--color-accent); }
   .quickopen-trigger kbd {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font: var(--type-mono-caption);
     border: var(--border-hairline) solid var(--color-border);
     border-radius: var(--radius-sm);
     padding: 0 var(--space-1);
@@ -1725,8 +1723,8 @@ ${designTokensCss(DESIGN_TOKENS)}
     color: var(--color-text);
   }
   .quickopen-option[aria-selected="true"] { background: var(--color-accent-tint); color: var(--color-accent); }
-  .quickopen-option-folder { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-muted); flex-shrink: 0; }
-  .quickopen-empty { padding: var(--space-4); color: var(--color-muted); font-size: var(--text-sm); }
+  .quickopen-option-folder { font: var(--type-mono-caption); color: var(--color-muted); flex-shrink: 0; }
+  .quickopen-empty { padding: var(--space-4); color: var(--color-muted); font: var(--type-control); }
 `;
 
 module.exports = { SITE_CSS, FONT_WOFF2_URL };
