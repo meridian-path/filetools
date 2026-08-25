@@ -52,9 +52,5 @@ module.exports = {
       answerHtml: 'A password-protected file can’t be read in the browser without its password, so it’s reported as an error rather than silently producing blank images. Remove the password first, then convert.',
     },
   ],
-  // jpg-png-to-pdf (its own natural reverse-pair link) is still on its own
-  // unmerged branch as of this commit -- see this tool's own progress
-  // notes for the follow-up to add the reciprocal link once both are on
-  // master, same pattern sql-formatter/csv-to-sql-insert used.
-  relatedSlugs: ['split-pdf', 'rotate-pdf', 'pdf-to-csv'],
+  relatedSlugs: ['jpg-png-to-pdf', 'split-pdf', 'rotate-pdf'],
 };
