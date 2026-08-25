@@ -94,6 +94,22 @@ test('csvRowsToJsonRecords: a repeated header name gets de-duplicated with a tra
   assert.deepEqual(record, { name: 'a', name_2: 'b', name_3: 'c' });
 });
 
+test('csvRowsToJsonRecords: a literal header value colliding with a generated dedup suffix does not silently clobber the earlier duplicate\'s column', () => {
+  // ["a", "a", "a_2"]: a naive per-base counter assigns "a" then "a_2" for
+  // the first duplicate, then independently starts counting "a_2"
+  // occurrences from scratch for the third column -- also landing on
+  // "a_2" -- so the second column's data is silently overwritten by the
+  // third. Every key must be checked against the full set of
+  // already-assigned output keys, not just its own base's counter.
+  const rows = [
+    ['a', 'a', 'a_2'],
+    ['first', 'second', 'third'],
+  ];
+  const [record] = csvRowsToJsonRecords(rows);
+  assert.deepEqual(Object.keys(record), ['a', 'a_2', 'a_2_2']);
+  assert.deepEqual(record, { a: 'first', a_2: 'second', a_2_2: 'third' });
+});
+
 test('csvRowsToJsonRecords: a row shorter than the header fills missing trailing fields with an empty string', () => {
   const rows = [
     ['name', 'price', 'category'],
