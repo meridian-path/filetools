@@ -146,7 +146,14 @@ async function build() {
   // (imagesToPdf/pdfToImages/pdfImageExtract), never itself a tool's
   // `clientEntry`, so CLIENT_FILES never picks it up on its own -- same
   // fixed-list treatment as the other shared, non-per-tool files here.
-  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js', 'batchProgress.js'];
+  //
+  // compareCsvPro.client.js: Compare-CSV Pro's own controller
+  // (the compare-csv paid batch/Excel-report add-on) -- same category as regexTester.worker.js/
+  // filter.client.js above, not a per-tool CLIENT_FILES entry, since it's
+  // loaded by its own fixed <script> tag (src/pages/toolPage.js's
+  // proFeatureHtml) rather than routed through dropzone.client.js's
+  // PROCESSORS map by clientEntry/maxBytes.
+  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js', 'batchProgress.js', 'compareCsvPro.client.js'];
   for (const file of [...ALWAYS_COPY_CLIENT_FILES, ...CLIENT_FILES]) {
     fs.copyFileSync(path.join(ROOT, 'src', 'browser', file), path.join(jsDir, file));
   }
