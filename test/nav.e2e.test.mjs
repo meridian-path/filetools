@@ -119,7 +119,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
     rows: g.querySelectorAll('.folder-tool-list a').length,
   })));
   assert.deepEqual(counts, [
-    { label: 'PDF', count: '6', rows: 6 },
+    { label: 'PDF', count: '7', rows: 7 },
     { label: 'CSV & Spreadsheets', count: '9', rows: 9 },
     { label: 'JSON & Data Formats', count: '6', rows: 6 },
     { label: 'Text', count: '4', rows: 4 },

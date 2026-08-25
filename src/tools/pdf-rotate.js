@@ -48,5 +48,5 @@ module.exports = {
       answerHtml: 'A password-protected file can’t be read in the browser without its password. Remove the password first, then rotate.',
     },
   ],
-  relatedSlugs: ['merge-pdf', 'split-pdf', 'pdf-to-csv'],
+  relatedSlugs: ['merge-pdf', 'split-pdf', 'pdf-to-jpg-png'],
 };
