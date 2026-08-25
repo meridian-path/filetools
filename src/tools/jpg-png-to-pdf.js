@@ -40,7 +40,7 @@ module.exports = {
     },
     {
       q: 'What page size does each image get?',
-      answerHtml: 'Each PDF page is sized to match its own image’s pixel dimensions exactly (at 72 points per inch), so nothing is cropped, stretched, or padded with blank margins - a portrait photo gets a portrait page, a landscape photo gets a landscape page.',
+      answerHtml: 'Each PDF page matches its own image’s aspect ratio exactly, sized at 144 DPI (144 image pixels per inch of page), so nothing is cropped, stretched, or padded with blank margins - a portrait photo gets a portrait page, a landscape photo gets a landscape page, sized reasonably for printing or viewing at actual size.',
     },
     {
       q: 'Is there a limit on how many images I can convert?',

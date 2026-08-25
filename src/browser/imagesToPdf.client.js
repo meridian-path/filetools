@@ -12,6 +12,17 @@
 
 const PDFLibPromise = import('../vendor/pdf-lib/pdf-lib.esm.min.js');
 
+// A PDF point is defined at 72 per inch. Treating 1 image pixel as 1 point
+// (i.e. IMAGE_DPI 72) means a modern phone/camera photo -- routinely
+// 3000-4000px on a side -- becomes a physically oversized page (a 4032x3024
+// photo would be ~56x42in). 144 is the same reverse-direction precedent
+// ./pdfToImages.client.js's own EXPORT_SCALE already uses for PDF page ->
+// image rendering, applied here the other way (image pixels -> PDF points)
+// so a page printed at actual size looks right on typical print/screen
+// output instead of building a page the size of a banner.
+const IMAGE_DPI = 144;
+const POINTS_PER_PIXEL = 72 / IMAGE_DPI;
+
 function humanSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -141,8 +152,12 @@ export async function run(ctx) {
         for (const idx of order) {
           const file = files[idx];
           const image = await embedImage(doc, file, PDFLib);
-          const page = doc.addPage([image.width, image.height]);
-          page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+          const pageWidth = image.width * POINTS_PER_PIXEL;
+          const pageHeight = image.height * POINTS_PER_PIXEL;
+          const page = doc.addPage([pageWidth, pageHeight]);
+          page.drawImage(image, {
+            x: 0, y: 0, width: pageWidth, height: pageHeight,
+          });
         }
         const bytes = await doc.save();
         downloadBlob(new Blob([bytes], { type: 'application/pdf' }), 'converted.pdf');

@@ -115,9 +115,12 @@ test('jpg-png-to-pdf: converts a single PNG into a one-page PDF', async () => {
 
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
   assert.equal(doc.getPageCount(), 1);
+  // Page points are the image's own pixel dimensions at 144 DPI (72 points
+  // per inch / 144 pixels per inch = 0.5 points per pixel) -- see
+  // ../src/browser/imagesToPdf.client.js's own IMAGE_DPI comment for why.
   const size = doc.getPage(0).getSize();
-  assert.equal(size.width, 1);
-  assert.equal(size.height, 1);
+  assert.equal(size.width, 0.5);
+  assert.equal(size.height, 0.5);
   assert.deepEqual(errors, []);
   await page.close();
 });
@@ -142,9 +145,10 @@ test('jpg-png-to-pdf: combines a PNG and a JPG into a two-page PDF, one page per
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
   assert.equal(doc.getPageCount(), 2);
   // photo1.png (1x1) stays page 1, photo2.jpg (6x4) is page 2 -- the same
-  // order the files were selected in, confirming no silent reorder.
-  assert.deepEqual(doc.getPage(0).getSize(), { width: 1, height: 1 });
-  assert.deepEqual(doc.getPage(1).getSize(), { width: 6, height: 4 });
+  // order the files were selected in, confirming no silent reorder. Page
+  // points are pixel dimensions at 144 DPI (0.5 points per pixel).
+  assert.deepEqual(doc.getPage(0).getSize(), { width: 0.5, height: 0.5 });
+  assert.deepEqual(doc.getPage(1).getSize(), { width: 3, height: 2 });
   await page.close();
 });
 
@@ -171,9 +175,10 @@ test('jpg-png-to-pdf: the up/down reorder controls actually change page order in
 
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
   assert.equal(doc.getPageCount(), 2);
-  // photo2.jpg (6x4) is now page 1, photo1.png (1x1) is now page 2.
-  assert.deepEqual(doc.getPage(0).getSize(), { width: 6, height: 4 });
-  assert.deepEqual(doc.getPage(1).getSize(), { width: 1, height: 1 });
+  // photo2.jpg (6x4) is now page 1, photo1.png (1x1) is now page 2. Page
+  // points are pixel dimensions at 144 DPI (0.5 points per pixel).
+  assert.deepEqual(doc.getPage(0).getSize(), { width: 3, height: 2 });
+  assert.deepEqual(doc.getPage(1).getSize(), { width: 0.5, height: 0.5 });
   await page.close();
 });
 
