@@ -151,6 +151,22 @@ test('dropzone: xlsx-to-csv (fileTypeLabel: ".xlsx file", a dotted extension) re
   await page.close();
 });
 
+test('dropzone: html-table-to-csv (fileTypeLabel: "HTML file", an acronym pronounced with a leading vowel sound) reports "isn\'t an HTML file", not "a HTML file"', async () => {
+  const page = await browser.newPage();
+  const badFile = path.join(TMP, 'dz-notahtml.pdf');
+  fs.writeFileSync(badFile, 'not html');
+  await expectWrongTypeMessage(page, 'data/html-table-to-csv/', badFile, '"dz-notahtml.pdf" isn\'t an HTML file - this tool reads HTML files.');
+  await page.close();
+});
+
+test('dropzone: xml-to-json (fileTypeLabel: "XML file", same vowel-sound-acronym case) reports "isn\'t an XML file", not "a XML file"', async () => {
+  const page = await browser.newPage();
+  const badFile = path.join(TMP, 'dz-notaxml.pdf');
+  fs.writeFileSync(badFile, 'not xml');
+  await expectWrongTypeMessage(page, 'data/xml-to-json/', badFile, '"dz-notaxml.pdf" isn\'t an XML file - this tool reads XML files.');
+  await page.close();
+});
+
 test('dropzone: hash-generator (fileTypeLabel: "", accepts every file type) never shows a wrong-type error at all -- every file matches', async () => {
   const page = await browser.newPage();
   const anyFile = path.join(TMP, 'dz-anything.xyz');
