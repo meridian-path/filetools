@@ -148,16 +148,53 @@ test('csv-to-json: a leading-zero value stays a string in the real output, never
 test('csv-to-json: pasting whitespace-only text shows a friendly error, not a raw exception', async () => {
   // dropzone.client.js itself intercepts a whitespace-only paste before
   // this tool's own run() ever sees it (see its own generic
-  // "Paste some markup first" guard) -- that lands in .dz-status, not the
-  // .alert-warn this tool's own parseCsvInput()-driven errors use below.
+  // "Paste some markup first" guard) -- that lands in this paste box's OWN
+  // .paste-status now (craft-audit item 5), never the shared .dz-status
+  // the unrelated file drop-zone owns, and never the .alert-warn this
+  // tool's own parseCsvInput()-driven errors use below.
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/csv-to-json/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '   \n  ');
   await page.locator('#paste-convert').click();
-  await page.waitForFunction(() => (document.querySelector('.dz-status')?.textContent || '').length > 0);
-  const msg = await page.locator('.dz-status').textContent();
+  await page.waitForFunction(() => (document.querySelector('.paste-status')?.textContent || '').length > 0);
+  const msg = await page.locator('.paste-status').textContent();
   assert.match(msg, /paste some/i);
+  assert.equal(await page.locator('.dropzone').getAttribute('data-state'), 'idle');
+  assert.equal(await page.locator('.dz-status').textContent(), '');
   await page.close();
+});
+
+test('csv-to-json: converting via the paste box never flips the unrelated file drop-zone to a "done" checkmark (craft-audit item 5)', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/csv-to-json/`, { waitUntil: 'networkidle' });
+  await page.fill('#paste-textarea', 'name,price\nCoffee,4.5\nTea,3.25');
+  await page.locator('#paste-convert').click();
+  await page.waitForSelector('.table-block .json-preview');
+  assert.equal(await page.locator('.dropzone').getAttribute('data-state'), 'idle');
+  assert.equal(await page.locator('.dz-status').textContent(), '');
+  await page.close();
+});
+
+test('csv-to-json: the output has a working copy-to-clipboard button alongside the download button (craft-audit item 8)', async () => {
+  const context = await browser.newContext();
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(baseUrl).origin });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}data/csv-to-json/`, { waitUntil: 'networkidle' });
+  await page.fill('#paste-textarea', 'name,price\nCoffee,4.5\nTea,3.25');
+  await page.locator('#paste-convert').click();
+  await page.waitForSelector('.table-block .json-preview');
+
+  await page.locator('button:has-text("Copy")').click();
+  await page.waitForFunction(() => {
+    const btn = [...document.querySelectorAll('button')].find((b) => b.textContent === 'Copied');
+    return !!btn;
+  });
+  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  assert.deepEqual(JSON.parse(clipboardText), [
+    { name: 'Coffee', price: '4.5' },
+    { name: 'Tea', price: '3.25' },
+  ]);
+  await context.close();
 });
 
 test('csv-to-json: uploading a whitespace-only file shows this tool\'s own "empty" error, not a raw exception', async () => {

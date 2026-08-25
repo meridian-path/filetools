@@ -142,14 +142,17 @@ test('word-frequency-counter: clicking "Count words" with an empty textarea show
   await page.goto(`${baseUrl}data/word-frequency-counter/`, { waitUntil: 'networkidle' });
   await page.locator('#paste-convert').click();
   await page.waitForFunction(() => {
-    const el = document.querySelector('.dz-status');
+    const el = document.querySelector('.paste-status');
     return el && el.textContent && el.textContent.trim().length > 0;
   });
   // dropzone.client.js's own generic paste-button guard fires here (an
   // empty textarea never reaches this tool's own run(), see
   // src/browser/dropzone.client.js's pasteButton handler) -- shared,
   // tool-agnostic copy, not this tool's own "that's empty" message.
-  const statusText = await page.locator('.dz-status').textContent();
+  // Craft-audit fix (item 5): lives in this paste box's OWN
+  // `.paste-status` line now, never the shared `.dz-status` the unrelated
+  // file drop-zone owns.
+  const statusText = await page.locator('.paste-status').textContent();
   assert.match(statusText, /paste some markup first/i);
   await page.close();
 });

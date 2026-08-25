@@ -153,8 +153,11 @@ test('csv-to-xlsx: pasting whitespace-only text shows a friendly error, not a ra
   await page.goto(`${baseUrl}data/csv-to-xlsx/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '   \n  ');
   await page.locator('#paste-convert').click();
-  await page.waitForFunction(() => (document.querySelector('.dz-status')?.textContent || '').length > 0);
-  const msg = await page.locator('.dz-status').textContent();
+  // Craft-audit fix (item 5): a paste-triggered status lives in this
+  // paste box's OWN `.paste-status` line now, never the shared
+  // `.dz-status` the unrelated file drop-zone owns.
+  await page.waitForFunction(() => (document.querySelector('.paste-status')?.textContent || '').length > 0);
+  const msg = await page.locator('.paste-status').textContent();
   assert.match(msg, /paste some/i);
   await page.close();
 });

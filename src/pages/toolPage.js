@@ -92,12 +92,23 @@ function renderToolPage(tool, example = {}) {
     : (fileTypeLabel ? `Drop your ${fileTypeLabel} here` : 'Drop a file here');
   const chooseLabel = tool.multiple ? 'Choose files' : 'Choose file';
 
+  // Craft-audit fixes (items 4/5/6): `data-live` opts this tool's paste box
+  // into dropzone.client.js's debounced auto-convert-on-type behavior (see
+  // that file's own header comment for which tools set `pasteInput.live`
+  // and why) -- honoring copy that already promises "updated instantly."
+  // `.paste-status` is this paste box's OWN status line, independent of
+  // the file drop-zone's `.dz-status` above it (dropzone.client.js's
+  // `source`-aware reportStatus/reportState): a paste-triggered run no
+  // longer flips the unrelated drop-zone's icon to a false "done"
+  // checkmark (item 5), and typing after an error clears THIS status line
+  // immediately (item 4) rather than leaving a stale message on screen.
   const pasteHtml = (!isCustomPanel && tool.pasteInput)
     ? `<div class="or-divider" role="separator" aria-label="or"><span>or</span></div>
-      <div class="paste-input">
+      <div class="paste-input"${tool.pasteInput.live ? ' data-live="true"' : ''}>
         <label for="paste-textarea">${escapeHtml(tool.pasteInput.label)}</label>
         <textarea id="paste-textarea" class="paste-textarea" placeholder="${escapeHtml(tool.pasteInput.placeholder)}" rows="6" spellcheck="false"></textarea>
         <button type="button" id="paste-convert" class="btn-secondary paste-convert-btn">${escapeHtml(tool.pasteInput.buttonLabel)}</button>
+        <p class="paste-status" role="status" aria-live="polite"></p>
       </div>`
     : '';
 

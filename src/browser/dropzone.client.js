@@ -74,6 +74,11 @@ if (toolSection) {
   const resultEl = toolSection.querySelector('.result');
   const cancelBtn = toolSection.querySelector('.dz-cancel');
   const progressFill = toolSection.querySelector('.progress-fill');
+  // Craft-audit fixes (items 4/5): the paste box's own status line,
+  // independent of the file drop-zone's `.dz-status`/visual state above.
+  // See handleFileList()'s `source` parameter below for how a paste-
+  // triggered run is routed here instead of touching the drop-zone at all.
+  const pasteStatusEl = toolSection.querySelector('.paste-status');
 
   // "working" state timing (design-standards.md's three response-time
   // limits): a generation counter is bumped on every new file selection
@@ -211,20 +216,54 @@ if (toolSection) {
     });
   }
 
-  async function handleFileList(fileList) {
+  /**
+   * Craft-audit fixes (items 4/5): routes a status message/state change to
+   * either the shared file drop-zone (`source === 'file'`, unchanged
+   * behavior) or the paste box's OWN independent status line
+   * (`source === 'paste'`) -- never both. Before this, EVERY validation
+   * error and EVERY processor state transition landed on the shared
+   * `.dz-status`/`dropzone.dataset.state` regardless of which input path
+   * triggered it, so converting via the paste box could flip the
+   * completely unrelated file drop-zone to a green "done" checkmark
+   * (item 5, implying a file had been dropped when none was), and an error
+   * raised by the paste box lived on past the moment a visitor started
+   * typing something valid, since nothing ever cleared it except another
+   * click (item 4 -- now cleared by the paste textarea's own 'input'
+   * listener below instead).
+   * @param {'file'|'paste'} source
+   */
+  function reportStatus(source, message, tone) {
+    if (source === 'paste') {
+      if (!pasteStatusEl) return;
+      pasteStatusEl.textContent = message || '';
+      if (tone) pasteStatusEl.dataset.tone = tone;
+      else delete pasteStatusEl.dataset.tone;
+    } else {
+      setStatus(message, tone);
+    }
+  }
+  function reportState(source, state) {
+    // The drop-zone's own visual state (icon/checkmark/border color) is
+    // reserved for real file-drop/choose actions -- a paste-triggered run
+    // never touches it, so the two affordances stay genuinely independent.
+    if (source !== 'paste') setState(state);
+  }
+
+  async function handleFileList(fileList, source = 'file') {
     const files = Array.from(fileList || []);
     if (!files.length) return;
 
     if (!multiple && files.length > 1) {
-      setState('error');
-      setStatus(`This tool works on one file at a time. Choose a single ${fileTypeLabel || 'file'}.`, 'error');
+      reportState(source, 'error');
+      reportStatus(source, `This tool works on one file at a time. Choose a single ${fileTypeLabel || 'file'}.`, 'error');
       return;
     }
 
     const bad = files.find((f) => !fileMatchesAccept(f));
     if (bad) {
-      setState('error');
-      setStatus(
+      reportState(source, 'error');
+      reportStatus(
+        source,
         fileTypeLabel
           ? `"${bad.name}" isn't ${withArticle(fileTypeLabel)} - this tool reads ${pluralize(fileTypeLabel)}.`
           : `"${bad.name}" isn't a supported file type for this tool.`,
@@ -236,8 +275,8 @@ if (toolSection) {
     const maxBytes = MAX_BYTES_BY_CLIENT[clientEntry] || DEFAULT_MAX_BYTES;
     const tooBig = files.find((f) => f.size > maxBytes);
     if (tooBig) {
-      setState('error');
-      setStatus(`"${tooBig.name}" is too large (${formatMb(tooBig.size)}). This tool handles files up to ${formatMb(maxBytes)} - anything bigger risks freezing your browser tab.`, 'error');
+      reportState(source, 'error');
+      reportStatus(source, `"${tooBig.name}" is too large (${formatMb(tooBig.size)}). This tool handles files up to ${formatMb(maxBytes)} - anything bigger risks freezing your browser tab.`, 'error');
       return;
     }
 
@@ -246,14 +285,18 @@ if (toolSection) {
       return myGeneration === currentGeneration;
     }
 
-    setState('working');
-    setStatus('Reading your file on this device…');
+    reportState(source, 'working');
+    reportStatus(source, source === 'paste' ? 'Reading that on this device…' : 'Reading your file on this device…');
     resultEl.hidden = true;
     resultEl.innerHTML = '';
 
     // Past 10s of the SAME job still running, reveal the Cancel button
     // (Nielsen's third response-time limit). Guarded by stillCurrent() so
-    // a fast job that already finished doesn't pop it back up late.
+    // a fast job that already finished doesn't pop it back up late. Left
+    // tied to the drop-zone regardless of source -- a real 10s+ stall is
+    // rare enough for a paste-driven job (no large-file I/O) that it isn't
+    // part of this fix's scope; only the ordinary error/done states above
+    // and below are what items 4/5 actually reported.
     clearSlowTimer();
     slowTimer = setTimeout(() => {
       if (stillCurrent()) dropzone.dataset.slow = 'true';
@@ -273,16 +316,16 @@ if (toolSection) {
         section: toolSection,
         dropzone,
         resultEl,
-        setState: (s) => { if (stillCurrent()) setState(s); },
-        setStatus: (m, t) => { if (stillCurrent()) setStatus(m, t); },
+        setState: (s) => { if (stillCurrent()) reportState(source, s); },
+        setStatus: (m, t) => { if (stillCurrent()) reportStatus(source, m, t); },
         setProgress: (done, total) => { if (stillCurrent()) setProgress(done, total); },
       });
       if (stillCurrent()) clearSlowTimer();
     } catch (err) {
       if (stillCurrent()) {
         clearSlowTimer();
-        setState('error');
-        setStatus(err && err.message ? err.message : 'Something went wrong reading that file.', 'error');
+        reportState(source, 'error');
+        reportStatus(source, err && err.message ? err.message : 'Something went wrong reading that file.', 'error');
       }
     }
   }
@@ -323,23 +366,57 @@ if (toolSection) {
   });
 
   // Optional second input path (src/pages/toolPage.js's `pasteInput`
-  // block, currently only html-table-to-csv): pasted text is wrapped in a
-  // synthetic File and pushed through the exact same handleFileList/
-  // processor.run() path a chosen/dropped file takes, so every tool's
-  // processor only ever has to handle one input shape.
+  // block -- every tool that sets a `pasteInput` field, e.g.
+  // html-table-to-csv, csv-to-json, json-minify-beautify): pasted text is
+  // wrapped in a synthetic File and pushed through the exact same
+  // handleFileList/processor.run() path (with source:'paste' -- see
+  // reportStatus/reportState above) a chosen/dropped file takes, so every
+  // tool's processor only ever has to handle one input shape.
+  const pasteContainer = toolSection.querySelector('.paste-input');
   const pasteTextarea = toolSection.querySelector('.paste-textarea');
   const pasteButton = toolSection.querySelector('.paste-convert-btn');
+  // Craft-audit fix (item 6): a tool whose `pasteInput.live` field is true
+  // (toolPage.js threads it through as `data-live="true"` on this same
+  // container) auto-converts on type instead of waiting for a button
+  // click -- currently json-minify-beautify only, see that tool's own
+  // comment for why. The button stays as a manual fallback either way.
+  const pasteLive = !!(pasteContainer && pasteContainer.dataset.live === 'true');
+
+  function runPasteConvert(text, { reportEmptyAsError }) {
+    if (!text.trim()) {
+      if (reportEmptyAsError) {
+        reportStatus('paste', 'Paste some markup first, or choose a file instead.', 'error');
+      } else {
+        // Live mode with nothing typed (yet): a silent reset, not an
+        // error -- an empty box mid-typing isn't a mistake to flag.
+        reportStatus('paste', '');
+        resultEl.hidden = true;
+        resultEl.innerHTML = '';
+      }
+      return;
+    }
+    const pasteFile = PASTE_FILE[clientEntry] || { name: 'pasted-input.txt', type: 'text/plain' };
+    const file = new File([text], pasteFile.name, { type: pasteFile.type });
+    handleFileList([file], 'paste');
+  }
+
   if (pasteTextarea && pasteButton) {
     pasteButton.addEventListener('click', () => {
+      runPasteConvert(pasteTextarea.value, { reportEmptyAsError: true });
+    });
+
+    // Craft-audit fix (item 4): clear this paste box's OWN status the
+    // moment its content changes, rather than leaving a stale error (or
+    // stale success message) on screen until the next explicit click.
+    let liveDebounceTimer = null;
+    pasteTextarea.addEventListener('input', () => {
+      reportStatus('paste', '');
+      if (!pasteLive) return;
+      if (liveDebounceTimer) clearTimeout(liveDebounceTimer);
       const text = pasteTextarea.value;
-      if (!text.trim()) {
-        setState('error');
-        setStatus('Paste some markup first, or choose a file instead.', 'error');
-        return;
-      }
-      const pasteFile = PASTE_FILE[clientEntry] || { name: 'pasted-input.txt', type: 'text/plain' };
-      const file = new File([text], pasteFile.name, { type: pasteFile.type });
-      handleFileList([file]);
+      liveDebounceTimer = setTimeout(() => {
+        runPasteConvert(text, { reportEmptyAsError: false });
+      }, 250);
     });
   }
 }

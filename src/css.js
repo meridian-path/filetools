@@ -314,7 +314,25 @@ ${designTokensCss(DESIGN_TOKENS)}
     font-size: var(--text-sm);
     color: var(--color-muted);
     margin-bottom: var(--space-4);
-    overflow: hidden;
+    /* Craft-audit fix (site-audit task, item 2): this used to be a plain
+       "overflow: hidden", clipping in BOTH axes. Since every link's own box
+       is exactly this row's height (no vertical padding to spare), the
+       site-wide :focus-visible ring's top/bottom strokes (which draw
+       outside the link's own border box -- see the shared rule above)
+       landed entirely outside this container's vertical extent and got
+       clipped away, leaving only two thin vertical slivers where a full
+       box ring should be -- reads as "a thin bar," not a ring. Horizontal
+       clipping alone (needed so a long breadcrumb never forces the row to
+       wrap or scroll -- flex-wrap: nowrap above) doesn't touch the ring's
+       vertical strokes, so this keeps that behavior unchanged while
+       letting the ring render in full, identical to every other
+       :focus-visible control on the site (design-standards.md: "a focus
+       indicator ... identical across every asset"). Reference:
+       docs/design/REFERENCE_LIBRARY.md entry 14 (GOV.UK Design System) --
+       conform on the interaction layer for anything input/keyboard-related
+       rather than inventing a bespoke treatment per component. */
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   .breadcrumb a {
     color: var(--color-muted);
@@ -431,6 +449,27 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
   @media (max-width: 768px) {
     .dropzone { min-height: 160px; padding: var(--space-5); }
+  }
+  /* Craft-audit fix (item 1, HIGHEST PRIORITY -- real WCAG 2.2 SC 2.4.13
+     gap, not just taste): the "Choose files"/"Choose file" control
+     (src/pages/toolPage.js) is a <label for="file-input"> wrapping a
+     visually-hidden (.sr-only) real <input type="file"> -- the standard
+     accessible-file-input pattern. A <label> is never itself focusable, so
+     Tab lands on the input, and the site-wide :focus-visible rule above
+     WAS already drawing a ring -- just around an element no visitor can
+     see (1x1px, clipped). :has() lets the VISIBLE label pick up the exact
+     same ring whenever its paired input carries keyboard focus, reusing
+     the same width/color/offset tokens the global rule uses rather than
+     inventing a bespoke style (design-standards.md: "a focus indicator ...
+     identical across every asset"). Reference:
+     docs/design/REFERENCE_LIBRARY.md entry 1 (Squoosh) -- this is the same
+     drop-target control that entry names; we diverge from it by fixing
+     only this accessibility gap, not adding its sample-file affordance
+     (out of scope for this pass). :has() has full evergreen-browser
+     support (Chrome 105+, Firefox 121+, Safari 15.4+). */
+  .dropzone:has(#file-input:focus-visible) > .btn-primary {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
   }
   .dropzone[data-state="dragover"] {
     border-style: solid;
@@ -1003,7 +1042,36 @@ ${designTokensCss(DESIGN_TOKENS)}
     outline: var(--border-control) solid var(--color-accent);
     outline-offset: 1px;
   }
+  /* Craft-audit fix (item 3): the example JSON/CSV/etc. shown before a
+     visitor pastes anything is a real "placeholder" attribute already
+     (src/pages/toolPage.js), never pre-filled ".value" -- but with no
+     ::placeholder rule of its own it inherited this element's full-weight
+     "color: var(--color-text)" in every browser that doesn't apply its own
+     automatic dimming strongly enough to read as obviously "not real
+     content" once it's set in this monospace, code-shaped font. Dimmed +
+     italic is the normal convention for placeholder text (distinct from
+     genuine typed input at a glance, in any browser) -- reusing
+     --color-muted rather than a new token, same token every other muted
+     caption/status string on this page already uses. */
+  .paste-textarea::placeholder {
+    color: var(--color-muted);
+    font-style: italic;
+    opacity: 1;
+  }
   .paste-input > .btn-secondary { align-self: flex-start; }
+  /* Independent paste-box status line (items 4/5: the paste box and the
+     file drop-zone above it must never share one status affordance -- see
+     src/browser/dropzone.client.js's "source"-aware reportStatus/
+     reportState). Left-aligned (unlike the centered .dz-status) since it
+     sits inside this left-aligned .paste-input block, not the centered
+     .dropzone card. */
+  .paste-status {
+    margin: 0;
+    font-size: var(--text-sm);
+    min-height: 1.5em;
+  }
+  .paste-status[data-tone="error"] { color: var(--color-danger); }
+  .paste-status[data-tone="success"] { color: var(--color-success); }
 
   /* -------------------------------------------------------------------
      Result block
@@ -1394,6 +1462,19 @@ ${designTokensCss(DESIGN_TOKENS)}
      src/shell.js) renders as a plain link with no box at all, so a load
      that never happens degrades to a real link, not an empty rectangle. */
   .newsletter-slot a { font-weight: var(--weight-medium); }
+  /* Craft-audit fix (item 9): the loaded iframe is Substack's own hosted
+     subscribe widget -- its internal avatar/title/"Powered by Substack"
+     wordmark/ToS links are cross-origin content this stylesheet has no
+     access to restyle. Rather than let that appear as an unexplained seam
+     ("two different products stitched together"), one small labeled line
+     names the hand-off before it happens, the same way GOV.UK's error
+     pattern (docs/design/REFERENCE_LIBRARY.md entry 14) states plainly
+     what's about to happen rather than leaving a visitor to infer it. */
+  .newsletter-provider-note {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
   .newsletter-embed {
     display: block;
     width: 100%;

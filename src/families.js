@@ -13,7 +13,13 @@
  * the input is the scanning key. html-table-to-csv and yaml-to-json have
  * no input family (HTML, YAML aren't families of their own), so they
  * resolve by the fallback half of the rule and take their output's family
- * (csv, json respectively).
+ * (csv, json respectively). 'dev' (craft-audit fix, item 7) is a second,
+ * narrower carve-out alongside that fallback: a genuine developer-utility
+ * tool with no file-format input OR output of its own to draw a family
+ * from (Regex Tester, Hash Generator, UUID Generator, and the rest of
+ * folders.js's 'developer' folder) takes 'dev' rather than falling back to
+ * DEFAULT_FAMILY's plain 'text', so it stops reading as an actual
+ * plain-text tool like sort-lines.js.
  *
  * FAMILY_BY_SLUG is an explicit per-slug map, one row per tool -- still
  * true after the 2026-08-22 fragment-pattern refactor, just no longer

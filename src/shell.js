@@ -260,6 +260,7 @@ function renderNewsletterSignup() {
       <div class="newsletter-slot" data-newsletter-slot data-newsletter-src="${escapeHtml(NEWSLETTER_FORM_ACTION)}" data-newsletter-title="${escapeHtml(embedTitle)}">
         <a href="${escapeHtml(SUBSTACK_PUBLICATION_URL)}" target="_blank" rel="noopener noreferrer">Subscribe on Substack</a>
       </div>
+      <p class="newsletter-provider-note">Signups are handled by Substack, our email provider - you&rsquo;ll see their subscribe box below.</p>
     </div>`;
 }
 

@@ -153,11 +153,14 @@ test('html-entity-encode-decode: clicking convert with an empty textarea shows a
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/html-entity-encode-decode/`, { waitUntil: 'networkidle' });
   await page.locator('#paste-convert').click();
+  // Craft-audit fix (item 5): a paste-triggered status lives in this
+  // paste box's OWN `.paste-status` line now, never the shared
+  // `.dz-status` the unrelated file drop-zone owns.
   await page.waitForFunction(() => {
-    const el = document.querySelector('.dz-status');
+    const el = document.querySelector('.paste-status');
     return el && el.textContent && el.textContent.trim().length > 0;
   });
-  const statusText = await page.locator('.dz-status').textContent();
+  const statusText = await page.locator('.paste-status').textContent();
   assert.match(statusText, /paste some/i);
   await page.close();
 });

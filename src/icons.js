@@ -114,12 +114,32 @@ function textMotif() {
   return `<path d="M6 10H18M6 15H15M6 20H17M6 25H12" stroke="${SURFACE}" stroke-width="1.75" stroke-linecap="round"/>`;
 }
 
+/**
+ * Craft-audit fix (item 7): a `</>` code-bracket motif for genuine
+ * developer-utility tools (Regex Tester, Hash Generator, UUID Generator,
+ * Base64/URL/HTML-entity encode-decode, SQL Formatter -- every tool whose
+ * folders.js `folder` is `'developer'`) so they read as their own kind in
+ * the file-browser listing instead of sharing `text`'s plate/Kind chip
+ * with genuine plain-text tools (Sort Lines, Word Frequency Counter, and
+ * similar). The folder-level 'dev' color axis and Kind label
+ * ('Dev'/FAMILY_KIND_LABELS) already existed (src/folders.js,
+ * src/pages/explorerWindow.js) in anticipation of exactly this -- only the
+ * per-tool plate motif was still missing, which is what made assigning
+ * `family: 'dev'` throw before this function existed.
+ */
+function devMotif() {
+  const brackets = `<path d="M10 10 6 16 10 22M14 10 18 16 14 22" ${MOTIF_STROKE}/>`;
+  const slash = `<path d="M13.4 9 10.6 23" stroke="${SURFACE}" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>`;
+  return brackets + slash;
+}
+
 const PLATE_MOTIFS = {
   pdf: pdfMotif,
   csv: csvMotif,
   json: jsonMotif,
   sheet: sheetMotif,
   text: textMotif,
+  dev: devMotif,
 };
 
 function pipRing() {
