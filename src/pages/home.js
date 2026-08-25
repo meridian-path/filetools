@@ -2,86 +2,83 @@
 
 const { renderPage, escapeHtml } = require('../shell.js');
 const { websiteJsonLd } = require('../structuredData.js');
-const { CATEGORY_LABELS, toolsByCategory, TOOLS, toolBySlug } = require('../tools/index.js');
+const { TOOLS } = require('../tools/index.js');
 const { url, absoluteUrl, SITE_TAGLINE } = require('../site.js');
-const { markFor } = require('../icons.js');
-const { familyOf } = require('../families.js');
+const { FOLDERS, toolsInFolder } = require('../folders.js');
+const {
+  renderToolRow, renderFolderSidebarRow, renderWindowChrome, renderWindowRuler,
+  renderWindowStatusBar, renderExplorerWindow,
+} = require('./explorerWindow.js');
 
-function renderToolRow(t) {
-  const iconWrap = `<div class="tool-row-icon-wrap mark--${escapeHtml(familyOf(t.slug))}">${markFor(t.slug, 'tool-row-icon')}</div>`;
-  return `<a class="tool-row" href="${escapeHtml(url(`${t.category}/${t.slug}/`))}">${iconWrap}<span class="tool-row-text"><span class="tool-row-name">${escapeHtml(t.navLabel)}</span><span class="tool-row-desc">${escapeHtml(t.deck)}</span></span></a>`;
+/**
+ * One folder's main-pane section: an h2 (real heading, stable
+ * id="folder-<key>" so #folder-pdf deep links keep working -- spec 3.6),
+ * a link to that folder's own index page, and its tool rows.
+ */
+function renderFolderSection(folder) {
+  const tools = toolsInFolder(folder.key);
+  const rows = tools.map(renderToolRow).join('\n          ');
+  return `<section class="window-section" aria-labelledby="folder-${escapeHtml(folder.key)}-h">
+        <h2 id="folder-${escapeHtml(folder.key)}-h" class="window-section-heading">
+          <a href="${escapeHtml(url(`${folder.slug}/`))}">${escapeHtml(folder.label)}</a>
+          <span class="window-section-count">${tools.length}</span>
+        </h2>
+        <div class="tool-list" data-window-rows>
+          ${rows}
+        </div>
+      </section>`;
 }
 
-// One representative tool per format family, for the hero's family index --
-// a real jump-straight-there shortcut into the 22-tool list below, not a
-// duplicate of it. Picked for being each family's clearest single-purpose
-// example (see src/families.js for the family taxonomy this reads).
-const FAMILY_INDEX_SLUGS = {
-  pdf: 'merge-pdf',
-  csv: 'merge-csv',
-  json: 'json-to-csv',
-  sheet: 'xlsx-to-csv',
-  text: 'word-frequency-counter',
-};
-const FAMILY_INDEX_LABELS = {
-  pdf: 'PDF',
-  csv: 'CSV',
-  json: 'JSON',
-  sheet: 'Excel',
-  text: 'Text',
-};
+/**
+ * The homepage explorer window: chrome strip + column ruler + a two-pane
+ * body (folder sidebar, five folder sections) + status bar (site-wide
+ * navigation/IA redesign, see the folder taxonomy/nav spec section 1.5).
+ * The two former homepage category sections (a flat CATEGORY_LABELS-driven
+ * grid) are replaced entirely by this -- real per-folder h2s are kept
+ * (still a topical-structure gain over one undivided list), just five of
+ * them now instead of two.
+ */
+function renderExplorerHome() {
+  const sidebarRows = FOLDERS.map((f) => renderFolderSidebarRow(f, toolsInFolder(f.key).length)).join('\n        ');
+  const sections = FOLDERS.map(renderFolderSection).join('\n      ');
+  const toolCount = TOOLS.length;
 
-function renderFamilyStripItem(family) {
-  const slug = FAMILY_INDEX_SLUGS[family];
-  const tool = toolBySlug(slug);
-  const label = FAMILY_INDEX_LABELS[family];
-  return `<a class="family-strip-item" href="${escapeHtml(url(`${tool.category}/${tool.slug}/`))}" aria-label="${escapeHtml(`${label} tools, starting with ${tool.navLabel}`)}"><span class="family-strip-icon-wrap mark--${family}">${markFor(slug, 'family-strip-icon')}</span><span class="family-strip-label">${escapeHtml(label)}</span></a>`;
+  const chrome = renderWindowChrome('~', toolCount, 'items');
+  const statusBar = renderWindowStatusBar(`${toolCount} files · 0 uploads · works offline`);
+
+  return renderExplorerWindow({
+    chrome,
+    ruler: renderWindowRuler(),
+    sidebar: sidebarRows,
+    body: sections,
+    statusBar,
+  });
 }
 
 function renderHomePage() {
-  // Two category sections (a real h2 each -- an SEO/topical-structure gain
-  // over the old flat single grid), each a dense hairline-separated list
-  // rather than a card grid -- see design-standards.md's craft floor on
-  // ragged final rows, which a list can't produce as the tool count grows.
-  // Section background tints (.tool-group--pdf/--data) were removed: now
-  // that each tool row's icon mark carries its own family hue, keeping a
-  // second, coarser color layer on top of it (a whole-section wash) reads
-  // as too much color at once. The <h2> and hairline border already carry
-  // the grouping without it.
-  const groups = Object.entries(CATEGORY_LABELS)
-    .map(([catKey, catLabel]) => {
-      const rows = toolsByCategory(catKey).map(renderToolRow).join('\n        ');
-      return `<section class="tool-group" aria-labelledby="group-${catKey}">
-        <h2 id="group-${catKey}">${escapeHtml(catLabel)}</h2>
-        <div class="tool-list">
-        ${rows}
-        </div>
-      </section>`;
-    })
-    .join('\n    ');
-
-  // Real count, not a hardcoded copy string that would go stale the next
-  // time a tool merges (TOOLS is auto-discovered, src/tools/index.js).
   const toolCount = TOOLS.length;
-  const familyStrip = ['pdf', 'csv', 'json', 'sheet', 'text'].map(renderFamilyStripItem).join('\n        ');
-  const firstCategoryKey = Object.keys(CATEGORY_LABELS)[0];
 
+  // Compressed hero (spec 1.5): kicker + h1 + one-line deck + the single
+  // accent CTA, which now targets the window itself via
+  // href="#explorer-window" -- the target's own tabindex="-1" (below)
+  // means a plain fragment-link activation already moves real focus
+  // there natively, no extra JS needed. The retired family-index strip
+  // (2026-08-23 composition pass) is superseded by the window's own
+  // sidebar + Kind chips, which carry the same "jump straight to a
+  // format" scent with more precision (a real count per folder, not just
+  // an icon). Deck shortened to one real sentence (was three) so it
+  // genuinely fits on one line even at 360px width, per spec 1.5's
+  // compressed-mobile-hero requirement -- not truncated via CSS, the
+  // claim itself is just stated more directly.
   const mainHtml = `    <div class="hero">
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <p class="hero-kicker">${toolCount} tools, zero uploads</p>
-          <h1>File tools that never leave your browser</h1>
-          <p class="deck">No account. No file uploads. No sign-up. Every tool below runs entirely on your device: turn off your Wi-Fi and they still work.</p>
-          <a class="btn-primary hero-cta" href="#group-${escapeHtml(firstCategoryKey)}">Browse all ${toolCount} tools</a>
-        </div>
-        <nav class="hero-families" aria-label="Jump to a tool by format">
-          <div class="family-strip">
-        ${familyStrip}
-          </div>
-        </nav>
-      </div>
+      <p class="hero-kicker">${toolCount} tools, zero uploads</p>
+      <h1>File tools that never leave your browser</h1>
+      <p class="deck">No account, no uploads. Runs on your device.</p>
+      <a class="btn-primary hero-cta" href="#explorer-window">Browse all ${toolCount} tools</a>
     </div>
-    ${groups}
+    <div id="explorer-window" tabindex="-1">
+    ${renderExplorerHome()}
+    </div>
     <p class="caption">Read more about how that’s possible on the <a href="${escapeHtml(url('how-this-works/'))}">how this works</a> page.</p>
 `;
 
@@ -97,4 +94,4 @@ function renderHomePage() {
   });
 }
 
-module.exports = { renderHomePage, renderToolRow };
+module.exports = { renderHomePage, renderExplorerHome, renderFolderSection };

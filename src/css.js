@@ -1384,54 +1384,28 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
 
   /* -------------------------------------------------------------------
-     404
+     404 -- restyled as the explorer's not-found state (site-wide
+     navigation/IA redesign, see the folder taxonomy/nav spec section 1.9).
      ------------------------------------------------------------------- */
-  .not-found ul { padding-left: var(--space-5); }
+  .window-sidebar-full {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
 
   /* -------------------------------------------------------------------
-     Home page -- left-aligned hero directly above the first category
-     group (design-standards.md's Distinctiveness Gate names a centered
-     hero over a card grid an automatic NO-GO; this also makes the
-     homepage's silhouette differ from every tool page by construction).
-     2026-08-23 composition pass (human feedback: the page read as flat/
-     generic): the hero becomes a two-column grid on a declared 12-column
-     track -- copy at 7 columns, a real functional element (not
-     decorative -- see design-standards.md) at 5: a family-index strip
-     linking straight to one representative tool per format family,
-     giving the accent-starved hero its first real color story. The page
-     also now renders wide (page-shell-app, home.js) instead of the
-     narrow reading width -- the homepage is a directory/app hub, not a
-     prose page, and every tool page it links to already uses this width.
-
-     References (docs/design/REFERENCE_LIBRARY.md, entries by number):
-     #23 (Linear) puts a real working product view directly in the hero as
-     proof instead of a feature-card grid -- taken as "put something real
-     and functional beside the headline," diverged on the mechanism: five
-     working tool pages can't embed live in one hero without a much larger
-     rebuild, so the family-index strip is real navigation (each icon is a
-     working link into an actual tool page) rather than an embedded demo.
-     #2 (Cobalt) argues against any hero at all for a single-tool page --
-     diverged deliberately, since this homepage indexes 22 distinct tools
-     rather than being one tool's own landing page, so it keeps a hero as
-     the wayfinding layer while still rejecting Cobalt's true target (a
-     feature grid or marketing block with no real function).
+     Home page hero -- left-aligned, directly above the explorer window
+     (design-standards.md's Distinctiveness Gate names a centered hero
+     over a card grid an automatic NO-GO). Compressed for the explorer-
+     window redesign (spec 1.5): the former family-index strip is retired
+     -- the window's own sidebar + per-row Kind chips now carry that same
+     "jump straight to a format" scent with more precision (a real count
+     per folder, not just an icon), so the hero is kicker + h1 + one-line
+     deck + one CTA, nothing wider than the measure. The page still
+     renders wide (page-shell-app, home.js): the homepage is a directory/
+     app hub, not a prose page.
      ------------------------------------------------------------------- */
-  .hero { padding: var(--space-7) 0 var(--space-6); text-align: left; }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-6);
-    align-items: start;
-  }
-  .hero-copy, .hero-families { grid-column: 1 / -1; }
-  @media (min-width: 768px) {
-    .hero-grid { grid-template-columns: repeat(6, 1fr); }
-  }
-  @media (min-width: 1024px) {
-    .hero-grid { grid-template-columns: repeat(12, 1fr); gap: var(--space-7); align-items: center; }
-    .hero-copy { grid-column: span 7; }
-    .hero-families { grid-column: span 5; }
-  }
+  .hero { padding: var(--space-7) 0 var(--space-5); text-align: left; }
   .hero-kicker {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
@@ -1445,57 +1419,14 @@ ${designTokensCss(DESIGN_TOKENS)}
   .hero .deck { margin: 0 0 var(--space-5); }
   .hero-cta { margin-top: var(--space-2); }
 
-  /* Family index -- a compact wayfinding strip, not a feature grid: no
-     card border/background/shadow per item (the taste guardrails call out
-     repeated identical card chrome as a generic default), just an icon and
-     a one-word label so it reads as an index rather than marketing copy.
-     Each item is a real link to that family's first tool page. */
-  .family-strip {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-5) var(--space-6);
-  }
-  @media (min-width: 1024px) {
-    .family-strip { justify-content: flex-end; }
-  }
-  .family-strip-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    width: 84px;
-    text-decoration: none;
-    color: var(--color-text);
-  }
-  .family-strip-item:hover .family-strip-label,
-  .family-strip-item:focus-visible .family-strip-label { color: var(--color-accent); }
-  .family-strip-icon-wrap {
-    width: var(--icon-wrap-lg); height: var(--icon-wrap-lg);
-    border-radius: var(--radius-pill);
-    background: var(--mark-wash);
-    display: flex; align-items: center; justify-content: center;
-    transition: box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
-  }
-  .family-strip-item:hover .family-strip-icon-wrap,
-  .family-strip-item:focus-visible .family-strip-icon-wrap {
-    box-shadow: 0 0 0 3px var(--color-accent-tint);
-  }
-  .family-strip-icon { width: var(--icon-lg); height: var(--icon-lg); }
-  .family-strip-label {
-    font-family: var(--font-display);
-    font-weight: var(--weight-bold);
-    font-size: var(--text-sm);
-    text-align: center;
-  }
-
   .tool-group { margin: var(--space-7) 0; padding: var(--space-4); border-radius: var(--radius-lg); }
   .tool-group h2 { margin-top: 0; margin-bottom: var(--space-4); }
 
+  /* A flat, dense single column (no 2-up grid): the explorer window's own
+     column ruler (Name / Kind) implies one row per tool, not a card-style
+     multi-column layout -- design-standards.md's craft-floor reasoning on
+     ragged final rows, which a grid reintroduces as row count grows. */
   .tool-list { display: flex; flex-direction: column; }
-  @media (min-width: 768px) {
-    .tool-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 var(--space-6); }
-  }
   .tool-row {
     display: flex;
     align-items: center;
@@ -1506,8 +1437,13 @@ ${designTokensCss(DESIGN_TOKENS)}
     color: var(--color-text);
     min-height: 44px;
   }
-  .tool-list > .tool-row:last-child,
-  .tool-list > .tool-row:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .tool-list > .tool-row:last-child { border-bottom: none; }
+  /* filter.client.js toggles the hidden attribute (not inline style) on a
+     filtered-out row -- but this rule's own display: flex above has equal
+     specificity to the UA stylesheet's [hidden] { display: none } and
+     loses the cascade tie to author-stylesheet order, so a hidden row
+     without this override would still render as a flex item. */
+  .tool-row[hidden] { display: none; }
   .tool-row:hover .tool-row-name { color: var(--color-accent); }
   /* Wash-disc treatment (see the Icon marks comment above) -- gives each
      row's family color real presence instead of a small near-monochrome
@@ -1521,7 +1457,7 @@ ${designTokensCss(DESIGN_TOKENS)}
     flex-shrink: 0;
   }
   .tool-row-icon { width: var(--icon-md); height: var(--icon-md); }
-  .tool-row-text { display: flex; flex-direction: column; gap: 2px; }
+  .tool-row-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
   .tool-row-name {
     font-family: var(--font-display);
     font-weight: var(--weight-bold);
@@ -1529,6 +1465,258 @@ ${designTokensCss(DESIGN_TOKENS)}
     color: var(--color-text);
   }
   .tool-row-desc { font-size: var(--text-sm); color: var(--color-muted); }
+  /* Kind chip (spec 1.5): the tool's own family label, family-6 text on
+     family-1 background -- the same ramp pair every mark/glyph already
+     uses via .mark--<family>, so no new color logic. Hidden below 768px
+     (the row's icon mark already carries the same color signal there;
+     the chip is additional information density that only fits once the
+     row has room). */
+  .tool-row-kind {
+    display: none;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--mark-wash);
+    color: var(--mark-plate);
+  }
+  @media (min-width: 768px) {
+    .tool-row-kind { display: inline-block; }
+  }
+
+  /* -------------------------------------------------------------------
+     Explorer window (spec 1.5/1.6/1.9) -- one bordered surface reused by
+     the homepage (with a folder sidebar), each folder page (without one),
+     and the 404 page (folder rows instead of tool rows). Chrome
+     decoration is deliberately closed to this exact token list (spec
+     1.11's own guardrail against gimmick creep -- no traffic lights, no
+     bevels, no wallpaper texture, ever).
+     ------------------------------------------------------------------- */
+  .explorer-window {
+    background: var(--color-surface);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin: var(--space-6) 0;
+  }
+  .window-chrome {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-alt);
+    border-bottom: var(--border-hairline) solid var(--color-border);
+  }
+  .window-path {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  .window-count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  .window-filter-slot { flex: 1; min-width: 0; display: flex; justify-content: flex-end; }
+  .window-filter-input {
+    width: 100%;
+    max-width: 220px;
+    min-height: 36px;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+  }
+  .window-ruler {
+    display: none;
+    padding: var(--space-2) var(--space-4) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    justify-content: space-between;
+  }
+  @media (min-width: 768px) {
+    .window-ruler { display: flex; }
+    .window-ruler span:last-child { margin-right: calc(var(--space-2) + 56px); }
+  }
+  .window-body {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2) var(--space-4) var(--space-4);
+  }
+  @media (min-width: 1024px) {
+    .window-body { flex-direction: row; gap: var(--space-6); }
+  }
+  .window-sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: var(--border-hairline) solid var(--color-border);
+    margin-bottom: var(--space-2);
+  }
+  @media (min-width: 1024px) {
+    .window-sidebar {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      border-bottom: none;
+      border-right: var(--border-hairline) solid var(--color-border);
+      padding: var(--space-2) var(--space-3) var(--space-2) 0;
+      margin-bottom: 0;
+    }
+  }
+  .window-sidebar-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+  }
+  .window-sidebar-row:hover { background: var(--color-accent-tint); color: var(--color-accent); }
+  .window-sidebar-label { flex: 1; }
+  .window-sidebar-count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-muted); }
+  .folder-glyph-window { width: var(--icon-sm); height: var(--icon-sm); flex-shrink: 0; }
+  .window-main { flex: 1; min-width: 0; }
+  .window-section { margin: var(--space-4) 0; }
+  .window-section:first-child { margin-top: var(--space-2); }
+  .window-section-heading {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-2);
+  }
+  .window-section-heading a { color: var(--color-text); text-decoration: none; }
+  .window-section-heading a:hover { color: var(--color-accent); }
+  .window-section-count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-regular);
+    color: var(--color-muted);
+  }
+  .window-empty-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+  .window-empty-clear {
+    border: var(--border-hairline) solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-3);
+    min-height: 36px;
+    cursor: pointer;
+    font-size: var(--text-sm);
+  }
+  .window-empty-clear:hover { border-color: var(--color-border-strong); }
+  .window-status-bar {
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface-alt);
+    border-top: var(--border-hairline) solid var(--color-border);
+  }
+  .window-status-text {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  /* -------------------------------------------------------------------
+     Quick-open (spec 1.7/1.13) -- a full-screen backdrop + a single
+     bordered dialog carrying one combobox input and its listbox. The
+     header trigger button only ever exists once filter.client.js runs
+     ("no dead control without JS").
+     ------------------------------------------------------------------- */
+  .quickopen-trigger {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+  .quickopen-trigger:hover { border-color: var(--color-border-strong); color: var(--color-text); }
+  .quickopen-trigger kbd {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0 var(--space-1);
+  }
+  .quickopen-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 24, 31, 0.4);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: var(--space-7) var(--space-4);
+    z-index: 200;
+  }
+  .quickopen-dialog {
+    width: 100%;
+    max-width: 480px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  .quickopen-input {
+    width: 100%;
+    min-height: 52px;
+    padding: var(--space-3) var(--space-4);
+    border: none;
+    border-bottom: var(--border-hairline) solid var(--color-border);
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    color: var(--color-text);
+  }
+  .quickopen-input:focus-visible { outline: none; }
+  .quickopen-listbox {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-2);
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .quickopen-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+  .quickopen-option[aria-selected="true"] { background: var(--color-accent-tint); color: var(--color-accent); }
+  .quickopen-option-folder { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-muted); flex-shrink: 0; }
+  .quickopen-empty { padding: var(--space-4); color: var(--color-muted); font-size: var(--text-sm); }
 `;
 
 module.exports = { SITE_CSS, FONT_WOFF2_URL };
