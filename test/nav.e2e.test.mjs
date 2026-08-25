@@ -106,7 +106,7 @@ test('nav: keyboard reaches all the way from the outer disclosure into a real to
   await page.keyboard.press('Tab'); // first tool link inside
   const focused = await page.evaluate(() => ({ tag: document.activeElement.tagName, href: document.activeElement.getAttribute('href') }));
   assert.equal(focused.tag, 'A');
-  assert.equal(focused.href, '/pdf/merge-pdf/');
+  assert.equal(focused.href, '/pdf/jpg-png-to-pdf/');
   await page.close();
 });
 
@@ -119,7 +119,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
     rows: g.querySelectorAll('.folder-tool-list a').length,
   })));
   assert.deepEqual(counts, [
-    { label: 'PDF', count: '5', rows: 5 },
+    { label: 'PDF', count: '6', rows: 6 },
     { label: 'CSV & Spreadsheets', count: '8', rows: 8 },
     { label: 'JSON & Data Formats', count: '5', rows: 5 },
     { label: 'Text', count: '4', rows: 4 },

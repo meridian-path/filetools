@@ -77,5 +77,5 @@ module.exports = {
       answerHtml: 'No. Pages are copied as-is; nothing is re-rendered or re-compressed, so the result is identical in quality to the source files.',
     },
   ],
-  relatedSlugs: ['split-pdf', 'rotate-pdf', 'pdf-to-csv'],
+  relatedSlugs: ['split-pdf', 'rotate-pdf', 'jpg-png-to-pdf'],
 };
