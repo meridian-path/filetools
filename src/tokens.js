@@ -80,11 +80,65 @@ const DESIGN_TOKENS = {
 
   '--tracking-tight': '-0.02em',
 
+  // Paired type-role tokens (craft-retrofit Phase 1, closing the
+  // design-tokens-deliverable gap the retrofit spec named:
+  // design-standards.md requires "each step defining size + line-height +
+  // weight + letter-spacing together" -- previously these four lived as
+  // independent atomic tokens a callsite combined by hand. Each --type-*
+  // below composes the CSS `font` shorthand (style/variant omitted, both
+  // default to normal) from the SAME atomic tokens above via var() --
+  // this pairs the values without duplicating them under a second name
+  // (the atoms remain the single source of truth; a --type-* token is a
+  // pure recombination, never a fresh literal). Use as
+  // `font: var(--type-h1);` -- letter-spacing is not part of the `font`
+  // shorthand in CSS, so a step needing non-default tracking still sets
+  // --tracking-tight separately alongside, same as before. Applied so far
+  // to headings, deck/caption text, and the explorer-window chrome this
+  // retrofit phase touches directly; the many remaining piecemeal
+  // font-size/-weight/line-height combinations elsewhere in src/css.js are
+  // a known, explicitly-deferred follow-up for the retrofit's later
+  // per-folder passes (Phase 3), not silently claimed done here.
+  '--type-h1': 'var(--weight-bold) var(--text-2xl)/var(--leading-tight) var(--font-display)',
+  '--type-h2': 'var(--weight-bold) var(--text-xl)/var(--leading-tight) var(--font-display)',
+  '--type-h3': 'var(--weight-bold) var(--text-lg)/var(--leading-tight) var(--font-display)',
+  '--type-body': 'var(--weight-regular) var(--text-base)/var(--leading-normal) var(--font-sans)',
+  '--type-deck': 'var(--weight-regular) var(--text-md)/var(--leading-normal) var(--font-sans)',
+  '--type-caption': 'var(--weight-regular) var(--text-xs)/var(--leading-normal) var(--font-sans)',
+  '--type-label': 'var(--weight-medium) var(--text-sm)/var(--leading-normal) var(--font-sans)',
+  // Row-name (tool-row's own display-face title, .tool-row-name) and the
+  // two mono-scale roles the explorer-window chrome/ruler/rows actually
+  // use (path bar at sm/medium, everything else -- count/ruler/kind chip/
+  // status text -- at xs/regular): named separately from --type-label
+  // above rather than reusing it, since neither matches that pairing's
+  // own size+weight combination.
+  '--type-row-name': 'var(--weight-bold) var(--text-md)/var(--leading-tight) var(--font-display)',
+  '--type-control': 'var(--weight-regular) var(--text-sm)/var(--leading-normal) var(--font-sans)',
+  '--type-mono-path': 'var(--weight-medium) var(--text-sm)/var(--leading-normal) var(--font-mono)',
+  '--type-mono-caption': 'var(--weight-regular) var(--text-xs)/var(--leading-normal) var(--font-mono)',
+
   '--measure': '66ch',
   '--width-page': '760px',
   '--width-app': '1040px',
   '--width-wide': '1200px',
 
+  // Semantic spacing ramp (craft-retrofit Phase 1 GAP 2 -- design-standards
+  // enforcement note): DESIGN_PLAYBOOK.md names four tiers (within-group,
+  // between-group, section-turn, chapter-break "sparingly"). Verified
+  // against this file's own actual pixel values rather than assuming a
+  // naming mismatch meant a missing token: every tier already has a real
+  // token here, just not documented as such -- --space-8 (64px) already
+  // IS the chapter-break value the playbook describes, --space-7 (48px)
+  // already IS the section-turn value; nothing new needed at that end of
+  // the scale. Adding a --space-9/-12/-16 tier here would have duplicated
+  // an existing value under a second name, which this file's own rule
+  // (directly below) already forbids -- so this gap closes as a mapping
+  // comment, not a new token:
+  //   within-group  (dense, same-control spacing): --space-2 / --space-3
+  //   between-group (related but distinct controls): --space-4 / --space-5
+  //   section-turn  (a page section ends, the next begins): --space-6 / --space-7
+  //   chapter-break (sparingly -- a real structural break, e.g. between
+  //     the homepage's folder sections or a tool page's core UI and its
+  //     FAQ block): --space-8
   '--space-1': '0.25rem',
   '--space-2': '0.5rem',
   '--space-3': '0.75rem',
@@ -97,10 +151,21 @@ const DESIGN_TOKENS = {
   '--radius-sm': '6px',
   '--radius-md': '10px',
   '--radius-lg': '14px',
+  // Not counted against the 3-radius cap (craft-retrofit Phase 1 GAP 3):
+  // a pill is categorically a shape token (full-round for a badge/chip),
+  // not a point on the corner-rounding scale the cap governs -- the same
+  // distinction most token systems draw between a "radius scale" and a
+  // "pill/full-round" special case. The corner-rounding scale itself stays
+  // exactly 3 values (sm/md/lg), honestly under the cap.
   '--radius-pill': '999px',
 
   '--shadow-sm': '0 1px 2px rgba(20, 24, 31, 0.07)',
   '--shadow-md': '0 8px 24px rgba(20, 24, 31, 0.09)',
+  // Counted as the same elevation tier as --shadow-sm, not a third
+  // (craft-retrofit Phase 1 GAP 3): this is a focus-adjacent accent ring
+  // (a colored 0-blur spread, always paired with a border/focus state),
+  // not a drop-shadow depth cue -- the 2-elevation cap governs depth
+  // (sm/md), which this token doesn't add a third step to.
   '--shadow-drop': '0 0 0 4px rgba(11, 95, 102, 0.06)',
 
   '--border-hairline': '1px',
@@ -214,7 +279,10 @@ const DESIGN_TOKENS = {
   // item counts -- never headings, body text, or controls. Flagged
   // explicitly for reviewer sign-off against design-standards.md's
   // 2-typeface cap; see the PR description for the disclosed fallback if
-  // rejected.
+  // rejected. Craft-retrofit Phase 0 re-verified every current usage
+  // stays inside this declared scope and filed a sign-off request through
+  // the standard decision-brief process -- pending a human/reviewer
+  // answer, not yet resolved by this comment alone.
   '--font-mono': 'ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
   '--sidebar-width': '15rem',
   '--tree-indent': '1.25rem',
