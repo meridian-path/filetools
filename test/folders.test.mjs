@@ -59,12 +59,12 @@ test('FOLDER_BY_KEY resolves every FOLDERS entry by its own key', () => {
   }
 });
 
-test('the taxonomy is exactly the spec\'s 5-folder, 30-slug assignment (folder taxonomy/nav spec section 1.1)', () => {
+test('the taxonomy is exactly the spec\'s 5-folder, 31-slug assignment (folder taxonomy/nav spec section 1.1)', () => {
   const byFolder = {};
   for (const f of FOLDERS) byFolder[f.key] = toolsInFolder(f.key).map((t) => t.slug).sort();
   assert.deepEqual(byFolder, {
     pdf: ['bank-statement-to-csv', 'jpg-png-to-pdf', 'merge-pdf', 'pdf-to-csv', 'rotate-pdf', 'split-pdf'].sort(),
-    spreadsheets: ['compare-csv', 'csv-to-sql-insert', 'html-table-to-csv', 'merge-csv', 'split-csv', 'transpose-csv', 'xlsx-to-csv', 'xlsx-to-json'].sort(),
+    spreadsheets: ['compare-csv', 'csv-to-sql-insert', 'csv-to-xlsx', 'html-table-to-csv', 'merge-csv', 'split-csv', 'transpose-csv', 'xlsx-to-csv', 'xlsx-to-json'].sort(),
     'data-formats': ['flatten-json', 'json-minify-beautify', 'json-to-csv', 'xml-to-json', 'yaml-to-json'].sort(),
     text: ['remove-duplicate-lines', 'sort-lines', 'text-case-converter', 'word-frequency-counter'].sort(),
     developer: ['base64-encode-decode', 'hash-generator', 'html-entity-encode-decode', 'regex-tester', 'sql-formatter', 'url-encode-decode', 'uuid-generator'].sort(),
