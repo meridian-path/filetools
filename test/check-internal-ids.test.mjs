@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { findLeakedIds, ID_RE } from '../scripts/check-internal-ids.js';
+import { findLeakedIds, ID_RE, findFiles, SCAN_DIRS } from '../scripts/check-internal-ids.js';
 
 /**
  * Regression coverage for the mechanical internal-id leak check
@@ -81,4 +81,27 @@ test('findLeakedIds: does not false-positive on an unrelated hyphenated identifi
 test('findLeakedIds: does not false-positive on a real commit SHA mention (no task-/decision- prefix)', () => {
   const file = tmpFile('// merged as commit 2791707752ad4ea0e290096305dce6ec5891fb6a\n');
   assert.deepEqual(findLeakedIds(file), []);
+});
+
+// Regression coverage for a near-miss found while fixing an unrelated CI
+// workflow bug: a leaked decision-id was almost committed in
+// .github/workflows/deploy-pages.yml's own comment, and this checker never
+// would have caught it -- .github wasn't in SCAN_DIRS, and even if it had
+// been, findFiles' own extension filter didn't include .yml/.yaml at all.
+// Both gaps are covered directly here, since main()'s own use of these
+// against the real ROOT can't exercise a case that (correctly) doesn't
+// exist in this repo right now.
+test('SCAN_DIRS includes .github -- CI workflow comments are exactly as public-facing as any src/ comment', () => {
+  assert.ok(SCAN_DIRS.includes('.github'));
+});
+
+test('findFiles: picks up a .yml file, not just js/mjs/css/md/html', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-yml-test-'));
+  const workflowsDir = path.join(dir, 'workflows');
+  fs.mkdirSync(workflowsDir);
+  const ymlFile = path.join(workflowsDir, 'deploy.yml');
+  fs.writeFileSync(ymlFile, '# see task-mt6jcfwr-ed62cc\n', 'utf8');
+  const found = findFiles(dir);
+  assert.deepEqual(found, [ymlFile]);
+  assert.deepEqual(findLeakedIds(ymlFile), ['task-mt6jcfwr-ed62cc']);
 });

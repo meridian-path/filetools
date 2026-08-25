@@ -31,10 +31,13 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-// Scans this repo's own source/test/docs -- NOT dist/ (a fresh build
-// output, regenerated every run, would only ever mirror src/ anyway) and
-// NOT node_modules/vendor (third-party code this repo doesn't author).
-const SCAN_DIRS = ['src', 'test', 'scripts', 'docs'];
+// Scans this repo's own source/test/docs/CI config -- NOT dist/ (a fresh
+// build output, regenerated every run, would only ever mirror src/ anyway)
+// and NOT node_modules/vendor (third-party code this repo doesn't author).
+// .github added after a near-miss: a CI workflow YAML comment is exactly
+// as public-facing as any src/ comment, but was never scanned since it
+// lived outside every prior SCAN_DIRS entry.
+const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github'];
 
 // Matches the shared queue's own id shape: "task-" or "decision-" followed
 // by a lowercase-alphanumeric segment, a hyphen, and a hex segment (the
@@ -51,7 +54,7 @@ function findFiles(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...findFiles(full));
-    else if (/\.(js|mjs|css|md|html)$/.test(entry.name)) out.push(full);
+    else if (/\.(js|mjs|css|md|html|yml|yaml)$/.test(entry.name)) out.push(full);
   }
   return out;
 }
@@ -140,4 +143,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findLeakedIds, ID_RE };
+module.exports = { findLeakedIds, ID_RE, findFiles, SCAN_DIRS };
