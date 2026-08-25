@@ -110,6 +110,25 @@ export function ruledSourcePage(x, y, opts = {}) {
 }
 
 /**
+ * A small abstract "photo" glyph (rounded-rect frame + a simple
+ * mountain/sun motif, the standard image-placeholder convention) -- the
+ * drawn stand-in for a source/result JPG or PNG file, the same
+ * "can't compute a real result at build time" reasoning ruledSourcePage()
+ * documents for a PDF/spreadsheet source.
+ * @param {number} x
+ * @param {number} y
+ * @param {{w?:number, h?:number, extraClass?:string}} [opts]
+ */
+export function photo(x, y, opts = {}) {
+  const { w = 34, h = 46, extraClass = '' } = opts;
+  const cls = extraClass ? ` class="${extraClass}"` : '';
+  const frame = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" ${STROKE}${cls}/>`;
+  const sun = `<circle cx="${x + w * 0.32}" cy="${y + h * 0.32}" r="${w * 0.1}" ${STROKE}/>`;
+  const mountains = `<path d="M${x + 4} ${y + h - 8}l${w * 0.22} -${h * 0.24}l${w * 0.16} ${h * 0.14}l${w * 0.2} -${h * 0.28}l${w * 0.2} ${h * 0.38}z" ${STROKE}/>`;
+  return frame + sun + mountains;
+}
+
+/**
  * @param {string} inner raw SVG content.
  * @param {string} label the diagram's accessible name.
  * @param {{viewBox?:string}} [opts]
