@@ -1,0 +1,56 @@
+# Blocks merge (once wired into branch protection -- a repo-settings step a
+# human completes separately) on any PR whose body or commits carry an
+# unresolved "COPY-REVIEW: REQUIRED" marker. Uses the GitHub CLI (gh),
+# preinstalled and pre-authenticated with GITHUB_TOKEN on GitHub-hosted
+# runners -- no third-party Action is needed here, so there is nothing that
+# needs pinning to a commit SHA the way the deploy workflow's third-party
+# Actions are.
+name: Copy Review Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  copy-review-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for an unresolved COPY-REVIEW marker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          BODY=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json body -q .body || echo "")
+          COMMIT_TEXT=$(gh pr view "$PR_NUMBER" --repo "$REPO" \
+            --json commits -q '.commits[] | .messageHeadline + " " + .messageBody' || echo "")
+          LABELS=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json labels -q '.labels[].name' || echo "")
+
+          COMBINED="$BODY
+          $COMMIT_TEXT"
+
+          NEEDS_REVIEW=false
+          if grep -q "COPY-REVIEW: REQUIRED" <<< "$COMBINED"; then
+            NEEDS_REVIEW=true
+          fi
+
+          RESOLVED=false
+          if grep -qx "copy-review-resolved" <<< "$LABELS"; then
+            RESOLVED=true
+          fi
+          if grep -q "COPY-REVIEW: RESOLVED" <<< "$COMBINED"; then
+            RESOLVED=true
+          fi
+
+          if [ "$NEEDS_REVIEW" = "true" ] && [ "$RESOLVED" != "true" ]; then
+            echo "::error::This PR carries an unresolved COPY-REVIEW: REQUIRED marker. An independent reviewer must add the 'copy-review-resolved' label (or a COPY-REVIEW: RESOLVED note in the PR body/a follow-up commit) after checking the copy diff before this can merge."
+            exit 1
+          fi
+
+          echo "Copy review gate: no unresolved marker found."
