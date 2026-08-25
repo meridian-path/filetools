@@ -15,11 +15,10 @@
  *
  * NUMBER_RE/isNumericColumn() are a duplicate of
  * ../pure/csvToSqlInsert.mjs's own detectColumnType() logic, for the exact
- * same reason that tool's own FAQ states and an independent review already
- * caught as a real bug once in this codebase: a leading-zero value like
- * "0042" is NOT a number by this rule (it is a code that merely looks
- * numeric), so a column containing it is written as text, never coerced
- * into a real Excel number that would silently drop the leading zero.
+ * same reason that tool's own FAQ states: a leading-zero value like "0042"
+ * is NOT a number by this rule (it is a code that merely looks numeric),
+ * so a column containing it is written as text, never coerced into a real
+ * Excel number that would silently drop the leading zero.
  */
 
 /**
