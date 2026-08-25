@@ -103,6 +103,14 @@ test('filter: zero matches shows a visible empty-state row with a working Clear 
   assert.equal(inputValue, '');
   const visibleRows = await page.locator('.tool-row:visible').count();
   assert.ok(visibleRows > 10, 'clearing should restore every row');
+  // Regression check: .window-empty-row's own `display: flex` used to have
+  // equal CSS specificity to its `[hidden]` override, so setting the
+  // hidden attribute alone (what Clear does) never actually hid the row --
+  // it kept rendering as an orphan "Clear" button on every listing page.
+  // Real, rendered invisibility is what this checks, not just the
+  // attribute.
+  await emptyRow.waitFor({ state: 'hidden' });
+  assert.equal(await emptyRow.isVisible(), false);
   await page.close();
 });
 
