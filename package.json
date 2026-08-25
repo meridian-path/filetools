@@ -12,6 +12,8 @@
     "pretest": "node scripts/check-em-dash.js && node scripts/check-internal-ids.js",
     "test": "node --test test/*.test.mjs",
     "visual-qa": "node scripts/visual-qa.js",
+    "lineup-squint": "node scripts/lineup-squint.js",
+    "capture-competitor-screenshot": "node scripts/capture-competitor-screenshot.js",
     "check-em-dash": "node scripts/check-em-dash.js",
     "check-internal-ids": "node scripts/check-internal-ids.js"
   },

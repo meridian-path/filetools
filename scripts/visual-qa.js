@@ -236,4 +236,12 @@ if (require.main === module) {
   });
 }
 
-module.exports = { VIEWPORTS, OUTPUT_DIR, isHttpUrl, pageNameFor, formatScoreSummary, findSiteRoot };
+module.exports = {
+  VIEWPORTS,
+  OUTPUT_DIR,
+  isHttpUrl,
+  pageNameFor,
+  formatScoreSummary,
+  findSiteRoot,
+  startStaticServer,
+};
