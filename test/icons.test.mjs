@@ -78,6 +78,7 @@ test('MARKS is exactly the fixed 31-row plate/verb/ink table, no more, no fewer'
     'flatten-json': { plate: 'json', verb: 'flatten', ink: 'json' },
     'json-minify-beautify': { plate: 'json', verb: 'convert', ink: 'json' },
     'yaml-to-json': { plate: 'json', verb: 'convert', ink: 'json' },
+    'json-to-yaml': { plate: 'json', verb: 'convert', ink: 'json' },
     'xml-to-json': { plate: 'json', verb: 'convert', ink: 'json', motif: 'xml' },
     'xlsx-to-csv': { plate: 'sheet', verb: 'convert', ink: 'csv' },
     'xlsx-to-json': { plate: 'sheet', verb: 'convert', ink: 'json' },

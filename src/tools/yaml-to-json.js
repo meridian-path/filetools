@@ -55,5 +55,5 @@ module.exports = {
       answerHtml: 'You’ll get a plain-English error naming the problem and its line and column instead of a converted file. Fix the indentation or syntax at that spot and try again.',
     },
   ],
-  relatedSlugs: ['json-to-csv', 'flatten-json', 'xlsx-to-json'],
+  relatedSlugs: ['json-to-yaml', 'json-to-csv', 'flatten-json', 'xlsx-to-json'],
 };
