@@ -27,6 +27,16 @@ module.exports = {
     label: 'Or paste JSON',
     placeholder: '{\n  "name": "Ada",\n  "roles": ["admin", "editor"]\n}',
     buttonLabel: 'Minify and beautify pasted JSON',
+    // Craft-audit fix (item 6): the deck copy above already promised
+    // "updated instantly" and this tool's own architecture supports it
+    // (dropzone.client.js's PROCESSORS pipeline runs the same
+    // jsonMinifyBeautify.client.js module either way) -- only the paste
+    // path was actually gated behind a click. `live: true` opts this
+    // tool's paste box into dropzone.client.js's debounced auto-run, so
+    // the copy is now true rather than watered down. The button stays as
+    // a manual "run now" fallback; running it again after typing is a
+    // harmless no-op re-render of the same input.
+    live: true,
   },
   howSteps: [
     'Drop or choose a .json file, or paste JSON directly into the text box.',

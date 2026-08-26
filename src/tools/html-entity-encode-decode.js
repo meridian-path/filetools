@@ -14,7 +14,9 @@ module.exports = {
   clientEntry: 'htmlEntity',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
-  family: 'text',
+  // Craft-audit fix (item 7): was 'text' -- see regex-tester.js's own
+  // comment on this same field for the full rationale.
+  family: 'dev',
   folder: 'developer',
   mark: { verb: 'convert' },
   maxBytes: 20 * 1024 * 1024,

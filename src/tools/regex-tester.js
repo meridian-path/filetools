@@ -14,7 +14,12 @@ module.exports = {
   clientEntry: 'regexTester',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
-  family: 'text',
+  // Craft-audit fix (item 7): was 'text', which made this genuine
+  // developer-utility tool indistinguishable (identical icon + "Text" Kind
+  // chip) from an actual plain-text tool like sort-lines.js in the
+  // file-browser listing -- 'dev' is its own family now (src/icons.js's
+  // devMotif(), folders.js's pre-existing 'dev' folder-color axis).
+  family: 'dev',
   folder: 'developer',
   mark: { verb: 'convert' },
   // customPanelMode (src/pages/toolPage.js, see uuid-generator.js's own

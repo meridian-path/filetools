@@ -33,6 +33,39 @@ function jsonBlob(jsonText) {
 }
 
 /**
+ * Craft-audit fix (item 8): a working copy-to-clipboard button, same shape
+ * as ../browser/jsonMinifyBeautify.client.js's own makeCopyButton (that
+ * file's header comment traces this same duplicated-by-convention pattern
+ * back to ../browser/urlEncode.client.js) -- this tool's JSON output only
+ * ever offered "Download converted.json", unlike its sibling
+ * json-minify-beautify a click away, which already has working "Copy
+ * minified"/"Copy beautified" buttons for the same kind of text/code
+ * result.
+ *
+ * @param {() => string} getText
+ * @param {string} label
+ */
+function makeCopyButton(getText, label) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn-secondary';
+  btn.textContent = label;
+  let resetTimer = null;
+  btn.addEventListener('click', async () => {
+    if (resetTimer) clearTimeout(resetTimer);
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('no Clipboard API');
+      await navigator.clipboard.writeText(getText());
+      btn.textContent = 'Copied';
+    } catch (err) {
+      btn.textContent = 'Couldn’t copy - select the text and copy manually';
+    }
+    resetTimer = setTimeout(() => { btn.textContent = label; }, 2000);
+  });
+  return btn;
+}
+
+/**
  * @param {HTMLElement} resultEl
  * @param {string} jsonText the full, pretty-printed JSON text.
  * @param {number} recordCount
@@ -74,6 +107,10 @@ function renderResult(resultEl, jsonText, recordCount) {
     downloadBlob(jsonBlob(jsonText), 'converted.json');
   });
   btnRow.appendChild(downloadBtn);
+  // Download stays the one accent-filled (.btn-primary) action per view
+  // (design-standards.md); Copy is secondary, same convention
+  // jsonMinifyBeautify.client.js's own panels already use.
+  btnRow.appendChild(makeCopyButton(() => jsonText, 'Copy JSON'));
   block.appendChild(btnRow);
 
   const supportNote = document.createElement('p');

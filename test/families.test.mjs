@@ -12,14 +12,18 @@ import { FAMILY_BY_SLUG, familyOf, DEFAULT_FAMILY } from '../src/families.js';
  * test is what makes a missing row loud instead of invisible.
  */
 
-const VALID_FAMILIES = new Set(['pdf', 'csv', 'json', 'sheet', 'text']);
+// 'dev' added by the craft-audit fix (site-audit task, item 7): genuine
+// developer-utility tools (folders.js's 'developer' folder) get their own
+// family now, distinct from plain-text tools -- see regex-tester.js's own
+// comment on its `family` field for the full rationale.
+const VALID_FAMILIES = new Set(['pdf', 'csv', 'json', 'sheet', 'text', 'dev']);
 
 test('every tool in the TOOLS registry has an explicit FAMILY_BY_SLUG entry', () => {
   const missing = TOOLS.map((t) => t.slug).filter((slug) => !(slug in FAMILY_BY_SLUG));
   assert.deepEqual(missing, [], `slugs missing an explicit family: ${missing.join(', ')}`);
 });
 
-test('every FAMILY_BY_SLUG value is one of the five known families', () => {
+test('every FAMILY_BY_SLUG value is one of the six known families', () => {
   for (const [slug, family] of Object.entries(FAMILY_BY_SLUG)) {
     assert.ok(VALID_FAMILIES.has(family), `${slug} maps to unknown family "${family}"`);
   }
@@ -37,7 +41,7 @@ test('familyOf() falls back to the default family for an unrecognized slug, neve
   assert.equal(familyOf(undefined), DEFAULT_FAMILY);
 });
 
-test('the taxonomy is exactly the spec\'s 5-family, 32-slug assignment', () => {
+test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\'), 35-slug assignment', () => {
   assert.deepEqual(FAMILY_BY_SLUG, {
     'merge-pdf': 'pdf',
     'split-pdf': 'pdf',
@@ -70,13 +74,17 @@ test('the taxonomy is exactly the spec\'s 5-family, 32-slug assignment', () => {
     'remove-duplicate-lines': 'text',
     'sort-lines': 'text',
     'word-frequency-counter': 'text',
-    'url-encode-decode': 'text',
-    'base64-encode-decode': 'text',
-    'html-entity-encode-decode': 'text',
     'text-case-converter': 'text',
-    'hash-generator': 'text',
-    'uuid-generator': 'text',
-    'regex-tester': 'text',
-    'sql-formatter': 'text',
+
+    // 'dev' -- genuine developer-utility tools (folders.js's 'developer'
+    // folder), craft-audit fix item 7. Distinct from the genuine
+    // plain-text tools above.
+    'url-encode-decode': 'dev',
+    'base64-encode-decode': 'dev',
+    'html-entity-encode-decode': 'dev',
+    'hash-generator': 'dev',
+    'uuid-generator': 'dev',
+    'regex-tester': 'dev',
+    'sql-formatter': 'dev',
   });
 });

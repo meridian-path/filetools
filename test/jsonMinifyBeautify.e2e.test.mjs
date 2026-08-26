@@ -189,8 +189,60 @@ test('json-minify-beautify: pasting whitespace-only text shows a friendly status
   await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '   ');
   await page.locator('#paste-convert').click();
-  await page.waitForFunction(() => document.querySelector('.dz-status')?.textContent.trim().length > 0);
-  const msg = await page.locator('.dz-status').textContent();
+  // Craft-audit fix (item 5): a paste-triggered status lives in this
+  // paste box's OWN `.paste-status` line now, never the shared file
+  // drop-zone's `.dz-status` -- see the next test for the cross-affordance
+  // regression this replaces.
+  await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
+  const msg = await page.locator('.paste-status').textContent();
   assert.match(msg, /paste some/i);
+  await page.close();
+});
+
+test('json-minify-beautify: an empty paste never flips the unrelated file drop-zone to an error/done state (craft-audit item 5)', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
+  await page.fill('#paste-textarea', '   ');
+  await page.locator('#paste-convert').click();
+  await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
+  assert.equal(await page.locator('.dropzone').getAttribute('data-state'), 'idle');
+  assert.equal(await page.locator('.dz-status').textContent(), '');
+  await page.close();
+});
+
+test('json-minify-beautify: a valid paste never flips the unrelated file drop-zone to a "done" checkmark (craft-audit item 5)', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
+  await page.fill('#paste-textarea', '{"a":1}');
+  await page.locator('#paste-convert').click();
+  await page.waitForSelector('.dual-result-row .table-block .json-preview');
+  assert.equal(await page.locator('.dropzone').getAttribute('data-state'), 'idle');
+  assert.equal(await page.locator('.dz-status').textContent(), '');
+  await page.close();
+});
+
+test('json-minify-beautify: typing valid JSON clears a stale paste error immediately, without re-clicking convert (craft-audit item 4)', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
+  await page.fill('#paste-textarea', '   ');
+  await page.locator('#paste-convert').click();
+  await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
+
+  await page.fill('#paste-textarea', '{"a":1}');
+  // No click here -- typing alone (the 'input' event) must clear the
+  // stale error text on its own.
+  await page.waitForFunction(() => (document.querySelector('.paste-status')?.textContent || '').trim() === '');
+  assert.equal((await page.locator('.paste-status').textContent()).trim(), '');
+  await page.close();
+});
+
+test('json-minify-beautify: typing valid JSON with no click at all renders the result live (craft-audit item 6 -- copy already promised "updated instantly")', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
+  await page.locator('#paste-textarea').pressSequentially('{"live":true}');
+  await page.waitForSelector('.dual-result-row .table-block .json-preview', { timeout: 5000 });
+
+  const panels = page.locator('.dual-result-row .table-block .json-preview');
+  assert.equal(await panels.nth(0).textContent(), '{"live":true}');
   await page.close();
 });

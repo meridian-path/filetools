@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 32-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 35-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -88,15 +88,17 @@ test('MARKS is exactly the fixed 32-row plate/verb/ink table, no more, no fewer'
     'remove-duplicate-lines': { plate: 'text', verb: 'dedupe', ink: 'text' },
     'sort-lines': { plate: 'text', verb: 'sort', ink: 'text' },
     'word-frequency-counter': { plate: 'text', verb: 'count', ink: 'text' },
-    'url-encode-decode': { plate: 'text', verb: 'convert', ink: 'text' },
-    'base64-encode-decode': { plate: 'text', verb: 'convert', ink: 'text' },
-    'html-entity-encode-decode': { plate: 'text', verb: 'convert', ink: 'text' },
     'text-case-converter': { plate: 'text', verb: 'convert', ink: 'text' },
-    'hash-generator': { plate: 'text', verb: 'convert', ink: 'text' },
+    // 'dev' plate/ink (craft-audit fix, item 7) -- see families.test.mjs's
+    // own comment on this same taxonomy change.
+    'url-encode-decode': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'base64-encode-decode': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'html-entity-encode-decode': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'hash-generator': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'csv-to-sql-insert': { plate: 'csv', verb: 'convert', ink: 'csv' },
-    'uuid-generator': { plate: 'text', verb: 'convert', ink: 'text' },
-    'regex-tester': { plate: 'text', verb: 'convert', ink: 'text' },
-    'sql-formatter': { plate: 'text', verb: 'convert', ink: 'text' },
+    'uuid-generator': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'regex-tester': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'sql-formatter': { plate: 'dev', verb: 'convert', ink: 'dev' },
   });
 });
 
@@ -132,7 +134,11 @@ test('every mark--<family> / mark-ink--<family> class in the stylesheet only eve
     assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b/, `hex literal inside ${m[0]}`);
     assert.match(body, /var\(--family-/, `${m[0]} does not set its custom property from a var(--family-*) token`);
   }
-  assert.equal(blocks, 12, `expected 6 .mark--<family> + 6 .mark-ink--<family> blocks (5 tool families + the folder-only "dev" family), found ${blocks}`);
+  // 'dev' used to be folder-only (no individual tool carried
+  // family:'dev') -- craft-audit fix item 7 gave 7 real tools that family
+  // too, but the CSS class count itself is unchanged since these classes
+  // already existed for the folder-level color axis.
+  assert.equal(blocks, 12, `expected 6 .mark--<family> + 6 .mark-ink--<family> blocks (5 format families + "dev"), found ${blocks}`);
 });
 
 test('every mark parses as well-formed XML and carries aria-hidden="true" focusable="false"', () => {

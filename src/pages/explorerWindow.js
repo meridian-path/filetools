@@ -22,11 +22,13 @@ const { familyOf } = require('../families.js');
 /**
  * Kind-chip label per tool `family` (spec 1.5) -- deliberately short,
  * matching the family's own recognizable initialism/name rather than a
- * longer category phrase. 'dev' is included for completeness (folders.js's
- * developer-folder familyKey) even though no individual tool currently
- * carries family:'dev' -- every tool keeps its own pre-existing family
- * regardless of which folder it displays in (folders.js's own header
- * comment).
+ * longer category phrase. 'dev' started as a folder-color-only axis
+ * (folders.js's developer-folder familyKey) with no individual tool
+ * actually carrying family:'dev' -- the craft-audit fix (site-audit task,
+ * item 7) gave the genuine developer-utility tools (Regex Tester, Hash
+ * Generator, UUID Generator, and others under folders.js's 'developer'
+ * folder) that same family, so their per-row icon/Kind chip finally reads
+ * as "Dev" instead of sharing plain-text tools' "Text" chip.
  */
 const FAMILY_KIND_LABELS = {
   pdf: 'PDF', csv: 'CSV', json: 'JSON', sheet: 'Sheet', text: 'Text', dev: 'Dev',

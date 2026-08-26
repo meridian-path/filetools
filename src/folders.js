@@ -39,10 +39,13 @@ const FOLDERS = [
   { key: 'spreadsheets', slug: 'spreadsheets', label: 'CSV & Spreadsheets', familyKey: 'csv', description: 'Merge, compare, transpose, and convert CSV and spreadsheet files.' },
   { key: 'data-formats', slug: 'data-formats', label: 'JSON & Data Formats', familyKey: 'json', description: 'Convert and clean up JSON, XML, and YAML.' },
   { key: 'text', slug: 'text', label: 'Text', familyKey: 'text', description: 'Sort, dedupe, and analyze plain text.' },
-  // familyKey 'dev' is the folder-level color axis only (src/tokens.js's
-  // --family-dev-1/6/8, added alongside this file) -- the individual
-  // tools inside this folder keep their OWN existing `family` (mostly
-  // 'text', for their own icon mark), unrelated to their folder's color.
+  // familyKey 'dev' started as this folder's own color axis only
+  // (src/tokens.js's --family-dev-1/6/8) with every tool inside it still
+  // carrying its OWN pre-existing `family` (mostly 'text'). Craft-audit
+  // fix (site-audit task, item 7) gave the genuine developer-utility tools
+  // in this folder `family: 'dev'` too (see regex-tester.js's own comment
+  // on that field), so this folder's color axis and its tools' own icon
+  // family now agree.
   { key: 'developer', slug: 'developer', label: 'Developer', familyKey: 'dev', description: 'Encoding, hashing, and other developer-utility conversions.' },
 ];
 
