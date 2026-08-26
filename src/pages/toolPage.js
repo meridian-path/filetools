@@ -22,6 +22,11 @@ const { realPageJsWeightKbLabel } = require('../jsWeight.js');
 const { MAX_BYTES_BY_CLIENT } = assembleBrowserClients();
 const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 
+// Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
+// see renderToolPage()'s own `faqs` comment below for the full rationale.
+// Built up one entry per Phase-3 folder pass, never all at once.
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats']);
+
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
 }
@@ -56,18 +61,11 @@ function renderToolPage(tool, example = {}) {
   // so this stays a single boolean flag rather than its own page template.
   const isCustomPanel = !!tool.customPanelMode;
 
-  // Craft-retrofit Phase 3(a) (developer folder, "speed as a feature"
-  // move): every developer-folder tool's own "Is X sent anywhere?"
-  // FAQ answer (already the first item on all 11) gets one appended
-  // sentence stating this page's real, computed JS weight -- a falsifiable
-  // number in the copy (REFERENCE_LIBRARY.md entries 6/7), never a bare
-  // adjective. Gated to `folder === 'developer'` deliberately, not applied
-  // site-wide yet -- the retrofit spec sequences this per folder
-  // (Phase 3), and each later folder's own pass is where this same
-  // treatment lands for its tools, not a big-bang change here. `faqs`
-  // (not `tool.faqs`) is what both the rendered markup and the FAQ JSON-LD
-  // below read, so the two can never drift apart.
-  const faqs = (tool.folder === 'developer' && tool.faqs.length)
+  // Craft-retrofit "speed as a feature" move (see SPEED_FEATURE_FOLDERS'
+  // own comment above for the rollout rationale). `faqs` (not `tool.faqs`)
+  // is what both the rendered markup and the FAQ JSON-LD below read, so the
+  // two can never drift apart.
+  const faqs = (SPEED_FEATURE_FOLDERS.has(tool.folder) && tool.faqs.length)
     ? [
       { ...tool.faqs[0], answerHtml: `${tool.faqs[0].answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` },
       ...tool.faqs.slice(1),
