@@ -24,8 +24,12 @@ const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 
 // Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
 // see renderToolPage()'s own `faqs` comment below for the full rationale.
-// Built up one entry per Phase-3 folder pass, never all at once.
-const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf']);
+// Built up one entry per Phase-3 folder pass, never all at once. As of the
+// `text` folder (Phase 3(e)), this now covers every real folder in
+// src/folders.js's own taxonomy -- kept as an explicit Set rather than
+// collapsed to "always true" so a genuinely new 6th folder still has to be
+// added here deliberately, the same way every prior folder was.
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf', 'text']);
 
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;

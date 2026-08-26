@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderToolPage } from '../src/pages/toolPage.js';
-import { toolBySlug } from '../src/tools/index.js';
+import { toolBySlug, TOOLS } from '../src/tools/index.js';
 import { realPageJsWeightKbLabel, realPageJsWeightBytes } from '../src/jsWeight.js';
 
 /**
@@ -78,11 +78,21 @@ test('the JS-weight sentence lands on compare-csv\'s real "Is my data sent anywh
   assert.ok(!html.includes(`What happens if the rows are in a different order in each file? This page loads`), 'the sentence must not have landed on the first (wrong) FAQ');
 });
 
-test('a tool in a folder with no Phase-3 pass yet is unchanged -- no JS-weight sentence at all', () => {
-  // text is the one folder with no Phase-3 pass as of this test -- update
-  // this to whichever folder is genuinely still pending if that changes.
-  const tool = toolBySlug('remove-duplicate-lines');
-  assert.equal(tool.folder, 'text', 'sanity: this slug must stay in a folder with no Phase-3 pass yet for this test to mean anything');
-  const html = renderToolPage(tool);
-  assert.ok(!html.includes('This page loads'), 'the JS-weight sentence should only render for a folder that has had its own Phase-3 pass');
+test('every text-folder tool (Phase 3(e), the last folder) also states its real JS weight', () => {
+  for (const slug of ['remove-duplicate-lines', 'sort-lines', 'text-case-converter', 'word-frequency-counter']) {
+    assertHasWeightSentence(slug);
+  }
+});
+
+test('with all 5 folders now rolled out, every single tool on the site states its real JS weight', () => {
+  // Phase 3(e) (text) was the last folder in the taxonomy -- SPEED_FEATURE_FOLDERS
+  // now covers developer/data-formats/spreadsheets/pdf/text, i.e. every real
+  // folder. This is the strongest version of the earlier per-folder tests:
+  // it iterates the live TOOLS registry directly rather than a hand-copied
+  // slug list, so it can never itself go stale the way a hardcoded list
+  // would. If a 6th folder is ever added without extending
+  // SPEED_FEATURE_FOLDERS, this is the test that catches it.
+  for (const tool of TOOLS) {
+    assertHasWeightSentence(tool.slug);
+  }
 });
