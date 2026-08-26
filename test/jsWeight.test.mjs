@@ -73,6 +73,8 @@ test('the real computed weight for every speed-as-a-feature clientEntry is a sma
     { clientEntry: 'csvDiff', proFeature: { clientEntry: 'compareCsvPro' } },
     { clientEntry: 'pdfImageExtract' }, { clientEntry: 'imagesToPdf' }, { clientEntry: 'pdfPages' },
     { clientEntry: 'pdfTables' }, { clientEntry: 'pdfToImages' }, { clientEntry: 'statementToCsv' },
+    { clientEntry: 'dedupeLines' }, { clientEntry: 'sortLines' }, { clientEntry: 'textCaseConverter' },
+    { clientEntry: 'wordFrequency' },
     { clientEntry: 'uuidGenerator', customPanelMode: true },
     { clientEntry: 'regexTester', customPanelMode: true },
   ];
