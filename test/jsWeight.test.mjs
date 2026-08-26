@@ -37,6 +37,17 @@ test('realPageJsWeightBytes() never silently includes a Worker for a custom-pane
   assert.notEqual(withoutWorker, withWorker);
 });
 
+test('realPageJsWeightBytes() adds a proFeature\'s own always-loaded client script on top of the base weight', () => {
+  const withoutProFeature = realPageJsWeightBytes({ clientEntry: 'csvDiff' });
+  const withProFeature = realPageJsWeightBytes({ clientEntry: 'csvDiff', proFeature: { clientEntry: 'compareCsvPro' } });
+  const proFeatureAlone = realGzipBytes('compareCsvPro.client.js');
+  assert.equal(withProFeature, withoutProFeature + proFeatureAlone);
+});
+
+test('realPageJsWeightBytes() ignores a tool with no proFeature field at all (the common case)', () => {
+  assert.equal(realPageJsWeightBytes({ clientEntry: 'csvDiff' }), realPageJsWeightBytes({ clientEntry: 'csvDiff', proFeature: undefined }));
+});
+
 test('realPageJsWeightKbLabel() rounds to the nearest whole KB with a trailing "KB"', () => {
   const bytes = realPageJsWeightBytes({ clientEntry: 'base64' });
   assert.equal(realPageJsWeightKbLabel({ clientEntry: 'base64' }), `${Math.round(bytes / 1024)}KB`);
@@ -56,6 +67,10 @@ test('the real computed weight for every speed-as-a-feature clientEntry is a sma
     { clientEntry: 'hashGenerator' }, { clientEntry: 'sqlFormatter' },
     { clientEntry: 'flattenJson' }, { clientEntry: 'jsonMinifyBeautify' }, { clientEntry: 'jsonToCsv' },
     { clientEntry: 'jsonToYaml' }, { clientEntry: 'xmlToJson' }, { clientEntry: 'yamlToJson' },
+    { clientEntry: 'csvToJson' }, { clientEntry: 'csvToSqlInsert' }, { clientEntry: 'csvToXlsx' },
+    { clientEntry: 'htmlTableToCsv' }, { clientEntry: 'csvMerge' }, { clientEntry: 'splitCsv' },
+    { clientEntry: 'transposeCsv' }, { clientEntry: 'xlsxToCsv' }, { clientEntry: 'xlsxToJson' },
+    { clientEntry: 'csvDiff', proFeature: { clientEntry: 'compareCsvPro' } },
     { clientEntry: 'uuidGenerator', customPanelMode: true },
     { clientEntry: 'regexTester', customPanelMode: true },
   ];

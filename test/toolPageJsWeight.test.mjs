@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderToolPage } from '../src/pages/toolPage.js';
 import { toolBySlug } from '../src/tools/index.js';
-import { realPageJsWeightKbLabel } from '../src/jsWeight.js';
+import { realPageJsWeightKbLabel, realPageJsWeightBytes } from '../src/jsWeight.js';
 
 /**
  * Regression test for the craft-retrofit "speed as a feature" addition
@@ -42,6 +42,34 @@ test('every data-formats-folder tool (Phase 3(b)) also states its real JS weight
   for (const slug of ['flatten-json', 'json-minify-beautify', 'json-to-csv', 'json-to-yaml', 'xml-to-json', 'yaml-to-json']) {
     assertHasWeightSentence(slug);
   }
+});
+
+test('every spreadsheets-folder tool (Phase 3(c)) also states its real JS weight, on its own real privacy FAQ wherever it falls in the list', () => {
+  for (const slug of ['compare-csv', 'csv-to-json', 'csv-to-sql-insert', 'csv-to-xlsx', 'html-table-to-csv', 'merge-csv', 'split-csv', 'transpose-csv', 'xlsx-to-csv', 'xlsx-to-json']) {
+    assertHasWeightSentence(slug);
+  }
+});
+
+test('compare-csv\'s stated weight includes its always-loaded Pro-feature script, not just the free-tier client', () => {
+  const tool = toolBySlug('compare-csv');
+  const html = renderToolPage(tool);
+  const label = realPageJsWeightKbLabel(tool);
+  // Regression guard: if a future edit reads only dropzone.client.js +
+  // csvDiff.client.js and forgets compareCsvPro.client.js (always fetched
+  // per toolPage.js's own proFeatureHtml), the stated figure would
+  // understate the real page weight -- assert it's not that smaller wrong
+  // number.
+  assert.ok(html.includes(`This page loads ${label} of JavaScript, gzipped`));
+  const withoutProFeature = Math.round(realPageJsWeightBytes({ clientEntry: tool.clientEntry }) / 1024);
+  assert.notEqual(label, `${withoutProFeature}KB`, 'the stated weight must not silently drop back to the pro-feature-excluded figure');
+});
+
+test('the JS-weight sentence lands on compare-csv\'s real "Is my data sent anywhere?" FAQ, not its first (functional) FAQ', () => {
+  const tool = toolBySlug('compare-csv');
+  const html = renderToolPage(tool);
+  const firstQMatch = html.match(/<h3>([^<]*)<\/h3>/);
+  assert.ok(firstQMatch && !/sent anywhere|upload/i.test(firstQMatch[1]), 'sanity: compare-csv\'s first FAQ should still be a functional question, not the privacy one');
+  assert.ok(!html.includes(`What happens if the rows are in a different order in each file? This page loads`), 'the sentence must not have landed on the first (wrong) FAQ');
 });
 
 test('a tool in a folder with no Phase-3 pass yet is unchanged -- no JS-weight sentence at all', () => {
