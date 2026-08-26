@@ -8,6 +8,7 @@ const { markFor } = require('../icons.js');
 const { familyOf } = require('../families.js');
 const { folderOf, FOLDER_BY_KEY } = require('../folders.js');
 const { assembleBrowserClients } = require('../browserClients.js');
+const { realPageJsWeightKbLabel } = require('../jsWeight.js');
 
 // Assembled (2026-08-22 fragment-pattern refactor) from each tool's own
 // `maxBytes` field (src/browserClients.js), the same source
@@ -55,6 +56,24 @@ function renderToolPage(tool, example = {}) {
   // so this stays a single boolean flag rather than its own page template.
   const isCustomPanel = !!tool.customPanelMode;
 
+  // Craft-retrofit Phase 3(a) (developer folder, "speed as a feature"
+  // move): every developer-folder tool's own "Is X sent anywhere?"
+  // FAQ answer (already the first item on all 11) gets one appended
+  // sentence stating this page's real, computed JS weight -- a falsifiable
+  // number in the copy (REFERENCE_LIBRARY.md entries 6/7), never a bare
+  // adjective. Gated to `folder === 'developer'` deliberately, not applied
+  // site-wide yet -- the retrofit spec sequences this per folder
+  // (Phase 3), and each later folder's own pass is where this same
+  // treatment lands for its tools, not a big-bang change here. `faqs`
+  // (not `tool.faqs`) is what both the rendered markup and the FAQ JSON-LD
+  // below read, so the two can never drift apart.
+  const faqs = (tool.folder === 'developer' && tool.faqs.length)
+    ? [
+      { ...tool.faqs[0], answerHtml: `${tool.faqs[0].answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` },
+      ...tool.faqs.slice(1),
+    ]
+    : tool.faqs;
+
   const howItems = tool.howSteps.map((s) => `<li>${escapeHtml(s)}</li>`).join('\n        ');
   // Native <details>/<summary> disclosure, not a JS accordion -- zero extra
   // JS, correct keyboard/screen-reader behaviour by construction, and every
@@ -64,7 +83,7 @@ function renderToolPage(tool, example = {}) {
   // The first two items ship `open` so the two highest-value answers
   // (privacy first) keep their immediately-visible weight; the rest are
   // collapsed.
-  const faqItems = tool.faqs.map((f, i) => `<details class="faq-item"${i < 2 ? ' open' : ''}>
+  const faqItems = faqs.map((f, i) => `<details class="faq-item"${i < 2 ? ' open' : ''}>
         <summary><h3>${escapeHtml(f.q)}</h3></summary>
         <p>${f.answerHtml}</p>
       </details>`).join('\n      ');
@@ -222,7 +241,7 @@ function renderToolPage(tool, example = {}) {
       { name: folder.label, url: absoluteUrl(`${folder.slug}/`) },
       { name: tool.h1, url: canonical },
     ]),
-    faqPageJsonLd(tool.faqs.map((f) => ({ q: f.q, answerHtml: f.answerHtml }))),
+    faqPageJsonLd(faqs.map((f) => ({ q: f.q, answerHtml: f.answerHtml }))),
   ];
 
   return renderPage({
