@@ -15,19 +15,20 @@ const ExcelJS = ExcelJSModule.default || ExcelJSModule;
  * the built dist/ output in a real headless browser. Requires `npm run
  * build` to have already produced dist/.
  *
- * No real Gumroad product exists yet (gumroadBuyUrl/gumroadProductPermalink
- * are both null in src/tools/compare-csv.js until a human creates one), so
- * two things are tested two different ways:
- *   - The as-shipped locked/"coming soon" state is tested directly against
- *     the real built page, no mocking needed.
- *   - The license-code-entry UI and the unlock transition need a
- *     product_permalink to exist for the UI to render at all (see
- *     compareCsvPro.client.js's own design) -- tested by intercepting the
- *     page RESPONSE itself (page.route on the page URL) to inject a real
- *     data-gumroad-product attribute, the same class of technique already
- *     used elsewhere on this site to reproduce specific rendered states,
- *     plus page.route on the actual Gumroad API URL to return a real,
- *     structurally-correct success/failure JSON body -- never a fake
+ * A real Gumroad product now exists (gumroadBuyUrl/gumroadProductPermalink
+ * are both set in src/tools/compare-csv.js), so two things are tested two
+ * different ways:
+ *   - The as-shipped locked state -- a real "Buy Pro" link plus an unlock
+ *     code box -- is tested directly against the real built page, no
+ *     mocking needed.
+ *   - The license-code-entry UI and the unlock transition are tested by
+ *     intercepting the page RESPONSE itself (page.route on the page URL) to
+ *     swap in a distinct, obviously-fake data-gumroad-product value (so
+ *     assertions on the outgoing request body can't accidentally pass
+ *     against the real product permalink), the same class of technique
+ *     already used elsewhere on this site to reproduce specific rendered
+ *     states, plus page.route on the actual Gumroad API URL to return a
+ *     real, structurally-correct success/failure JSON body -- never a fake
  *     internal flag standing in for the real network response shape.
  *   - The unlocked batch-compare + Excel-export flow is tested by
  *     pre-seeding localStorage's real unlock key before navigation (exactly
@@ -101,7 +102,7 @@ after(async () => {
   await new Promise((resolve) => server.close(resolve));
 });
 
-test('Compare-CSV Pro: as shipped (no product configured yet), shows an honest "coming soon" state, never a live-looking broken link', async () => {
+test('Compare-CSV Pro: as shipped, shows a real "Buy Pro" link and unlock code box, never the "coming soon" placeholder', async () => {
   const page = await browser.newPage();
   const errors = collectPageErrors(page);
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
@@ -109,9 +110,12 @@ test('Compare-CSV Pro: as shipped (no product configured yet), shows an honest "
   const proSection = page.locator('.pro-feature');
   await proSection.waitFor();
   const text = await proSection.textContent();
-  assert.match(text, /coming soon/i);
-  assert.equal(await proSection.locator('a').count(), 0, 'no purchase link should render until a real Gumroad product exists');
-  assert.equal(await proSection.locator('input#pro-license-input').count(), 0, 'no unlock-code box should render until a real product_permalink exists to verify against');
+  assert.doesNotMatch(text, /coming soon/i);
+
+  const buyLink = proSection.locator('a');
+  assert.equal(await buyLink.count(), 1, 'the real Gumroad product is configured, so exactly one purchase link should render');
+  assert.equal(await buyLink.getAttribute('href'), 'https://meridianops.gumroad.com/l/CSV-PRO');
+  assert.equal(await proSection.locator('input#pro-license-input').count(), 1, 'the unlock-code box should render since a real product_permalink exists to verify against');
 
   assert.deepEqual(errors, []);
   await page.close();
