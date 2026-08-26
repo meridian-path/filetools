@@ -25,7 +25,7 @@ const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 // Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
 // see renderToolPage()'s own `faqs` comment below for the full rationale.
 // Built up one entry per Phase-3 folder pass, never all at once.
-const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats']);
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets']);
 
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
@@ -62,14 +62,26 @@ function renderToolPage(tool, example = {}) {
   const isCustomPanel = !!tool.customPanelMode;
 
   // Craft-retrofit "speed as a feature" move (see SPEED_FEATURE_FOLDERS'
-  // own comment above for the rollout rationale). `faqs` (not `tool.faqs`)
-  // is what both the rendered markup and the FAQ JSON-LD below read, so the
-  // two can never drift apart.
+  // own comment above for the rollout rationale). Appends to the tool's own
+  // privacy FAQ ("Is my X sent anywhere?" / "Do you upload my X anywhere?" /
+  // "Is my file uploaded to a server?"), found by content match rather than
+  // assumed to be faqs[0] -- Phase 3(a)/(b)'s own tools all happen to lead
+  // with it, but Phase 3(c) (spreadsheets) does not: compare-csv/merge-csv/
+  // merge-pdf/rotate-pdf/split-pdf/pdf-to-csv/split-csv all put it later in
+  // the list (functional questions come first there). Falls back to index 0
+  // only if no FAQ matches the pattern (uuid-generator's own privacy FAQ,
+  // "Is anything sent to a server?", doesn't contain either phrase, but is
+  // still genuinely its first FAQ). `faqs` (not `tool.faqs`) is what both
+  // the rendered markup and the FAQ JSON-LD below read, so the two can
+  // never drift apart.
+  const privacyFaqIndex = (() => {
+    const i = tool.faqs.findIndex((f) => /sent anywhere|upload/i.test(f.q));
+    return i === -1 ? 0 : i;
+  })();
   const faqs = (SPEED_FEATURE_FOLDERS.has(tool.folder) && tool.faqs.length)
-    ? [
-      { ...tool.faqs[0], answerHtml: `${tool.faqs[0].answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` },
-      ...tool.faqs.slice(1),
-    ]
+    ? tool.faqs.map((f, i) => (i === privacyFaqIndex
+      ? { ...f, answerHtml: `${f.answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` }
+      : f))
     : tool.faqs;
 
   const howItems = tool.howSteps.map((s) => `<li>${escapeHtml(s)}</li>`).join('\n        ');
