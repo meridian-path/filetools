@@ -71,7 +71,7 @@ module.exports = {
   // renders an honest "not listed for sale yet" state.
   proFeature: {
     clientEntry: 'compareCsvPro',
-    gumroadBuyUrl: null,
-    gumroadProductPermalink: null,
+    gumroadBuyUrl: 'https://meridianops.gumroad.com/l/CSV-PRO',
+    gumroadProductPermalink: 'CSV-PRO',
   },
 };
