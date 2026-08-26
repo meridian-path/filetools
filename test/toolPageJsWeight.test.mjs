@@ -50,6 +50,12 @@ test('every spreadsheets-folder tool (Phase 3(c)) also states its real JS weight
   }
 });
 
+test('every pdf-folder tool (Phase 3(d)) also states its real JS weight, on its own real privacy FAQ wherever it falls in the list', () => {
+  for (const slug of ['extract-images-from-pdf', 'jpg-png-to-pdf', 'merge-pdf', 'rotate-pdf', 'split-pdf', 'pdf-to-csv', 'pdf-to-jpg-png', 'bank-statement-to-csv']) {
+    assertHasWeightSentence(slug);
+  }
+});
+
 test('compare-csv\'s stated weight includes its always-loaded Pro-feature script, not just the free-tier client', () => {
   const tool = toolBySlug('compare-csv');
   const html = renderToolPage(tool);
@@ -73,7 +79,10 @@ test('the JS-weight sentence lands on compare-csv\'s real "Is my data sent anywh
 });
 
 test('a tool in a folder with no Phase-3 pass yet is unchanged -- no JS-weight sentence at all', () => {
-  const tool = toolBySlug('merge-pdf');
+  // text is the one folder with no Phase-3 pass as of this test -- update
+  // this to whichever folder is genuinely still pending if that changes.
+  const tool = toolBySlug('remove-duplicate-lines');
+  assert.equal(tool.folder, 'text', 'sanity: this slug must stay in a folder with no Phase-3 pass yet for this test to mean anything');
   const html = renderToolPage(tool);
   assert.ok(!html.includes('This page loads'), 'the JS-weight sentence should only render for a folder that has had its own Phase-3 pass');
 });

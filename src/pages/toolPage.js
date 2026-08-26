@@ -25,7 +25,7 @@ const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 // Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
 // see renderToolPage()'s own `faqs` comment below for the full rationale.
 // Built up one entry per Phase-3 folder pass, never all at once.
-const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets']);
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf']);
 
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
