@@ -226,6 +226,21 @@ test('jpg-png-to-pdf: converting several images shows real per-image progress (d
   // moved off its initial empty value -- if reportBatchProgress()/
   // setProgress() were removed, this would time out and fail for real
   // (the status would stay the old static "Converting on this device...").
+  //
+  // Timeouts here are 30000ms (up from an original 15000ms; see
+  // test/pdfImageExtract.e2e.test.mjs's own 20000ms precedent for a
+  // similarly heavier multi-file operation) -- a real CI flake (not a
+  // reproducible local failure, and not traceable to any logic change:
+  // the fixture images are a 1x1-pixel PNG/JPG pair, so the actual
+  // pdf-lib work here is trivial) surfaced this test's own download wait
+  // timing out under the CPU contention of many e2e files' own Chromium
+  // instances running concurrently on a 2-core GitHub Actions runner --
+  // a real resource-contention margin problem, not a hang, since the
+  // determinate-progress wait immediately above (unmodified) always
+  // resolves quickly. Widening the budget only removes false failures
+  // under load; a genuine regression (e.g. reportBatchProgress()/
+  // setProgress() removed, or the download never firing at all) still
+  // times out and fails for real well within 30s.
   const page = await browser.newPage({ acceptDownloads: true });
   const errors = collectPageErrors(page);
   await page.goto(`${baseUrl}pdf/jpg-png-to-pdf/`, { waitUntil: 'networkidle' });
@@ -242,13 +257,13 @@ test('jpg-png-to-pdf: converting several images shows real per-image progress (d
     const status = document.querySelector('.dz-status')?.textContent || '';
     const dz = document.querySelector('.dropzone');
     return /Converting image \d+ of 6…/.test(status) && dz?.dataset.state === 'working' && dz?.dataset.determinate === 'true';
-  }, { timeout: 15000 });
+  }, { timeout: 30000 });
 
   const widthDuringWork = await page.locator('.progress-fill').evaluate((el) => el.style.width);
   assert.notEqual(widthDuringWork, '', 'progress-fill should have a real inline width once determinate progress is reported');
   assert.notEqual(widthDuringWork, '0%');
 
-  const download = await page.waitForEvent('download', { timeout: 15000 });
+  const download = await page.waitForEvent('download', { timeout: 30000 });
   const outPath = path.join(TMP, 'progress-out.pdf');
   await download.saveAs(outPath);
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
