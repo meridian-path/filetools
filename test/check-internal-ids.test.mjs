@@ -95,6 +95,27 @@ test('SCAN_DIRS includes .github -- CI workflow comments are exactly as public-f
   assert.ok(SCAN_DIRS.includes('.github'));
 });
 
+// Regression coverage for a real, self-caught leak while writing a
+// lineup/squint verdict (craft-retrofit Phase 3 visual-QA pass): a
+// verdict-<date>.md's own prose cited an internal decision id directly.
+// visual-qa-competitors/ is committed (not gitignored - see its own
+// README), so a verdict file's prose is exactly as public-facing as a
+// docs/ page, but the directory was never in SCAN_DIRS.
+test('SCAN_DIRS includes visual-qa-competitors -- a verdict.md\'s own prose is exactly as public-facing as any docs/ page', () => {
+  assert.ok(SCAN_DIRS.includes('visual-qa-competitors'));
+});
+
+test('findFiles: picks up a leaked id inside a nested visual-qa-competitors/<tool-slug>/verdict-*.md file', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-verdict-test-'));
+  const toolDir = path.join(dir, 'hash-generator');
+  fs.mkdirSync(toolDir);
+  const verdictFile = path.join(toolDir, 'verdict-2026-08-27.md');
+  fs.writeFileSync(verdictFile, 'Traffic finding per decision-mt933kei-d26512.\n', 'utf8');
+  const found = findFiles(dir);
+  assert.deepEqual(found, [verdictFile]);
+  assert.deepEqual(findLeakedIds(verdictFile), ['decision-mt933kei-d26512']);
+});
+
 test('findFiles: picks up a .yml file, not just js/mjs/css/md/html', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-yml-test-'));
   const workflowsDir = path.join(dir, 'workflows');

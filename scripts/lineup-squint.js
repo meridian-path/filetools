@@ -84,9 +84,18 @@ function readCompetitorScreenshots(dir) {
       + 'Populate it first -- see scripts/capture-competitor-screenshot.js and this repo\'s TESTING.md.',
     );
   }
+  // Excludes a previously-recorded verdict's own composed PNGs
+  // (verdict-<date>-lineup.png / verdict-<date>-squint.png -- see this
+  // directory's own README's "Recording a verdict" convention, which
+  // deliberately stores them alongside the real competitor screenshots).
+  // Without this, re-running a verdict later silently feeds the OLD
+  // lineup/squint composite back in as if it were an extra competitor tile
+  // -- a real bug found while re-verifying hash-generator's own stale
+  // 2026-08-25 verdict against the post-Phase-1 template.
+  const VERDICT_FILE_RE = /^verdict-\d{4}-\d{2}-\d{2}-(lineup|squint)\.(png|jpe?g)$/i;
   const files = fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && IMAGE_EXT_RE.test(entry.name))
+    .filter((entry) => entry.isFile() && IMAGE_EXT_RE.test(entry.name) && !VERDICT_FILE_RE.test(entry.name))
     .map((entry) => entry.name)
     .sort();
   if (files.length < 2) {

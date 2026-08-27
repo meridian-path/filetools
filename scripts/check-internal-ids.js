@@ -40,7 +40,12 @@ const ROOT = path.join(__dirname, '..');
 // class of gap recurred a third time (monthly craft audit, 2026-08-26): a
 // leaked id in .claude/commands/conduct-lite.md sat live on the public repo
 // since 2026-08-23, since that directory was never in this list either.
-const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github', '.claude'];
+// visual-qa-competitors added the same day after a real (self-caught, not
+// shipped) leak while writing a lineup/squint verdict: verdict-<date>.md
+// prose cited an internal decision id directly. That directory is
+// committed (not gitignored, see its own README), so its prose is exactly
+// as public-facing as a docs/ page.
+const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github', '.claude', 'visual-qa-competitors'];
 
 // Matches the shared queue's own id shape: "task-" or "decision-" followed
 // by a lowercase-alphanumeric segment, a hyphen, and a hex segment (the

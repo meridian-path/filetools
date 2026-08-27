@@ -51,6 +51,31 @@ test('readCompetitorScreenshots: returns a sorted, humanized label per image, ig
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+test('readCompetitorScreenshots: excludes a previously-recorded verdict\'s own composed PNGs (verdict-<date>-lineup/squint.png)', () => {
+  // Regression guard for a real bug found while re-verifying hash-generator's
+  // own 2026-08-27 verdict: without this exclusion, re-running a verdict
+  // check against a directory that already holds an earlier verdict's own
+  // saved composite images silently fed those OLD composites back in as if
+  // they were extra real competitors.
+  const dir = makeTempDirWithFiles([
+    'real-competitor-one.png',
+    'real-competitor-two.png',
+    'verdict-2026-08-25-lineup.png',
+    'verdict-2026-08-25-squint.png',
+  ]);
+  const result = readCompetitorScreenshots(dir);
+  assert.equal(result.length, 2);
+  assert.ok(result.every((r) => !r.absPath.includes('verdict-')));
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('readCompetitorScreenshots: a filename merely containing "verdict" but not matching the dated composite shape is still treated as a real competitor', () => {
+  const dir = makeTempDirWithFiles(['verdict-of-the-decade-tool.png', 'another-tool.png']);
+  const result = readCompetitorScreenshots(dir);
+  assert.equal(result.length, 2);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test('readCompetitorScreenshots: does not recurse into subdirectories', () => {
   const dir = makeTempDirWithFiles(['a.png', 'b.png']);
   fs.mkdirSync(path.join(dir, 'nested'));
