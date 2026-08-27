@@ -227,20 +227,32 @@ test('jpg-png-to-pdf: converting several images shows real per-image progress (d
   // setProgress() were removed, this would time out and fail for real
   // (the status would stay the old static "Converting on this device...").
   //
-  // Timeouts here are 30000ms (up from an original 15000ms; see
-  // test/pdfImageExtract.e2e.test.mjs's own 20000ms precedent for a
-  // similarly heavier multi-file operation) -- a real CI flake (not a
-  // reproducible local failure, and not traceable to any logic change:
-  // the fixture images are a 1x1-pixel PNG/JPG pair, so the actual
-  // pdf-lib work here is trivial) surfaced this test's own download wait
-  // timing out under the CPU contention of many e2e files' own Chromium
-  // instances running concurrently on a 2-core GitHub Actions runner --
-  // a real resource-contention margin problem, not a hang, since the
-  // determinate-progress wait immediately above (unmodified) always
-  // resolves quickly. Widening the budget only removes false failures
-  // under load; a genuine regression (e.g. reportBatchProgress()/
-  // setProgress() removed, or the download never firing at all) still
-  // times out and fails for real well within 30s.
+  // Root cause of the real CI flake this test used to hit (identical
+  // "page.waitForEvent: Timeout ... waiting for event download" failure on
+  // both a master push and PR #84's run, neither touching this tool's own
+  // code): a genuine listener-registration race, not raw runner slowness --
+  // `page.waitForEvent('download', ...)` used to be called AFTER the
+  // progress waitForFunction() had already resolved, several `await`s (and
+  // therefore several event-loop turns) after the click that starts the
+  // conversion. Every OTHER download test in this same file (see the four
+  // earlier `Promise.all([page.waitForEvent('download', ...), ...click()])`
+  // call sites above) already arms the listener before or concurrently with
+  // the click for exactly this reason -- this was the one test in the file
+  // that didn't, and the fixture images are trivially small (a 1x1-pixel
+  // PNG/JPG pair), so under enough CI-runner contention the whole
+  // conversion can finish and fire `download` before this test's own await
+  // chain ever reaches the line that starts listening for it, which is a
+  // real miss (Playwright's download event has no buffered replay), not a
+  // slow one. Fixed by arming the download listener before the click, same
+  // as the file's own established pattern, while still awaiting the
+  // progress assertion independently afterward -- both are now genuinely
+  // concurrent with the conversion, not sequenced after it. 30000ms is kept
+  // (up from an original 15000ms; see test/pdfImageExtract.e2e.test.mjs's
+  // own 20000ms precedent for a similarly heavier multi-file operation) as
+  // a real margin for CPU-contended CI, not a substitute for the race fix
+  // above -- a genuine regression (reportBatchProgress()/setProgress()
+  // removed, or the download never firing at all) still times out and
+  // fails for real well within 30s.
   const page = await browser.newPage({ acceptDownloads: true });
   const errors = collectPageErrors(page);
   await page.goto(`${baseUrl}pdf/jpg-png-to-pdf/`, { waitUntil: 'networkidle' });
@@ -251,6 +263,7 @@ test('jpg-png-to-pdf: converting several images shows real per-image progress (d
   await page.waitForSelector('.file-list .file-row');
   assert.equal(await page.locator('.file-list .file-row').count(), 6);
 
+  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
   await page.locator('button:has-text("Convert to PDF")').click();
 
   await page.waitForFunction(() => {
@@ -263,7 +276,7 @@ test('jpg-png-to-pdf: converting several images shows real per-image progress (d
   assert.notEqual(widthDuringWork, '', 'progress-fill should have a real inline width once determinate progress is reported');
   assert.notEqual(widthDuringWork, '0%');
 
-  const download = await page.waitForEvent('download', { timeout: 30000 });
+  const download = await downloadPromise;
   const outPath = path.join(TMP, 'progress-out.pdf');
   await download.saveAs(outPath);
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
