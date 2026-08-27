@@ -22,6 +22,15 @@ const { realPageJsWeightKbLabel } = require('../jsWeight.js');
 const { MAX_BYTES_BY_CLIENT } = assembleBrowserClients();
 const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 
+// Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
+// see renderToolPage()'s own `faqs` comment below for the full rationale.
+// Built up one entry per Phase-3 folder pass, never all at once. As of the
+// `text` folder (Phase 3(e)), this now covers every real folder in
+// src/folders.js's own taxonomy -- kept as an explicit Set rather than
+// collapsed to "always true" so a genuinely new 6th folder still has to be
+// added here deliberately, the same way every prior folder was.
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf', 'text']);
+
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
 }
@@ -56,22 +65,27 @@ function renderToolPage(tool, example = {}) {
   // so this stays a single boolean flag rather than its own page template.
   const isCustomPanel = !!tool.customPanelMode;
 
-  // Craft-retrofit Phase 3(a) (developer folder, "speed as a feature"
-  // move): every developer-folder tool's own "Is X sent anywhere?"
-  // FAQ answer (already the first item on all 11) gets one appended
-  // sentence stating this page's real, computed JS weight -- a falsifiable
-  // number in the copy (REFERENCE_LIBRARY.md entries 6/7), never a bare
-  // adjective. Gated to `folder === 'developer'` deliberately, not applied
-  // site-wide yet -- the retrofit spec sequences this per folder
-  // (Phase 3), and each later folder's own pass is where this same
-  // treatment lands for its tools, not a big-bang change here. `faqs`
-  // (not `tool.faqs`) is what both the rendered markup and the FAQ JSON-LD
-  // below read, so the two can never drift apart.
-  const faqs = (tool.folder === 'developer' && tool.faqs.length)
-    ? [
-      { ...tool.faqs[0], answerHtml: `${tool.faqs[0].answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` },
-      ...tool.faqs.slice(1),
-    ]
+  // Craft-retrofit "speed as a feature" move (see SPEED_FEATURE_FOLDERS'
+  // own comment above for the rollout rationale). Appends to the tool's own
+  // privacy FAQ ("Is my X sent anywhere?" / "Do you upload my X anywhere?" /
+  // "Is my file uploaded to a server?"), found by content match rather than
+  // assumed to be faqs[0] -- Phase 3(a)/(b)'s own tools all happen to lead
+  // with it, but Phase 3(c) (spreadsheets) does not: compare-csv/merge-csv/
+  // merge-pdf/rotate-pdf/split-pdf/pdf-to-csv/split-csv all put it later in
+  // the list (functional questions come first there). Falls back to index 0
+  // only if no FAQ matches the pattern (uuid-generator's own privacy FAQ,
+  // "Is anything sent to a server?", doesn't contain either phrase, but is
+  // still genuinely its first FAQ). `faqs` (not `tool.faqs`) is what both
+  // the rendered markup and the FAQ JSON-LD below read, so the two can
+  // never drift apart.
+  const privacyFaqIndex = (() => {
+    const i = tool.faqs.findIndex((f) => /sent anywhere|upload/i.test(f.q));
+    return i === -1 ? 0 : i;
+  })();
+  const faqs = (SPEED_FEATURE_FOLDERS.has(tool.folder) && tool.faqs.length)
+    ? tool.faqs.map((f, i) => (i === privacyFaqIndex
+      ? { ...f, answerHtml: `${f.answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` }
+      : f))
     : tool.faqs;
 
   const howItems = tool.howSteps.map((s) => `<li>${escapeHtml(s)}</li>`).join('\n        ');

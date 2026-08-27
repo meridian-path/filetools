@@ -37,24 +37,48 @@ test('realPageJsWeightBytes() never silently includes a Worker for a custom-pane
   assert.notEqual(withoutWorker, withWorker);
 });
 
+test('realPageJsWeightBytes() adds a proFeature\'s own always-loaded client script on top of the base weight', () => {
+  const withoutProFeature = realPageJsWeightBytes({ clientEntry: 'csvDiff' });
+  const withProFeature = realPageJsWeightBytes({ clientEntry: 'csvDiff', proFeature: { clientEntry: 'compareCsvPro' } });
+  const proFeatureAlone = realGzipBytes('compareCsvPro.client.js');
+  assert.equal(withProFeature, withoutProFeature + proFeatureAlone);
+});
+
+test('realPageJsWeightBytes() ignores a tool with no proFeature field at all (the common case)', () => {
+  assert.equal(realPageJsWeightBytes({ clientEntry: 'csvDiff' }), realPageJsWeightBytes({ clientEntry: 'csvDiff', proFeature: undefined }));
+});
+
 test('realPageJsWeightKbLabel() rounds to the nearest whole KB with a trailing "KB"', () => {
   const bytes = realPageJsWeightBytes({ clientEntry: 'base64' });
   assert.equal(realPageJsWeightKbLabel({ clientEntry: 'base64' }), `${Math.round(bytes / 1024)}KB`);
 });
 
-test('the real computed weight for every developer-folder tool is a small, plausible figure (sanity bound, not a hardcoded expectation)', () => {
+test('the real computed weight for every speed-as-a-feature clientEntry is a small, plausible figure (sanity bound, not a hardcoded expectation)', () => {
   // Guards against a future refactor silently pulling in something huge
   // (e.g. a vendor library) without anyone noticing the "speed as a
   // feature" claim had gone false -- not a precise pin, since the real
-  // bytes legitimately drift as tool code changes.
-  const devTools = [
+  // bytes legitimately drift as tool code changes. Deliberately keyed by
+  // clientEntry, not by which folder currently claims a tool (folder
+  // assignment drifts independently -- see toolPage.js's own comment on
+  // Phase 3(a)'s PR description naming 11 tools when only 7 actually lived
+  // in that folder).
+  const speedFeatureClients = [
     { clientEntry: 'base64' }, { clientEntry: 'urlEncode' }, { clientEntry: 'htmlEntity' },
-    { clientEntry: 'hashGenerator' }, { clientEntry: 'sqlFormatter' }, { clientEntry: 'csvToSqlInsert' },
-    { clientEntry: 'jsonMinifyBeautify' }, { clientEntry: 'textCaseConverter' }, { clientEntry: 'wordFrequency' },
+    { clientEntry: 'hashGenerator' }, { clientEntry: 'sqlFormatter' },
+    { clientEntry: 'flattenJson' }, { clientEntry: 'jsonMinifyBeautify' }, { clientEntry: 'jsonToCsv' },
+    { clientEntry: 'jsonToYaml' }, { clientEntry: 'xmlToJson' }, { clientEntry: 'yamlToJson' },
+    { clientEntry: 'csvToJson' }, { clientEntry: 'csvToSqlInsert' }, { clientEntry: 'csvToXlsx' },
+    { clientEntry: 'htmlTableToCsv' }, { clientEntry: 'csvMerge' }, { clientEntry: 'splitCsv' },
+    { clientEntry: 'transposeCsv' }, { clientEntry: 'xlsxToCsv' }, { clientEntry: 'xlsxToJson' },
+    { clientEntry: 'csvDiff', proFeature: { clientEntry: 'compareCsvPro' } },
+    { clientEntry: 'pdfImageExtract' }, { clientEntry: 'imagesToPdf' }, { clientEntry: 'pdfPages' },
+    { clientEntry: 'pdfTables' }, { clientEntry: 'pdfToImages' }, { clientEntry: 'statementToCsv' },
+    { clientEntry: 'dedupeLines' }, { clientEntry: 'sortLines' }, { clientEntry: 'textCaseConverter' },
+    { clientEntry: 'wordFrequency' },
     { clientEntry: 'uuidGenerator', customPanelMode: true },
     { clientEntry: 'regexTester', customPanelMode: true },
   ];
-  for (const tool of devTools) {
+  for (const tool of speedFeatureClients) {
     const bytes = realPageJsWeightBytes(tool);
     assert.ok(bytes > 500, `${tool.clientEntry}: ${bytes} bytes looks too small to be real`);
     assert.ok(bytes < 50 * 1024, `${tool.clientEntry}: ${bytes} bytes is no longer a "speed as a feature" figure`);

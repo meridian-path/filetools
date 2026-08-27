@@ -25,6 +25,14 @@ const BROWSER_DIR = path.join(__dirname, 'browser');
  * initial-load weight). No other tool on the site does this yet; a future
  * tool that does should be added to EAGER_WORKER_BY_CLIENT below rather
  * than hand-computed elsewhere.
+ *
+ * Phase 3(c) (spreadsheets folder): a tool with a `proFeature` (currently
+ * only compare-csv) also always fetches that add-on's own client script --
+ * toolPage.js's proFeatureHtml emits the <script> tag unconditionally
+ * whenever `tool.proFeature` exists, not gated on whether the visitor has
+ * actually unlocked it. realPageJsWeightBytes() below adds that file in
+ * too, since it's real weight for every visitor, not a special case to
+ * ignore.
  */
 const EAGER_WORKER_BY_CLIENT = {
   regexTester: 'regexTester.worker.js',
@@ -36,7 +44,7 @@ function gzipBytes(file) {
 }
 
 /**
- * @param {{clientEntry: string, customPanelMode?: boolean}} tool
+ * @param {{clientEntry: string, customPanelMode?: boolean, proFeature?: {clientEntry: string}}} tool
  * @returns {number} combined gzip bytes of every script this tool's page
  *   fetches on first load.
  */
@@ -44,6 +52,13 @@ function realPageJsWeightBytes(tool) {
   const files = tool.customPanelMode
     ? [`${tool.clientEntry}.client.js`, ...(EAGER_WORKER_BY_CLIENT[tool.clientEntry] ? [EAGER_WORKER_BY_CLIENT[tool.clientEntry]] : [])]
     : ['dropzone.client.js', `${tool.clientEntry}.client.js`];
+  // A tool with a `proFeature` (currently only compare-csv) loads that
+  // add-on's own client script unconditionally on every page load --
+  // toolPage.js's proFeatureHtml emits the <script> tag whenever
+  // `tool.proFeature` exists, not gated on whether the visitor has
+  // actually unlocked it (see that file's own proFeatureHtml comment).
+  // Real initial-load weight for every visitor, not an edge case to skip.
+  if (tool.proFeature && tool.proFeature.clientEntry) files.push(`${tool.proFeature.clientEntry}.client.js`);
   return files.reduce((sum, f) => sum + gzipBytes(f), 0);
 }
 
