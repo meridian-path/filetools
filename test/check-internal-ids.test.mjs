@@ -105,3 +105,26 @@ test('findFiles: picks up a .yml file, not just js/mjs/css/md/html', () => {
   assert.deepEqual(found, [ymlFile]);
   assert.deepEqual(findLeakedIds(ymlFile), ['task-mt6jcfwr-ed62cc']);
 });
+
+// Regression coverage for the 4th occurrence of this exact incident class
+// (monthly craft audit, 2026-08-26): a real id leaked in
+// .claude/commands/conduct-lite.md sat live on the public repo for three
+// days, since .claude was never in SCAN_DIRS -- same missing-directory
+// shape as the .github gap above. Both the array membership and a real
+// fixture proving findFiles() actually reaches a nested .claude/ file are
+// covered here, so a future removal of the entry fails a real test rather
+// than waiting for the next monthly audit to notice.
+test('SCAN_DIRS includes .claude -- a slash-command doc comment is exactly as public-facing as any src/ comment', () => {
+  assert.ok(SCAN_DIRS.includes('.claude'));
+});
+
+test('findFiles: picks up a leaked id inside a nested .claude/commands/*.md file', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-claude-test-'));
+  const commandsDir = path.join(dir, 'commands');
+  fs.mkdirSync(commandsDir);
+  const mdFile = path.join(commandsDir, 'conduct-lite.md');
+  fs.writeFileSync(mdFile, 'Validated end to end (task-mt638skf-4558aa, 2026-08-23).\n', 'utf8');
+  const found = findFiles(dir);
+  assert.deepEqual(found, [mdFile]);
+  assert.deepEqual(findLeakedIds(mdFile), ['task-mt638skf-4558aa']);
+});

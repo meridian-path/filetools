@@ -36,8 +36,11 @@ const ROOT = path.join(__dirname, '..');
 // and NOT node_modules/vendor (third-party code this repo doesn't author).
 // .github added after a near-miss: a CI workflow YAML comment is exactly
 // as public-facing as any src/ comment, but was never scanned since it
-// lived outside every prior SCAN_DIRS entry.
-const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github'];
+// lived outside every prior SCAN_DIRS entry. .claude added after the same
+// class of gap recurred a third time (monthly craft audit, 2026-08-26): a
+// leaked id in .claude/commands/conduct-lite.md sat live on the public repo
+// since 2026-08-23, since that directory was never in this list either.
+const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github', '.claude'];
 
 // Matches the shared queue's own id shape: "task-" or "decision-" followed
 // by a lowercase-alphanumeric segment, a hyphen, and a hex segment (the
