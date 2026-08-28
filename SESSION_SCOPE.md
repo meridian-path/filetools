@@ -27,9 +27,10 @@ repo.
   central queue (see `/conduct-lite` for how to pull them).
 - The ordinary local dev/QA loop: install deps, run the test suite, run visual-qa, run
   Lighthouse, read/edit/write any file inside this repo.
-- Everything TheOrchestra's `.claude/rules/qa.md` self-QA checklist and
-  `.claude/rules/design-standards.md` already require of any builder task - both apply here in
-  full, unchanged. Read them from TheOrchestra's checkout since this repo has no local copy.
+- Everything TheOrchestra's standing self-QA checklist and design-standards rules already
+  require of any builder task - both apply here in full, unchanged. Read them from
+  TheOrchestra's checkout (under its own `.claude/rules/` directory) since this repo has no
+  local copy.
 
 ## Forbidden
 

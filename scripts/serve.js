@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Local static server for dist/, for manual/local testing (see
- * TESTING.md). Not used by the build itself and not part of any deploy --
+ * Local static server for dist/, for manual/local testing (see this repo's
+ * own testing-instructions doc). Not used by the build itself and not part of any deploy --
  * GitHub Pages serves dist/ directly. Binds to localhost only.
  *
  * Every internal link in the built site is root-relative under

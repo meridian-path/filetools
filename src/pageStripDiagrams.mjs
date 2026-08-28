@@ -134,7 +134,7 @@ export function photo(x, y, opts = {}) {
  * @param {{viewBox?:string}} [opts]
  * @returns {string} a bare <svg> -- NOT wrapped in a card div, since this
  *   always renders inside src/pages/toolPage.js's own .output-example
- *   figure/card, and design-standards.md forbids nested cards. Formerly
+ *   figure/card, and nesting a card inside another card is banned. Formerly
  *   src/diagrams.js's wrap() also emitted a `.transform-diagram` div
  *   wrapper for its old standalone top-of-page placement; that div (and
  *   its now-unused card styling) is retired along with the file.

@@ -56,6 +56,46 @@ const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github', '.claude', 'visu
 // anywhere, including a comment, is exactly what rule 1 forbids.
 const ID_RE = /\b(?:task|decision)-[0-9a-z]+-[0-9a-f]{4,}\b/g;
 
+// Internal governing-doc filenames -- a design-rationale comment that cites
+// "design-standards.md" or "REFERENCE_LIBRARY.md entry 2" by name is exactly
+// as much a leak as a task-/decision-id: it names a document a stranger
+// reading this source has never heard of and can never open. Real leak,
+// found live-rendered sitewide (13 source files, this repo's own 7th
+// external-eye audit): a CSS design-rationale comment inlined verbatim into
+// every page's shipped <style> block. Named literally (these are a fixed,
+// small set of real filenames, not a general shape) rather than inferred
+// from a pattern the way ID_RE is. `.md` is optional on the ones commonly
+// referenced without it in prose (CRAFT_DOCTRINE, DESIGN_PLAYBOOK,
+// REFERENCE_LIBRARY).
+const DOC_FILENAME_RE = /\b(?:design-standards\.md|qa\.md|CRAFT_DOCTRINE(?:\.md)?|DESIGN_PLAYBOOK(?:\.md)?|REFERENCE_LIBRARY(?:\.md)?|GOALS\.md|TESTING\.md)\b/g;
+
+// Internal series/tracking labels -- "WS-3", "Phase-1", "spec-section-1.6",
+// "site-audit-item-4" and similar read as gibberish to an outside reader and
+// are a reliable signal this comment was copied straight out of an internal
+// planning/tracking artifact rather than written for this repo's own
+// audience. Deliberately matches ONLY the hyphenated machine-tracking shape,
+// not this codebase's own long-standing, widespread space-separated prose
+// ("spec section 1.6", "Phase 3(a)") used throughout src/test comments to
+// cite this repo's own design spec/rollout -- that space form is this repo's
+// own established convention, not a leak, and appears in dozens of files far
+// outside this fix's scope; matching it here would fail CI on all of them.
+// The hyphenated form is the shape actually found leaking cross-repo (this
+// rotation's sibling fixes in lol-practice-system/repertoire-builder), and
+// is rare/incidental enough in this repo's own pre-existing text that the
+// few real hits found here were fixed as part of adding this check (see the
+// PR this shipped in). Case-sensitive, deliberately not /i: a
+// case-insensitive "WS-\d" matched "ws-8"/"ws-7" inside package-lock.json's
+// own real npm-registry URLs ("ws/-/ws-8.21.3.tgz", the `ws` websocket
+// package's own version-numbered tarball name) -- a real false positive
+// caught while writing this check, not a hypothetical one.
+const SERIES_LABEL_RE = /\b(?:WS-\d+|Phase-\d+|spec-section-\d+(?:\.\d+)*|site-audit-item-\d+)\b/g;
+
+// Every pattern class findLeakedIds checks, in one place -- extend this
+// array (not ID_RE itself) to add a new leak shape, since ID_RE is also
+// imported directly by check-copy-tells.js for its own narrower id-shape-only
+// use and must keep meaning exactly "a task-/decision-id", nothing broader.
+const LEAK_PATTERNS = [ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE];
+
 function findFiles(dir) {
   const out = [];
   if (!fs.existsSync(dir)) return out;
@@ -63,6 +103,26 @@ function findFiles(dir) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...findFiles(full));
     else if (/\.(js|mjs|css|md|html|yml|yaml)$/.test(entry.name)) out.push(full);
+  }
+  return out;
+}
+
+// SCAN_DIRS above is a directory allowlist -- it never covered root-level
+// tracked files (README.md, SESSION_SCOPE.md, package.json,
+// package-lock.json), since none of them live inside any of those
+// directories. Deliberately non-recursive (recursing from ROOT would just
+// re-walk every SCAN_DIRS entry a second time, plus node_modules/dist/.git)
+// -- this only looks at direct children of the repo root. Extension list
+// adds .json on top of findFiles' own set so package.json/package-lock.json
+// are actually reachable; root-only scope keeps this cheap even though
+// package-lock.json can be large.
+function findRootFiles() {
+  const out = [];
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (entry.isDirectory()) continue;
+    if (/\.(js|mjs|css|md|html|yml|yaml|json)$/.test(entry.name)) {
+      out.push(path.join(ROOT, entry.name));
+    }
   }
   return out;
 }
@@ -102,17 +162,21 @@ function findLeakedIds(filePath) {
 
   const matches = [];
   for (const line of strippedLines) {
-    matches.push(...(line.match(ID_RE) || []));
+    for (const re of LEAK_PATTERNS) {
+      matches.push(...(line.match(re) || []));
+    }
   }
   // Concatenating two full lines with no separator (not just their tail/
   // head) is deliberately wasteful but simple, and safe: a match found
   // only in the concatenation and not in either line alone can only be
-  // one that genuinely spans the line break, since ID_RE's `\b` anchors
-  // mean a match wholly inside one line's own text is already found by
-  // the per-line pass above.
+  // one that genuinely spans the line break, since each pattern's `\b`
+  // anchors mean a match wholly inside one line's own text is already
+  // found by the per-line pass above.
   for (let i = 0; i < strippedLines.length - 1; i += 1) {
     const pair = strippedLines[i] + strippedLines[i + 1];
-    matches.push(...(pair.match(ID_RE) || []));
+    for (const re of LEAK_PATTERNS) {
+      matches.push(...(pair.match(re) || []));
+    }
   }
   return [...new Set(matches)];
 }
@@ -125,14 +189,24 @@ function findLeakedIds(filePath) {
 // ("task-mt6jcfwr-ed62cc" etc.) to exercise check-copy-tells.js's own
 // process-talk-marker detection, which reuses this file's ID_RE against
 // rendered dist/ output rather than source.
+//
+// scripts/check-copy-tells.js and scripts/check-em-dash.js join this list
+// for a different reason (governing-doc-filename leak audit, 7th
+// occurrence): both are dev-tooling scripts that never get bundled or
+// shipped to a browser, and their own source comments name the exact rule
+// file they implement -- the same accepted shape as this file's own header
+// above naming public-repo-hygiene.md, not a leak into anything
+// public-facing. Explicitly reviewed and cleared, not an oversight.
 const EXCLUDED_FILES = [
   __filename,
   path.join(ROOT, 'test', 'check-internal-ids.test.mjs'),
   path.join(ROOT, 'test', 'check-copy-tells.test.mjs'),
+  path.join(ROOT, 'scripts', 'check-copy-tells.js'),
+  path.join(ROOT, 'scripts', 'check-em-dash.js'),
 ].map((f) => path.resolve(f));
 
 function main() {
-  const files = SCAN_DIRS.flatMap((d) => findFiles(path.join(ROOT, d)))
+  const files = [...SCAN_DIRS.flatMap((d) => findFiles(path.join(ROOT, d))), ...findRootFiles()]
     .filter((f) => !EXCLUDED_FILES.includes(path.resolve(f)));
 
   const offenders = [];
@@ -158,4 +232,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findLeakedIds, ID_RE, findFiles, SCAN_DIRS };
+module.exports = { findLeakedIds, ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE, findFiles, findRootFiles, SCAN_DIRS, ROOT };

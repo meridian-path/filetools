@@ -76,7 +76,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       # Requires dist/ to already exist -- the end-to-end tests exercise the
-      # built site itself, not just source. See TESTING.md section 5.
+      # built site itself, not just source.
       - name: Run test suite
         run: npm test
 

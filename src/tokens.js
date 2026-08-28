@@ -80,10 +80,9 @@ const DESIGN_TOKENS = {
 
   '--tracking-tight': '-0.02em',
 
-  // Paired type-role tokens (craft-retrofit Phase 1, closing the
-  // design-tokens-deliverable gap the retrofit spec named:
-  // design-standards.md requires "each step defining size + line-height +
-  // weight + letter-spacing together" -- previously these four lived as
+  // Paired type-role tokens, closing the design-tokens-deliverable gap:
+  // the type scale requires each step to define size + line-height +
+  // weight + letter-spacing together -- previously these four lived as
   // independent atomic tokens a callsite combined by hand. Each --type-*
   // below composes the CSS `font` shorthand (style/variant omitted, both
   // default to normal) from the SAME atomic tokens above via var() --
@@ -121,16 +120,15 @@ const DESIGN_TOKENS = {
   '--width-app': '1040px',
   '--width-wide': '1200px',
 
-  // Semantic spacing ramp (craft-retrofit Phase 1 GAP 2 -- design-standards
-  // enforcement note): DESIGN_PLAYBOOK.md names four tiers (within-group,
-  // between-group, section-turn, chapter-break "sparingly"). Verified
+  // Semantic spacing ramp: the assigned tiers are within-group,
+  // between-group, section-turn, and chapter-break ("sparingly"). Verified
   // against this file's own actual pixel values rather than assuming a
   // naming mismatch meant a missing token: every tier already has a real
   // token here, just not documented as such -- --space-8 (64px) already
-  // IS the chapter-break value the playbook describes, --space-7 (48px)
-  // already IS the section-turn value; nothing new needed at that end of
-  // the scale. Adding a --space-9/-12/-16 tier here would have duplicated
-  // an existing value under a second name, which this file's own rule
+  // IS the chapter-break value, --space-7 (48px) already IS the
+  // section-turn value; nothing new needed at that end of the scale.
+  // Adding a --space-9/-12/-16 tier here would have duplicated an
+  // existing value under a second name, which this file's own rule
   // (directly below) already forbids -- so this gap closes as a mapping
   // comment, not a new token:
   //   within-group  (dense, same-control spacing): --space-2 / --space-3
@@ -172,9 +170,8 @@ const DESIGN_TOKENS = {
   '--border-control': '2px',
   '--border-drop': '2px',
 
-  // Motion system (design-standards.md's required motion token group --
-  // previously absent entirely; see docs/CHANGELOG.md for the audit that
-  // found it). Values are Material's, as cited in docs/DESIGN_PLAYBOOK.md.
+  // Motion system (the required motion token group -- previously absent
+  // entirely). Values are Material Design's.
   // Hard cap: no transition in src/css.js may exceed 400ms.
   '--motion-duration-fast': '150ms',
   '--motion-duration-standard': '200ms',
@@ -273,16 +270,15 @@ const DESIGN_TOKENS = {
   '--family-dev-6': 'oklch(47% 0.100 90)',
   '--family-dev-8': 'oklch(30% 0.070 90)',
 
-  // Navigation/IA redesign tokens (see the folder taxonomy/nav spec section 1.11).
+  // Navigation/IA redesign tokens.
   // --font-mono is a third, system-stack-only typeface (zero network
   // cost) used exclusively for the path bar, folder/tool Kind chips, and
   // item counts -- never headings, body text, or controls. Flagged
-  // explicitly for reviewer sign-off against design-standards.md's
-  // 2-typeface cap; see the PR description for the disclosed fallback if
-  // rejected. Craft-retrofit Phase 0 re-verified every current usage
-  // stays inside this declared scope and filed a sign-off request through
-  // the standard decision-brief process -- pending a human/reviewer
-  // answer, not yet resolved by this comment alone.
+  // explicitly for reviewer sign-off against the site's 2-typeface cap;
+  // see the PR description for the disclosed fallback if rejected. Every
+  // current usage has been re-verified to stay inside this declared
+  // scope; the exception itself is still pending a human/reviewer answer,
+  // not yet resolved by this comment alone.
   '--font-mono': 'ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
   '--sidebar-width': '15rem',
   '--tree-indent': '1.25rem',

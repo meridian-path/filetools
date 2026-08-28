@@ -14,8 +14,8 @@
  *
  * Competitor/template screenshots are PROVIDED, not fetched live by this
  * script -- they live in `visual-qa-competitors/<tool-slug>/*.png` per
- * asset (see this repo's TESTING.md for the full convention and how a
- * reviewer records a verdict). Populate that directory ahead of time with
+ * asset (see this repo's own testing-instructions doc for the full
+ * convention and how a reviewer records a verdict). Populate that directory ahead of time with
  * `scripts/capture-competitor-screenshot.js`, or any real screenshot.
  *
  * Deliberately zero new dependencies: both composed images are built by
@@ -81,7 +81,7 @@ function readCompetitorScreenshots(dir) {
   if (!fs.existsSync(dir)) {
     throw new Error(
       `Competitor/template screenshots directory not found: ${dir}\n`
-      + 'Populate it first -- see scripts/capture-competitor-screenshot.js and this repo\'s TESTING.md.',
+      + 'Populate it first -- see scripts/capture-competitor-screenshot.js and this repo\'s own testing-instructions doc.',
     );
   }
   // Excludes a previously-recorded verdict's own composed PNGs
@@ -91,7 +91,7 @@ function readCompetitorScreenshots(dir) {
   // Without this, re-running a verdict later silently feeds the OLD
   // lineup/squint composite back in as if it were an extra competitor tile
   // -- a real bug found while re-verifying hash-generator's own stale
-  // 2026-08-25 verdict against the post-Phase-1 template.
+  // 2026-08-25 verdict against the updated template.
   const VERDICT_FILE_RE = /^verdict-\d{4}-\d{2}-\d{2}-(lineup|squint)\.(png|jpe?g)$/i;
   const files = fs
     .readdirSync(dir, { withFileTypes: true })
@@ -286,7 +286,7 @@ async function main() {
 
     console.log('');
     console.log('Both images produced. A human reviewer still has to view them and record a');
-    console.log('PASS/FAIL verdict for each ritual -- see this repo\'s TESTING.md for where.');
+    console.log('PASS/FAIL verdict for each ritual -- see this repo\'s own testing-instructions doc for where.');
   } finally {
     await browser.close();
   }

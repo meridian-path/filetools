@@ -24,7 +24,8 @@ const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 
 // Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
 // see renderToolPage()'s own `faqs` comment below for the full rationale.
-// Built up one entry per Phase-3 folder pass, never all at once. As of the
+// Built up one entry per folder as each one got its own rollout pass, never
+// all at once. As of the
 // `text` folder (Phase 3(e)), this now covers every real folder in
 // src/folders.js's own taxonomy -- kept as an explicit Set rather than
 // collapsed to "always true" so a genuinely new 6th folder still has to be
@@ -105,7 +106,7 @@ function renderToolPage(tool, example = {}) {
   // A single inline glyph+text row under a hairline, not a 3-card grid --
   // giving "related" content-block visual weight on every one of this
   // site's tool pages was the single largest contributor to identical
-  // section silhouettes across pages (design-standards.md). Every link and
+  // section silhouettes across pages. Every link and
   // its anchor text is unchanged from the card version; only the
   // restated-deck paragraph is dropped.
   const related = tool.relatedSlugs

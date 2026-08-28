@@ -7,7 +7,7 @@ import { realPageJsWeightKbLabel, realPageJsWeightBytes } from '../src/jsWeight.
 /**
  * Regression test for the craft-retrofit "speed as a feature" addition
  * (src/jsWeight.js, wired into src/pages/toolPage.js): a tool page in a
- * folder that has had its own Phase-3 pass must state its real computed JS
+ * folder that has had its own speed-feature rollout pass must state its real computed JS
  * weight, and that same figure must appear identically in both the visible
  * HTML and the FAQPage JSON-LD (the two are built from one `faqs` array
  * specifically so they can never drift apart -- this test would catch a

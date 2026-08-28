@@ -107,9 +107,9 @@ function renderResult(resultEl, jsonText, recordCount) {
     downloadBlob(jsonBlob(jsonText), 'converted.json');
   });
   btnRow.appendChild(downloadBtn);
-  // Download stays the one accent-filled (.btn-primary) action per view
-  // (design-standards.md); Copy is secondary, same convention
-  // jsonMinifyBeautify.client.js's own panels already use.
+  // Download stays the one accent-filled (.btn-primary) action per view;
+  // Copy is secondary, same convention jsonMinifyBeautify.client.js's own
+  // panels already use.
   btnRow.appendChild(makeCopyButton(() => jsonText, 'Copy JSON'));
   block.appendChild(btnRow);
 

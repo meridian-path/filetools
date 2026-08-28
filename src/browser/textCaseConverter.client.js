@@ -45,7 +45,7 @@ function previewOf(text) {
  * @param {() => string} getText
  * @param {string} label
  * @param {boolean} primary whether this renders as the page's one
- *   accent-filled action (design-standards.md: exactly one per view).
+ *   accent-filled action (exactly one per view, by design).
  */
 function makeCopyButton(getText, label, primary) {
   const btn = document.createElement('button');

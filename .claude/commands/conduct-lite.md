@@ -34,9 +34,9 @@ repo's root - read it in full before anything else if this is the first run this
    ```
    node "C:\Users\dylan\Dev\TheOrchestra\orchestrator\lib\cli.js" claim <taskId> --agent session-b
    ```
-   Build it per that task's own description. TheOrchestra's `.claude/rules/qa.md` self-QA
-   checklist and `.claude/rules/design-standards.md` apply in full - read them from
-   TheOrchestra's checkout since this repo has no local copy.
+   Build it per that task's own description. TheOrchestra's standing self-QA checklist and
+   design-standards rules apply in full - read them from TheOrchestra's checkout (under its
+   own `.claude/rules/` directory) since this repo has no local copy.
 5. **Complete/checkpoint through the same shared CLI**, same as any other Orchestra builder
    task - `complete`/`checkpoint-with-full-result`, with the four mandatory `--digest-*`
    fields. `push-branch`/PR conventions for this repo are unchanged by any of this.
