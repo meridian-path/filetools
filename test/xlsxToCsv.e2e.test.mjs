@@ -213,9 +213,9 @@ test('xlsx-to-csv: a file that isn\'t a real zip/workbook gets a clear error, ne
   await page.locator('#file-input').setInputFiles(path.join(TMP, 'not-a-workbook.xlsx'));
 
   await page.waitForFunction(() => {
-    const el = document.querySelector('.dz-status');
-    return el && el.textContent && el.textContent.length > 0;
-  });
+    const dz = document.querySelector('.dropzone');
+    return dz && dz.dataset.state === 'error';
+  }, { timeout: 15000 });
   const statusText = await page.locator('.dz-status').textContent();
   assert.match(statusText, /doesn.t look like a valid \.xlsx/i);
   assert.deepEqual(errors, []);
