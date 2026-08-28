@@ -100,6 +100,23 @@ function copyVendor() {
     path.join(VENDOR, 'js-yaml', 'LICENSE')
   );
 
+  // heic2any -- MIT (verified: node_modules/heic2any/LICENSE.md). Its own
+  // published bundle is a UMD build (sets `window.heic2any`, no `export`
+  // statement) -- same reasoning as exceljs above, loaded via a classic
+  // <script> tag rather than import(). Zero runtime dependencies of its
+  // own; the actual HEIC decode (libheif compiled to WASM) is embedded
+  // directly in this one file and run from a Worker built from a Blob URL
+  // at call time -- no separate .wasm file to vendor, and no CDN fetch, so
+  // "turn off your Wi-Fi and this page still works" holds here too.
+  copy(
+    path.join(nm, 'heic2any', 'dist', 'heic2any.min.js'),
+    path.join(VENDOR, 'heic2any', 'heic2any.min.js')
+  );
+  copy(
+    path.join(nm, 'heic2any', 'LICENSE.md'),
+    path.join(VENDOR, 'heic2any', 'LICENSE.md')
+  );
+
   // Space Grotesk (display typeface) -- SIL OFL 1.1 (verified:
   // node_modules/@fontsource-variable/space-grotesk/LICENSE). Latin subset
   // only, variable weight -- see src/css.js's @font-face block.
@@ -112,7 +129,7 @@ function copyVendor() {
     path.join(VENDOR, 'fonts', 'space-grotesk', 'LICENSE')
   );
 
-  console.log('vendor/ populated from node_modules (pdf-lib, pdfjs-dist, exceljs, fflate, js-yaml, space-grotesk).');
+  console.log('vendor/ populated from node_modules (pdf-lib, pdfjs-dist, exceljs, fflate, js-yaml, heic2any, space-grotesk).');
 }
 
 if (require.main === module) {

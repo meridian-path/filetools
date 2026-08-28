@@ -86,5 +86,6 @@ test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\')
     'uuid-generator': 'dev',
     'regex-tester': 'dev',
     'sql-formatter': 'dev',
+    'heic-to-jpg-png': 'dev',
   });
 });

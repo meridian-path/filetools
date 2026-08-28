@@ -99,6 +99,7 @@ test('MARKS is exactly the fixed 35-row plate/verb/ink table, no more, no fewer'
     'uuid-generator': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'regex-tester': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'sql-formatter': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'heic-to-jpg-png': { plate: 'dev', verb: 'convert', ink: 'dev' },
   });
 });
 
