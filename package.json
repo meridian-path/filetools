@@ -6,6 +6,7 @@
   "type": "commonjs",
   "main": "src/build.js",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "build": "node src/build.js",
     "vendor": "node scripts/copy-vendor.js",
     "serve": "node scripts/serve.js 8080",
@@ -16,7 +17,8 @@
     "capture-competitor-screenshot": "node scripts/capture-competitor-screenshot.js",
     "check-em-dash": "node scripts/check-em-dash.js",
     "check-internal-ids": "node scripts/check-internal-ids.js",
-    "check-copy-tells": "node scripts/check-copy-tells.js"
+    "check-copy-tells": "node scripts/check-copy-tells.js",
+    "check-commit-message": "node scripts/check-commit-message.js"
   },
   "engines": {
     "node": ">=18"
