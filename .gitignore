@@ -20,3 +20,7 @@ DISTRIBUTION_PACKET.md
 # output directory -- never pushed to a public repo.
 .announce-state.json
 dist-announcements/
+
+# Local-only operating notes; not part of the published project.
+/SESSION_SCOPE.md
+/.claude/commands/conduct-lite.md
