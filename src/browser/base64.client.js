@@ -221,9 +221,9 @@ export async function run(ctx) {
   // synthetic paste File dropzone.client.js names 'pasted-input.txt') is
   // almost always someone wanting its Base64, i.e. encode; pasted content
   // could be either, so encode stays the default there too since it's the
-  // more common first action (competitor tools this page is measured
-  // against -- see docs/design/REFERENCE_LIBRARY.md -- default to encode
-  // as well) and the mode toggle is one click away either way.
+  // more common first action (the competitor tools this page is measured
+  // against default to encode as well) and the mode toggle is one click
+  // away either way.
   const optionState = { mode: 'encode', urlSafe: false };
   renderResult(resultEl, rawBytes, optionState, pureModule);
 

@@ -156,9 +156,9 @@ ${designTokensCss(DESIGN_TOKENS)}
      by default at EVERY viewport width now -- unlike the old flat
      29-link dump, the folder tree is real content worth a deliberate
      open action even on desktop, not just a mobile space-saving measure
-     (Cobalt, REFERENCE_LIBRARY.md entry 2, demotes secondary nav to
-     small text rather than pushing primary content down; that same
-     "closed until asked for" shape now applies at every width). What
+     (Cobalt's own nav demotes secondary links to small text rather than
+     pushing primary content down; that same "closed until asked for"
+     shape now applies at every width). What
      changes at the INNER folder-group level (>=1024px, below) is layout
      only: five columns instead of one stacked list. No menu/tree/menubar
      role anywhere in this markup (src/shell.js's own comment cites the
@@ -326,11 +326,11 @@ ${designTokensCss(DESIGN_TOKENS)}
        wrap or scroll -- flex-wrap: nowrap above) doesn't touch the ring's
        vertical strokes, so this keeps that behavior unchanged while
        letting the ring render in full, identical to every other
-       :focus-visible control on the site (design-standards.md: "a focus
-       indicator ... identical across every asset"). Reference:
-       docs/design/REFERENCE_LIBRARY.md entry 14 (GOV.UK Design System) --
-       conform on the interaction layer for anything input/keyboard-related
-       rather than inventing a bespoke treatment per component. */
+       :focus-visible control on the site (a focus indicator that is
+       identical everywhere, by design). Reference: GOV.UK Design System's
+       focus style -- conform on the interaction layer for anything
+       input/keyboard-related rather than inventing a bespoke treatment
+       per component. */
     overflow-x: hidden;
     overflow-y: visible;
   }
@@ -460,13 +460,12 @@ ${designTokensCss(DESIGN_TOKENS)}
      see (1x1px, clipped). :has() lets the VISIBLE label pick up the exact
      same ring whenever its paired input carries keyboard focus, reusing
      the same width/color/offset tokens the global rule uses rather than
-     inventing a bespoke style (design-standards.md: "a focus indicator ...
-     identical across every asset"). Reference:
-     docs/design/REFERENCE_LIBRARY.md entry 1 (Squoosh) -- this is the same
-     drop-target control that entry names; we diverge from it by fixing
-     only this accessibility gap, not adding its sample-file affordance
-     (out of scope for this pass). :has() has full evergreen-browser
-     support (Chrome 105+, Firefox 121+, Safari 15.4+). */
+     inventing a bespoke style (a focus indicator that is identical
+     everywhere, by design). Reference: this is the same drop-target
+     control style Squoosh uses; we diverge from it by fixing only this
+     accessibility gap, not adding its sample-file affordance (out of
+     scope for this pass). :has() has full evergreen-browser support
+     (Chrome 105+, Firefox 121+, Safari 15.4+). */
   .dropzone:has(#file-input:focus-visible) > .btn-primary {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
@@ -952,8 +951,7 @@ ${designTokensCss(DESIGN_TOKENS)}
      Cell-level CSV diff table (compare-csv --
      src/browser/csvDiff.client.js). Row-level tint from a shared
      background token PLUS the .diff-status-cell text label in every row
-     (never color alone -- see design-standards.md's "color never the sole
-     carrier of meaning").
+     (never color alone as the sole carrier of meaning).
      ------------------------------------------------------------------- */
   .extracted-table tr[data-diff-status="added"] > td { background: var(--color-success-bg); }
   .extracted-table tr[data-diff-status="removed"] > td { background: var(--color-danger-bg); }
@@ -1096,9 +1094,9 @@ ${designTokensCss(DESIGN_TOKENS)}
      half of Pattern E -- see src/pageStripDiagrams.mjs and
      src/examples/*.mjs). Rendered inline inside an .output-example figure
      (below), so this is deliberately just the <svg> styling -- no card
-     background/border/padding of its own, since design-standards.md
-     forbids a card nested inside another card and .output-example is
-     already that card. (Formerly src/diagrams.js's own top-of-page
+     background/border/padding of its own, since nesting a card inside
+     another card is banned and .output-example is already that card.
+     (Formerly src/diagrams.js's own top-of-page
      .transform-diagram div carried that card styling directly; retired
      along with the file.)
      ------------------------------------------------------------------- */
@@ -1119,7 +1117,7 @@ ${designTokensCss(DESIGN_TOKENS)}
      teal); recolored to the tool's own family plate color so the diagram
      agrees with that tool's mark/dropzone color rather than competing
      with it. --color-accent keeps its monopoly on actions/links/focus
-     (design-standards.md's restraint-budget rule). */
+     (the site's restraint-budget rule for accent color). */
   .transform-diagram-svg .td-accent { color: var(--mark-plate); }
 
   /* -------------------------------------------------------------------
@@ -1137,9 +1135,9 @@ ${designTokensCss(DESIGN_TOKENS)}
 
   /* -------------------------------------------------------------------
      How-it-works process rail -- CSS-only counter-generated step markers
-     on the genuinely-ordered <ol> (design-standards.md permits numbering an
-     element's own semantics; it rejects decorative numbering of sections,
-     a different thing).
+     on the genuinely-ordered <ol> (numbering an element's own semantics
+     is fine; decorative numbering of sections is a different thing and
+     is not).
      ------------------------------------------------------------------- */
   .how-steps {
     list-style: none;
@@ -1345,7 +1343,7 @@ ${designTokensCss(DESIGN_TOKENS)}
 
   /* -------------------------------------------------------------------
      Related tools -- one inline glyph+text row under a hairline, not a
-     card grid (design-standards.md; see toolPage.js's comment).
+     card grid (see toolPage.js's own comment for why).
      ------------------------------------------------------------------- */
   .related-row {
     display: flex;
@@ -1468,8 +1466,8 @@ ${designTokensCss(DESIGN_TOKENS)}
      access to restyle. Rather than let that appear as an unexplained seam
      ("two different products stitched together"), one small labeled line
      names the hand-off before it happens, the same way GOV.UK's error
-     pattern (docs/design/REFERENCE_LIBRARY.md entry 14) states plainly
-     what's about to happen rather than leaving a visitor to infer it. */
+     pattern states plainly what's about to happen rather than leaving a
+     visitor to infer it. */
   .newsletter-provider-note {
     margin: var(--space-2) 0 0;
     font-size: var(--text-xs);
@@ -1497,8 +1495,8 @@ ${designTokensCss(DESIGN_TOKENS)}
 
   /* -------------------------------------------------------------------
      Home page hero -- left-aligned, directly above the explorer window
-     (design-standards.md's Distinctiveness Gate names a centered hero
-     over a card grid an automatic NO-GO). Compressed for the explorer-
+     (a centered hero over a card grid reads as generic-template and is
+     avoided on purpose). Compressed for the explorer-
      window redesign (spec 1.5): the former family-index strip is retired
      -- the window's own sidebar + per-row Kind chips now carry that same
      "jump straight to a format" scent with more precision (a real count
@@ -1526,8 +1524,8 @@ ${designTokensCss(DESIGN_TOKENS)}
 
   /* A flat, dense single column (no 2-up grid): the explorer window's own
      column ruler (Name / Kind) implies one row per tool, not a card-style
-     multi-column layout -- design-standards.md's craft-floor reasoning on
-     ragged final rows, which a grid reintroduces as row count grows. */
+     multi-column layout -- avoiding the ragged-final-row problem a grid
+     reintroduces as row count grows. */
   .tool-list { display: flex; flex-direction: column; }
   .tool-row {
     display: flex;

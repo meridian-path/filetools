@@ -80,8 +80,10 @@ if (toolSection) {
   // triggered run is routed here instead of touching the drop-zone at all.
   const pasteStatusEl = toolSection.querySelector('.paste-status');
 
-  // "working" state timing (design-standards.md's three response-time
-  // limits): a generation counter is bumped on every new file selection
+  // "working" state timing (the three standard response-time limits -
+  // visible change within 100ms, explicit working state past 1s,
+  // determinate progress past 10s): a generation counter is bumped on
+  // every new file selection
   // AND on Cancel, so a
   // processor that's still running when the visitor cancels can finish
   // its work in the background without ever touching the UI again --
@@ -194,8 +196,8 @@ if (toolSection) {
    * done/total width -- for the handful of batch processors whose loop
    * genuinely knows both numbers (see src/browser/batchProgress.js). Most
    * tools never call this; the bar stays indeterminate and that's correct
-   * for them (design-standards.md's "determinate progress past 10s"
-   * requirement only bites once a processor can actually count units). */
+   * for them (the "determinate progress past 10s" requirement only bites
+   * once a processor can actually count units). */
   function setProgress(done, total) {
     if (!progressFill || !total) return;
     dropzone.dataset.determinate = 'true';

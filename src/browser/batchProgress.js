@@ -1,7 +1,7 @@
 // Shared batch-progress reporting -- one canonical phrasing + wiring for
 // every processor whose loop genuinely knows a real done/total count, so no
 // tool's multi-item wait reads slightly differently from its sibling's
-// (CRAFT_DOCTRINE.md 2.4's designed-edge-states ritual). The pure formatting
+// (a deliberately designed edge-state, not an afterthought). The pure formatting
 // function lives in ../pure/batchProgress.mjs (see that file's own header
 // comment for why); this file is the thin ctx-wrapper convenience that calls
 // both dropzone.client.js callbacks (setStatus for the aria-live text,

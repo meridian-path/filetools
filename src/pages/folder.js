@@ -11,12 +11,11 @@
  * ruler, tool rows with Kind chips, status bar), same shared component the
  * homepage uses minus the sidebar -- see src/pages/explorerWindow.js.
  *
- * Reference-library grounding (design-standards.md Enforcement, carried
- * from the spec): REFERENCE_LIBRARY.md entry 2 (Cobalt) -- the tool/
- * content is the landing surface, no marketing block above it; this page
- * follows that shape (path bar, one intro paragraph, straight into the
- * tool list). Entry 1 (Squoosh) -- a number attached to every claim; this
- * page's intro names real tools rather than adjectives.
+ * Reference-library grounding: Cobalt -- the tool/content is the landing
+ * surface, no marketing block above it; this page follows that shape
+ * (path bar, one intro paragraph, straight into the tool list). Squoosh --
+ * a number attached to every claim; this page's intro names real tools
+ * rather than adjectives.
  *
  * Verb-subsection scale note (spec section 1.6/1.12): a folder with more
  * than FOLDER_VERB_SUBSECTION_THRESHOLD tools is specified to render its

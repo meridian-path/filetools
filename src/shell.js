@@ -36,8 +36,8 @@ const SOCIAL_ICON_SVG = '<svg width="18" height="18" viewBox="0 0 100 100" xmlns
 
 /**
  * Portfolio-wide footer credit line -- identical wording/type role on all
- * three properties, naming the operator and linking to the other two. See
- * docs/DESIGN_PLAYBOOK.md's "What stays shared across the portfolio".
+ * three properties, naming the operator and linking to the other two, by
+ * design (this is deliberately shared across the whole portfolio).
  */
 function renderFooterCredit() {
   return `<p class="footer-credit">Built by Dylan, also making <a href="https://repertoire-builder.com" rel="noopener noreferrer">Repertoire Builder</a> and <a href="https://lol-practice-system.com" rel="noopener noreferrer">Solo Queue Practice</a>. <a class="footer-social" href="https://x.com/builtittheycome" rel="noopener noreferrer">${SOCIAL_ICON_SVG}Follow @builtittheycome</a></p>`;

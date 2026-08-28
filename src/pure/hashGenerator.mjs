@@ -21,8 +21,8 @@
  * straightforward block cipher, there is no vetted vendor library already
  * in this repo for it, and SubtleCrypto doesn't cover it either. Same
  * "explicitly acceptable fallback, not a shortcut taken silently" shape
- * TESTING.md's "Known simplifications" section already documents for
- * other tools on this site.
+ * this codebase already uses for other tools' own documented
+ * simplifications.
  */
 
 /**
