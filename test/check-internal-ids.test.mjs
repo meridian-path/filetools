@@ -225,10 +225,10 @@ test('findLeakedIds: does not false-positive DOC_FILENAME_RE/SERIES_LABEL_RE on 
 // inside any SCAN_DIRS entry. findRootFiles() closes that blind spot without
 // making the walk recursive from ROOT (which would just re-walk every
 // SCAN_DIRS entry a second time, plus node_modules/dist/.git).
-test('findRootFiles: picks up a leaked id in a root-level file SCAN_DIRS never reaches', () => {
+test('findRootFiles: picks up a leaked governing-doc filename in a root-level file SCAN_DIRS never reaches', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-root-test-'));
   const readme = path.join(dir, 'README.md');
-  fs.writeFileSync(readme, 'See task-mt6jcfwr-ed62cc for background.\n', 'utf8');
+  fs.writeFileSync(readme, 'See design-standards.md for background.\n', 'utf8');
   const srcDir = path.join(dir, 'src');
   fs.mkdirSync(srcDir);
   fs.writeFileSync(path.join(srcDir, 'nested.md'), 'nothing to see here\n', 'utf8');
@@ -240,7 +240,7 @@ test('findRootFiles: picks up a leaked id in a root-level file SCAN_DIRS never r
     .filter((e) => !e.isDirectory() && /\.(js|mjs|css|md|html|yml|yaml|json)$/.test(e.name))
     .map((e) => path.join(dir, e.name));
   assert.deepEqual(entries, [readme]);
-  assert.deepEqual(findLeakedIds(readme), ['task-mt6jcfwr-ed62cc']);
+  assert.deepEqual(findLeakedIds(readme), ['design-standards.md']);
 });
 
 test('findRootFiles: reaches package.json at the real repo root (json is not in findFiles\' own extension set)', () => {
