@@ -51,5 +51,5 @@ module.exports = {
       answerHtml: 'No. Each image’s original pixel data is embedded in the PDF as-is - nothing is re-compressed or re-encoded, so the result looks identical to the source images.',
     },
   ],
-  relatedSlugs: ['pdf-to-jpg-png', 'merge-pdf', 'split-pdf'],
+  relatedSlugs: ['pdf-to-jpg-png', 'heic-to-jpg-png', 'merge-pdf', 'split-pdf'],
 };
