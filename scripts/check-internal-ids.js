@@ -29,6 +29,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 // Scans this repo's own source/test/docs/CI config -- NOT dist/ (a fresh
@@ -188,7 +189,9 @@ function findLeakedIds(filePath) {
 // this list for the same reason: it needs literal id-shaped fixtures
 // ("task-mt6jcfwr-ed62cc" etc.) to exercise check-copy-tells.js's own
 // process-talk-marker detection, which reuses this file's ID_RE against
-// rendered dist/ output rather than source.
+// rendered dist/ output rather than source. test/check-commit-message.test.mjs
+// joins for the identical reason, against scripts/check-commit-message.js's
+// own reuse of these same patterns at commit-message-check time.
 //
 // scripts/check-copy-tells.js and scripts/check-em-dash.js join this list
 // for a different reason (governing-doc-filename leak audit, 7th
@@ -201,13 +204,34 @@ const EXCLUDED_FILES = [
   __filename,
   path.join(ROOT, 'test', 'check-internal-ids.test.mjs'),
   path.join(ROOT, 'test', 'check-copy-tells.test.mjs'),
+  path.join(ROOT, 'test', 'check-commit-message.test.mjs'),
   path.join(ROOT, 'scripts', 'check-copy-tells.js'),
   path.join(ROOT, 'scripts', 'check-em-dash.js'),
 ].map((f) => path.resolve(f));
 
+// Rule 1 only governs what is "public-facing" -- a file git does not track
+// will never be pushed to the public repo, so scanning it isn't just
+// wasted work, it actively produces false failures on legitimate local
+// content. Real case that surfaced this: ROLLING_PLAN.md sits untracked
+// at repo root (gitignored, this session's own living log, genuinely full
+// of real task-/decision-ids by design) and was being swept in by
+// findRootFiles()'s plain directory read, failing `npm test` in any
+// checkout where that file has ever been written -- never caught by CI,
+// which clones fresh and never materializes an untracked file at all.
+// Scoping to `git ls-files` (the same ground truth the tracked-charter-
+// file assertion in docs/HYGIENE_CHECK_TEMPLATE.md uses) fixes this
+// generally rather than naming ROLLING_PLAN.md/TESTING.md one at a time,
+// so the next untracked local note file doesn't reintroduce the same gap.
+function gitTrackedFiles(dir = ROOT) {
+  const out = execFileSync('git', ['ls-files'], { cwd: dir, encoding: 'utf8' });
+  return new Set(out.split('\n').filter(Boolean).map((f) => path.resolve(dir, f)));
+}
+
 function main() {
+  const tracked = gitTrackedFiles();
   const files = [...SCAN_DIRS.flatMap((d) => findFiles(path.join(ROOT, d))), ...findRootFiles()]
-    .filter((f) => !EXCLUDED_FILES.includes(path.resolve(f)));
+    .filter((f) => !EXCLUDED_FILES.includes(path.resolve(f)))
+    .filter((f) => tracked.has(path.resolve(f)));
 
   const offenders = [];
   for (const file of files) {
@@ -232,4 +256,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findLeakedIds, ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE, findFiles, findRootFiles, SCAN_DIRS, ROOT };
+module.exports = { findLeakedIds, ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE, findFiles, findRootFiles, gitTrackedFiles, SCAN_DIRS, ROOT };

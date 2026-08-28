@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
 import {
   findLeakedIds,
   ID_RE,
@@ -10,6 +11,7 @@ import {
   SERIES_LABEL_RE,
   findFiles,
   findRootFiles,
+  gitTrackedFiles,
   SCAN_DIRS,
   ROOT,
 } from '../scripts/check-internal-ids.js';
@@ -254,4 +256,46 @@ test('findRootFiles: does not recurse into subdirectories', () => {
   const rootFiles = findRootFiles();
   const relRootFiles = rootFiles.map((f) => path.relative(ROOT, f));
   assert.ok(!relRootFiles.some((f) => f.includes(path.sep)), 'expected every result to be a direct child of ROOT, not a nested path');
+});
+
+// Regression coverage for a real, live bug found during a hygiene-
+// verification pass: findRootFiles() reads every root-level .md file off
+// disk with no regard for git-tracked status, so an untracked local file
+// sitting at repo root (ROLLING_PLAN.md -- this session's own living log,
+// gitignored, genuinely full of real task-/decision-ids by design) was
+// being scanned and failing `npm test` in any checkout where that file
+// exists, even though it will never reach the public repo. Never caught
+// by CI, which clones fresh and never materializes an untracked file at
+// all -- only a checkout with real accumulated local state (like this
+// session's own primary checkout) can reproduce it.
+test('gitTrackedFiles: excludes an untracked file from the returned set', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-git-test-'));
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+
+  const tracked = path.join(dir, 'README.md');
+  fs.writeFileSync(tracked, 'tracked\n', 'utf8');
+  execFileSync('git', ['add', 'README.md'], { cwd: dir });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+
+  const untracked = path.join(dir, 'ROLLING_PLAN.md');
+  fs.writeFileSync(untracked, 'task-mt6jcfwr-ed62cc\n', 'utf8');
+
+  const result = gitTrackedFiles(dir);
+  assert.ok(result.has(path.resolve(tracked)), 'expected the committed file to be reported as tracked');
+  assert.ok(!result.has(path.resolve(untracked)), 'expected the untracked file to be excluded');
+});
+
+test('CLI: the real repo passes end to end, including with an untracked ROLLING_PLAN.md-shaped file on disk at root', () => {
+  // Exercises main() for real against the actual ROOT, the same way
+  // `npm test`'s pretest step does -- if the git-tracked-only filtering
+  // above ever regresses, this fails for real, right here, since a real
+  // ROLLING_PLAN.md sits on disk in this exact checkout during this test.
+  const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'check-internal-ids.js')], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 0, `expected exit 0, got stderr:\n${result.stderr}`);
+  assert.match(result.stdout, /zero leaked ids/);
 });
