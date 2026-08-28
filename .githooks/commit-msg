@@ -1,0 +1,6 @@
+#!/bin/sh
+# Installed via `npm install`'s `prepare` script (`git config core.hooksPath
+# .githooks`) -- see scripts/check-commit-message.js's own header for why
+# this exists. Blocks a commit whose message leaks an internal id or
+# governing-doc filename reference; everything else is untouched.
+node scripts/check-commit-message.js "$1"
