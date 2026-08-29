@@ -998,6 +998,90 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
 
   /* -------------------------------------------------------------------
+     Text diff two-pane grid (text-diff -- src/browser/textDiff.client.js).
+     Two textareas above this (reuses .paste-textarea), then this grid
+     below: a CSS grid with 2 columns so every source line gets its own
+     Original/Changed cell pair, collapsing to 1 column under 768px (each
+     line's two cells then stack adjacent in source order -- still
+     readable as a pair, just not side by side). Row tint reuses the same
+     background tokens as the cell-level CSV diff table above; word-level
+     .text-diff-ins/.text-diff-del reuse .diff-cell-new/.diff-cell-old's
+     color choice but as inline <mark> spans (background + text color, not
+     block-level), since these highlight a span inside running text rather
+     than a whole table cell.
+     ------------------------------------------------------------------- */
+  .text-diff-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  .text-diff-input-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .text-diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-top: var(--space-4);
+  }
+  .text-diff-cell {
+    display: flex;
+    align-items: flex-start;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border-bottom: var(--border-hairline) solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .text-diff-cell--b { border-left: var(--border-hairline) solid var(--color-border); }
+  .text-diff-header {
+    font-weight: var(--weight-bold);
+    background: var(--color-surface-alt);
+  }
+  .text-diff-cell[data-diff-status="added"] { background: var(--color-success-bg); }
+  .text-diff-cell[data-diff-status="removed"] { background: var(--color-danger-bg); }
+  .text-diff-cell[data-diff-status="changed"] { background: var(--color-warn-bg); }
+  .text-diff-cell[data-diff-status="empty"] { background: var(--color-surface-alt); }
+  .text-diff-linenum {
+    flex: 0 0 auto;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+    margin-right: var(--space-2);
+    user-select: none;
+  }
+  .text-diff-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .text-diff-ins {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-radius: var(--radius-sm);
+    padding: 0 1px;
+  }
+  .text-diff-del {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    text-decoration: line-through;
+    border-radius: var(--radius-sm);
+    padding: 0 1px;
+  }
+  @media (max-width: 767px) {
+    .text-diff-inputs { grid-template-columns: 1fr; }
+    .text-diff-grid { grid-template-columns: 1fr; }
+    .text-diff-cell--b { border-left: none; }
+    .text-diff-cell--a:not(.text-diff-header) {
+      border-top: var(--border-control) solid var(--color-border-strong);
+      margin-top: var(--space-2);
+    }
+  }
+
+  /* -------------------------------------------------------------------
      Second input path: "paste markup" (html-table-to-csv today; toolPage.js
      only renders this block when a tool config sets pasteInput)
      ------------------------------------------------------------------- */
