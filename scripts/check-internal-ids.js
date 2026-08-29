@@ -20,6 +20,22 @@
  * line by line, once over every adjacent pair of lines concatenated --
  * see findLeakedIds's own doc comment for why.
  *
+ * SCAN SCOPE: walks the full `git ls-files` tree (see scannableTrackedFiles()),
+ * not a hand-maintained directory allowlist. This checker previously scanned
+ * only an explicit SCAN_DIRS list ('src', 'test', 'scripts', 'docs',
+ * '.github', '.claude', 'visual-qa-competitors'), which went unscanned for a
+ * newly-added tracked top-level directory until someone remembered to add it
+ * -- the exact shape that bit this checker FOUR separate times (the original
+ * narrow scope; .github added only after a near-miss; .claude added only
+ * after "the same class of gap recurred a third time"; visual-qa-competitors
+ * added the same day as the .claude fix), and was found STILL open a fifth
+ * time by the external-eye audit rotation's 13th instance (two more tracked
+ * top-level directories -- .githooks, assets -- sitting unscanned, no live
+ * leak in either at the time, but the structural gap was real). Both
+ * sibling assets in this same Orchestra rotation (repertoire-builder,
+ * lol-practice-system) converted to this same git-ls-files-based denylist
+ * shape first; this is filetools' own port of that proven pattern.
+ *
  * Usage:
  *   node scripts/check-internal-ids.js
  * Exits 1 and prints every match (file, and the matched id) if anything
@@ -32,21 +48,6 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-// Scans this repo's own source/test/docs/CI config -- NOT dist/ (a fresh
-// build output, regenerated every run, would only ever mirror src/ anyway)
-// and NOT node_modules/vendor (third-party code this repo doesn't author).
-// .github added after a near-miss: a CI workflow YAML comment is exactly
-// as public-facing as any src/ comment, but was never scanned since it
-// lived outside every prior SCAN_DIRS entry. .claude added after the same
-// class of gap recurred a third time (monthly craft audit, 2026-08-26): a
-// leaked id in .claude/commands/conduct-lite.md sat live on the public repo
-// since 2026-08-23, since that directory was never in this list either.
-// visual-qa-competitors added the same day after a real (self-caught, not
-// shipped) leak while writing a lineup/squint verdict: verdict-<date>.md
-// prose cited an internal decision id directly. That directory is
-// committed (not gitignored, see its own README), so its prose is exactly
-// as public-facing as a docs/ page.
-const SCAN_DIRS = ['src', 'test', 'scripts', 'docs', '.github', '.claude', 'visual-qa-competitors'];
 
 // Matches the shared queue's own id shape: "task-" or "decision-" followed
 // by a lowercase-alphanumeric segment, a hyphen, and a hex segment (the
@@ -97,36 +98,23 @@ const SERIES_LABEL_RE = /\b(?:WS-\d+|Phase-\d+|spec-section-\d+(?:\.\d+)*|site-a
 // use and must keep meaning exactly "a task-/decision-id", nothing broader.
 const LEAK_PATTERNS = [ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE];
 
-function findFiles(dir) {
-  const out = [];
-  if (!fs.existsSync(dir)) return out;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...findFiles(full));
-    else if (/\.(js|mjs|css|md|html|yml|yaml)$/.test(entry.name)) out.push(full);
-  }
-  return out;
-}
+// Directory-name denylist -- defense in depth only, not the primary scope
+// control (scannableTrackedFiles() below already filters to git-tracked
+// files, and all three of these are gitignored in this repo, so none of
+// them should ever appear in `git ls-files` output under normal use).
+// Protects against a future `git add -f` accident forcibly tracking build
+// output or a vendored third-party copy the same way the sibling repos' own
+// denylists do. Extend ONLY for real build/dependency/generated output,
+// never turn this back into a scan-scope allowlist -- reintroducing a
+// hand-maintained "these are the directories we scan" list is exactly the
+// bug class this fix closes.
+const DENY_DIR_PREFIXES = ['node_modules/', 'dist/', 'vendor/', 'tmp_test/', 'visual-qa-output/', '.lighthouseci/'];
 
-// SCAN_DIRS above is a directory allowlist -- it never covered root-level
-// tracked files (README.md, SESSION_SCOPE.md, package.json,
-// package-lock.json), since none of them live inside any of those
-// directories. Deliberately non-recursive (recursing from ROOT would just
-// re-walk every SCAN_DIRS entry a second time, plus node_modules/dist/.git)
-// -- this only looks at direct children of the repo root. Extension list
-// adds .json on top of findFiles' own set so package.json/package-lock.json
-// are actually reachable; root-only scope keeps this cheap even though
-// package-lock.json can be large.
-function findRootFiles() {
-  const out = [];
-  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
-    if (entry.isDirectory()) continue;
-    if (/\.(js|mjs|css|md|html|yml|yaml|json)$/.test(entry.name)) {
-      out.push(path.join(ROOT, entry.name));
-    }
-  }
-  return out;
-}
+// Extensions this checker reads as text and scans for a leak -- unchanged
+// from the prior allowlist's own extension set (that was never the bug;
+// only the DIRECTORY scope was). Binary files (images, fonts, xlsx/pdf
+// fixtures) can't carry a text-shaped leak and would just be wasted I/O.
+const SCANNED_EXT_RE = /\.(js|mjs|css|md|html|yml|yaml|json)$/i;
 
 /**
  * @param {string} filePath
@@ -214,29 +202,33 @@ const EXCLUDED_FILES = [
   path.join(ROOT, 'scripts', 'check-em-dash.js'),
 ].map((f) => path.resolve(f));
 
-// Rule 1 only governs what is "public-facing" -- a file git does not track
-// will never be pushed to the public repo, so scanning it isn't just
-// wasted work, it actively produces false failures on legitimate local
-// content. Real case that surfaced this: ROLLING_PLAN.md sits untracked
-// at repo root (gitignored, this session's own living log, genuinely full
-// of real task-/decision-ids by design) and was being swept in by
-// findRootFiles()'s plain directory read, failing `npm test` in any
-// checkout where that file has ever been written -- never caught by CI,
-// which clones fresh and never materializes an untracked file at all.
-// Scoping to `git ls-files` (the same ground truth the tracked-charter-
-// file assertion in docs/HYGIENE_CHECK_TEMPLATE.md uses) fixes this
-// generally rather than naming ROLLING_PLAN.md/TESTING.md one at a time,
-// so the next untracked local note file doesn't reintroduce the same gap.
-function gitTrackedFiles(dir = ROOT) {
+/**
+ * @param {string} [dir] repo root to scan (the real ROOT by default; a
+ *   synthetic fixture repo in tests).
+ * @returns {string[]} the absolute path of every git-tracked file under
+ *   `dir`, after the directory-name denylist and the scanned-extension
+ *   filter -- the full tracked tree, not a hand-picked directory subset,
+ *   so a newly-added tracked top-level directory (root-level files
+ *   included -- `git ls-files` has no notion of "top-level" to miss) is
+ *   covered automatically with no list to remember to update. Rule 1 only
+ *   governs what is public-facing, and a file git does not track will
+ *   never be pushed to the public repo -- an untracked local note (this
+ *   session's own ROLLING_PLAN.md, gitignored, genuinely full of real
+ *   task-/decision-ids by design) is correctly never scanned, since
+ *   `git ls-files` never lists it in the first place.
+ */
+function scannableTrackedFiles(dir = ROOT) {
   const out = execFileSync('git', ['ls-files'], { cwd: dir, encoding: 'utf8' });
-  return new Set(out.split('\n').filter(Boolean).map((f) => path.resolve(dir, f)));
+  return out
+    .split('\n')
+    .filter(Boolean)
+    .filter((f) => !DENY_DIR_PREFIXES.some((prefix) => f.startsWith(prefix)))
+    .filter((f) => SCANNED_EXT_RE.test(f))
+    .map((f) => path.resolve(dir, f));
 }
 
 function main() {
-  const tracked = gitTrackedFiles();
-  const files = [...SCAN_DIRS.flatMap((d) => findFiles(path.join(ROOT, d))), ...findRootFiles()]
-    .filter((f) => !EXCLUDED_FILES.includes(path.resolve(f)))
-    .filter((f) => tracked.has(path.resolve(f)));
+  const files = scannableTrackedFiles().filter((f) => !EXCLUDED_FILES.includes(path.resolve(f)));
 
   const offenders = [];
   for (const file of files) {
@@ -261,4 +253,6 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findLeakedIds, ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE, findFiles, findRootFiles, gitTrackedFiles, SCAN_DIRS, ROOT };
+module.exports = {
+  findLeakedIds, ID_RE, DOC_FILENAME_RE, SERIES_LABEL_RE, scannableTrackedFiles, DENY_DIR_PREFIXES, SCANNED_EXT_RE, ROOT,
+};

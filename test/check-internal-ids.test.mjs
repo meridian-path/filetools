@@ -9,10 +9,9 @@ import {
   ID_RE,
   DOC_FILENAME_RE,
   SERIES_LABEL_RE,
-  findFiles,
-  findRootFiles,
-  gitTrackedFiles,
-  SCAN_DIRS,
+  scannableTrackedFiles,
+  DENY_DIR_PREFIXES,
+  SCANNED_EXT_RE,
   ROOT,
 } from '../scripts/check-internal-ids.js';
 
@@ -25,6 +24,20 @@ import {
  * happened to wrap across a line break, and because the grep pattern used
  * that pass only matched one specific id-prefix shape rather than the
  * general task-/decision- id shape. Both gaps are covered here directly.
+ *
+ * Denylist conversion (external-eye audit rotation, 13th filetools
+ * instance): this checker used to walk a hand-maintained SCAN_DIRS
+ * directory allowlist, which went unscanned for a newly-added tracked
+ * top-level directory until someone remembered to extend the list --
+ * bitten FIVE separate times (the original narrow scope; .github added
+ * only after a near-miss; .claude added only after the same gap recurred
+ * a third time; visual-qa-competitors added the same day as the .claude
+ * fix; .githooks and assets found still-unscanned, clean but exposed, by
+ * this rotation's own 13th audit). scannableTrackedFiles() replaces the
+ * old findFiles()/findRootFiles()/gitTrackedFiles()/SCAN_DIRS shape with a
+ * single git-ls-files-based walk of the ENTIRE tracked tree, denylisting
+ * only real generated/vendored output directories -- the same shape this
+ * Orchestra rotation's two sibling assets already proved out first.
  */
 
 function tmpFile(content, ext = '.js') {
@@ -32,6 +45,26 @@ function tmpFile(content, ext = '.js') {
   const file = path.join(dir, `sample${ext}`);
   fs.writeFileSync(file, content, 'utf8');
   return file;
+}
+
+/**
+ * @param {Record<string,string>} files relative path -> content, one entry
+ *   per file to commit into a fresh throwaway git repo.
+ * @returns {string} the repo's root directory.
+ */
+function tmpGitRepo(files) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-repo-test-'));
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  for (const [relPath, content] of Object.entries(files)) {
+    const full = path.join(dir, relPath);
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, content, 'utf8');
+  }
+  execFileSync('git', ['add', '-A'], { cwd: dir });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+  return dir;
 }
 
 // ID_RE is a shared, `g`-flagged module-level regex object: assert.match
@@ -94,80 +127,6 @@ test('findLeakedIds: does not false-positive on a real commit SHA mention (no ta
   assert.deepEqual(findLeakedIds(file), []);
 });
 
-// Regression coverage for a near-miss found while fixing an unrelated CI
-// workflow bug: a leaked decision-id was almost committed in
-// .github/workflows/deploy-pages.yml's own comment, and this checker never
-// would have caught it -- .github wasn't in SCAN_DIRS, and even if it had
-// been, findFiles' own extension filter didn't include .yml/.yaml at all.
-// Both gaps are covered directly here, since main()'s own use of these
-// against the real ROOT can't exercise a case that (correctly) doesn't
-// exist in this repo right now.
-test('SCAN_DIRS includes .github -- CI workflow comments are exactly as public-facing as any src/ comment', () => {
-  assert.ok(SCAN_DIRS.includes('.github'));
-});
-
-// Regression coverage for a real, self-caught leak while writing a
-// lineup/squint verdict (craft-retrofit Phase 3 visual-QA pass): a
-// verdict-<date>.md's own prose cited an internal decision id directly.
-// visual-qa-competitors/ is committed (not gitignored - see its own
-// README), so a verdict file's prose is exactly as public-facing as a
-// docs/ page, but the directory was never in SCAN_DIRS.
-test('SCAN_DIRS includes visual-qa-competitors -- a verdict.md\'s own prose is exactly as public-facing as any docs/ page', () => {
-  assert.ok(SCAN_DIRS.includes('visual-qa-competitors'));
-});
-
-test('findFiles: picks up a leaked id inside a nested visual-qa-competitors/<tool-slug>/verdict-*.md file', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-verdict-test-'));
-  const toolDir = path.join(dir, 'hash-generator');
-  fs.mkdirSync(toolDir);
-  const verdictFile = path.join(toolDir, 'verdict-2026-08-27.md');
-  fs.writeFileSync(verdictFile, 'Traffic finding per decision-mt933kei-d26512.\n', 'utf8');
-  const found = findFiles(dir);
-  assert.deepEqual(found, [verdictFile]);
-  assert.deepEqual(findLeakedIds(verdictFile), ['decision-mt933kei-d26512']);
-});
-
-test('findFiles: picks up a .yml file, not just js/mjs/css/md/html', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-yml-test-'));
-  const workflowsDir = path.join(dir, 'workflows');
-  fs.mkdirSync(workflowsDir);
-  const ymlFile = path.join(workflowsDir, 'deploy.yml');
-  fs.writeFileSync(ymlFile, '# see task-mt6jcfwr-ed62cc\n', 'utf8');
-  const found = findFiles(dir);
-  assert.deepEqual(found, [ymlFile]);
-  assert.deepEqual(findLeakedIds(ymlFile), ['task-mt6jcfwr-ed62cc']);
-});
-
-// Regression coverage for the 4th occurrence of this exact incident class
-// (monthly craft audit, 2026-08-26): a real id leaked in
-// .claude/commands/conduct-lite.md sat live on the public repo for three
-// days, since .claude was never in SCAN_DIRS -- same missing-directory
-// shape as the .github gap above. Both the array membership and a real
-// fixture proving findFiles() actually reaches a nested .claude/ file are
-// covered here, so a future removal of the entry fails a real test rather
-// than waiting for the next monthly audit to notice.
-test('SCAN_DIRS includes .claude -- a slash-command doc comment is exactly as public-facing as any src/ comment', () => {
-  assert.ok(SCAN_DIRS.includes('.claude'));
-});
-
-test('findFiles: picks up a leaked id inside a nested .claude/commands/*.md file', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-claude-test-'));
-  const commandsDir = path.join(dir, 'commands');
-  fs.mkdirSync(commandsDir);
-  const mdFile = path.join(commandsDir, 'conduct-lite.md');
-  fs.writeFileSync(mdFile, 'Validated end to end (task-mt638skf-4558aa, 2026-08-23).\n', 'utf8');
-  const found = findFiles(dir);
-  assert.deepEqual(found, [mdFile]);
-  assert.deepEqual(findLeakedIds(mdFile), ['task-mt638skf-4558aa']);
-});
-
-// Regression coverage for the 7th occurrence of this incident class (7th
-// monthly external-eye audit): internal governing-doc filenames
-// (design-standards.md, REFERENCE_LIBRARY.md, etc.) were live-rendered
-// sitewide via CSS design-rationale comments across 13 source files. ID_RE
-// alone has zero pattern coverage for a governing-doc filename -- it only
-// matches the task-/decision-id shape -- so this was a real, unaddressed gap
-// in the checker itself, not a fluke miss.
 test('DOC_FILENAME_RE matches design-standards.md', () => {
   assert.match('design-standards.md', new RegExp(DOC_FILENAME_RE.source));
 });
@@ -221,70 +180,73 @@ test('findLeakedIds: does not false-positive DOC_FILENAME_RE/SERIES_LABEL_RE on 
   assert.deepEqual(findLeakedIds(file), []);
 });
 
-// Regression coverage for the 7th occurrence's item 3: SCAN_DIRS is a
-// directory allowlist that never covered root-level tracked files (README.md,
-// SESSION_SCOPE.md, package.json, package-lock.json), since none of them live
-// inside any SCAN_DIRS entry. findRootFiles() closes that blind spot without
-// making the walk recursive from ROOT (which would just re-walk every
-// SCAN_DIRS entry a second time, plus node_modules/dist/.git).
-test('findRootFiles: picks up a leaked governing-doc filename in a root-level file SCAN_DIRS never reaches', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-root-test-'));
-  const readme = path.join(dir, 'README.md');
-  fs.writeFileSync(readme, 'See design-standards.md for background.\n', 'utf8');
-  const srcDir = path.join(dir, 'src');
-  fs.mkdirSync(srcDir);
-  fs.writeFileSync(path.join(srcDir, 'nested.md'), 'nothing to see here\n', 'utf8');
-
-  // findRootFiles takes no argument (always scans the real ROOT), so
-  // exercise its directory-listing behavior directly against a synthetic
-  // root here rather than importing a second copy of the module.
-  const entries = fs.readdirSync(dir, { withFileTypes: true })
-    .filter((e) => !e.isDirectory() && /\.(js|mjs|css|md|html|yml|yaml|json)$/.test(e.name))
-    .map((e) => path.join(dir, e.name));
-  assert.deepEqual(entries, [readme]);
-  assert.deepEqual(findLeakedIds(readme), ['design-standards.md']);
+test('scannableTrackedFiles: covers every git-tracked directory, including one never named in any hand-maintained scan list', () => {
+  // The exact bug class this fix closes: a newly-added tracked top-level
+  // directory (here, a synthetic stand-in for the real .githooks/assets
+  // gap the audit found) must be scanned with zero code change, since
+  // there is no directory allowlist left to forget to extend.
+  const dir = tmpGitRepo({
+    'a-brand-new-directory-nobody-ever-listed/notes.md': 'See task-mt6jcfwr-ed62cc for context.\n',
+  });
+  const absFiles = scannableTrackedFiles(dir);
+  const relFiles = absFiles.map((f) => path.relative(dir, f).split(path.sep).join('/'));
+  assert.deepEqual(relFiles, ['a-brand-new-directory-nobody-ever-listed/notes.md']);
+  assert.deepEqual(findLeakedIds(absFiles[0]), ['task-mt6jcfwr-ed62cc']);
 });
 
-test('findRootFiles: reaches package.json at the real repo root (json is not in findFiles\' own extension set)', () => {
-  const rootFiles = findRootFiles();
-  const relRootFiles = rootFiles.map((f) => path.relative(ROOT, f));
-  assert.ok(relRootFiles.includes('package.json'), 'expected findRootFiles() to include package.json');
-  assert.ok(relRootFiles.includes('package-lock.json'), 'expected findRootFiles() to include package-lock.json');
+test('scannableTrackedFiles: covers a root-level tracked file with no subdirectory at all', () => {
+  const dir = tmpGitRepo({ 'README.md': 'See design-standards.md for background.\n' });
+  const files = scannableTrackedFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join('/'));
+  assert.deepEqual(files, ['README.md']);
 });
 
-test('findRootFiles: does not recurse into subdirectories', () => {
-  const rootFiles = findRootFiles();
-  const relRootFiles = rootFiles.map((f) => path.relative(ROOT, f));
-  assert.ok(!relRootFiles.some((f) => f.includes(path.sep)), 'expected every result to be a direct child of ROOT, not a nested path');
+test('scannableTrackedFiles: excludes an untracked file, even one sitting right next to tracked files', () => {
+  const dir = tmpGitRepo({ 'README.md': 'tracked\n' });
+  fs.writeFileSync(path.join(dir, 'ROLLING_PLAN.md'), 'task-mt6jcfwr-ed62cc\n', 'utf8');
+  const files = scannableTrackedFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join('/'));
+  assert.deepEqual(files, ['README.md']);
 });
 
-// Regression coverage for a real, live bug found during a hygiene-
-// verification pass: findRootFiles() reads every root-level .md file off
-// disk with no regard for git-tracked status, so an untracked local file
-// sitting at repo root (ROLLING_PLAN.md -- this session's own living log,
-// gitignored, genuinely full of real task-/decision-ids by design) was
-// being scanned and failing `npm test` in any checkout where that file
-// exists, even though it will never reach the public repo. Never caught
-// by CI, which clones fresh and never materializes an untracked file at
-// all -- only a checkout with real accumulated local state (like this
-// session's own primary checkout) can reproduce it.
-test('gitTrackedFiles: excludes an untracked file from the returned set', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-internal-ids-git-test-'));
-  execFileSync('git', ['init', '-q'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+test('scannableTrackedFiles: excludes a file under a denylisted directory prefix even if force-tracked', () => {
+  const dir = tmpGitRepo({
+    'src/real.js': '// nothing to see here\n',
+    'dist/built.js': '// task-mt6jcfwr-ed62cc would leak here if scanned\n',
+  });
+  const files = scannableTrackedFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join('/'));
+  assert.deepEqual(files, ['src/real.js']);
+});
 
-  const tracked = path.join(dir, 'README.md');
-  fs.writeFileSync(tracked, 'tracked\n', 'utf8');
-  execFileSync('git', ['add', 'README.md'], { cwd: dir });
-  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+test('scannableTrackedFiles: excludes a binary/non-scanned extension even when tracked', () => {
+  const dir = tmpGitRepo({
+    'assets/logo.png': 'not a real png, just a placeholder blob\n',
+    'assets/notes.html': '<p>hello</p>\n',
+  });
+  const files = scannableTrackedFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join('/'));
+  assert.deepEqual(files, ['assets/notes.html']);
+});
 
-  const untracked = path.join(dir, 'ROLLING_PLAN.md');
-  fs.writeFileSync(untracked, 'task-mt6jcfwr-ed62cc\n', 'utf8');
+test('DENY_DIR_PREFIXES stays scoped to real generated/vendored output, never grows back into a scan-scope allowlist', () => {
+  // A loose upper bound, not a golden list -- this test exists to catch the
+  // regression this fix is named after (an allowlist creeping back in
+  // disguised as a "denylist"), not to lock the exact membership. Every
+  // entry must look like build/vendor/test-artifact output, not a real
+  // content directory a human might write copy into.
+  for (const prefix of DENY_DIR_PREFIXES) {
+    assert.ok(prefix.endsWith('/'), `${prefix} should be a directory prefix ending in /`);
+  }
+  assert.ok(DENY_DIR_PREFIXES.length <= 10, 'DENY_DIR_PREFIXES is growing suspiciously large for a defense-in-depth-only list');
+});
 
-  const result = gitTrackedFiles(dir);
-  assert.ok(result.has(path.resolve(tracked)), 'expected the committed file to be reported as tracked');
-  assert.ok(!result.has(path.resolve(untracked)), 'expected the untracked file to be excluded');
+test('SCANNED_EXT_RE matches every extension the prior allowlist scanned, including .yml/.yaml and root-level .json', () => {
+  for (const name of ['a.js', 'a.mjs', 'a.css', 'a.md', 'a.html', 'a.yml', 'a.yaml', 'a.json']) {
+    assert.match(name, SCANNED_EXT_RE, `expected a match for ${name}`);
+  }
+});
+
+test('SCANNED_EXT_RE does not match a binary extension', () => {
+  for (const name of ['a.png', 'a.jpg', 'a.woff2', 'a.ttf']) {
+    assert.doesNotMatch(name, SCANNED_EXT_RE, `expected NO match for ${name}`);
+  }
 });
 
 test('CLI: the real repo passes end to end, including with an untracked ROLLING_PLAN.md-shaped file on disk at root', () => {
@@ -298,4 +260,10 @@ test('CLI: the real repo passes end to end, including with an untracked ROLLING_
   });
   assert.equal(result.status, 0, `expected exit 0, got stderr:\n${result.stderr}`);
   assert.match(result.stdout, /zero leaked ids/);
+});
+
+test('CLI: the real repo now scans .githooks/ and assets/ -- the two directories the external-eye audit found sitting unscanned', () => {
+  const files = scannableTrackedFiles().map((f) => path.relative(ROOT, f).split(path.sep).join('/'));
+  assert.ok(files.some((f) => f.startsWith('.githooks/')), 'expected at least one scanned file under .githooks/');
+  assert.ok(files.some((f) => f.startsWith('assets/')), 'expected at least one scanned file under assets/');
 });
