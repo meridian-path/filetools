@@ -61,5 +61,5 @@ module.exports = {
       answerHtml: 'You get a plain-English message naming the specific problem - a character outside the Base64 alphabet, padding in the wrong place, or a length that is not possible for Base64 - instead of a silent wrong result. Whitespace and line breaks in the pasted text are ignored rather than treated as errors, since that is how Base64 is often shared.',
     },
   ],
-  relatedSlugs: ['remove-duplicate-lines', 'sort-lines', 'hash-generator'],
+  relatedSlugs: ['remove-duplicate-lines', 'sort-lines', 'hash-generator', 'jwt-decoder'],
 };
