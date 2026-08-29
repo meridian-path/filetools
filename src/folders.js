@@ -47,6 +47,13 @@ const FOLDERS = [
   // on that field), so this folder's color axis and its tools' own icon
   // family now agree.
   { key: 'developer', slug: 'developer', label: 'Developer', familyKey: 'dev', description: 'Encoding, hashing, and other developer-utility conversions.' },
+  // Added for the 2026-08-29 Image Resize/Compress tool -- this repo's
+  // first image-*manipulation* tool (distinct from the image-*conversion*
+  // tools folded into 'developer', e.g. heic-to-jpg-png), with room for
+  // future siblings (crop/rotate/watermark). See
+  // src/tools/image-resize-compress.js's own comment on its `family`
+  // field for the taxonomy decision this closes.
+  { key: 'image', slug: 'image', label: 'Image', familyKey: 'image', description: 'Resize and compress images, right in your browser.' },
 ];
 
 const DEFAULT_FOLDER = 'developer';

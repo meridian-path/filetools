@@ -34,6 +34,10 @@ import { countFixture as wordCharacterCountFixture, FIXTURE_TEXT as WORD_CHARACT
 import { convertFixture as unixTimestampFixture, FIXTURE_JSON as UNIX_TIMESTAMP_FIXTURE_JSON } from '../src/examples/unix-timestamp-converter.mjs';
 import { qrFixture, FIXTURE_TEXT as QR_FIXTURE_TEXT } from '../src/examples/qr-code-generator.mjs';
 import { diffFixture as textDiffFixture } from '../src/examples/text-diff.mjs';
+import {
+  fixtureTargetHeight as imageResizeTargetHeight, FIXTURE_SRC_WIDTH as IMAGE_RESIZE_SRC_WIDTH,
+  FIXTURE_SRC_HEIGHT as IMAGE_RESIZE_SRC_HEIGHT, FIXTURE_TARGET_WIDTH as IMAGE_RESIZE_TARGET_WIDTH,
+} from '../src/examples/image-resize-compress.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -619,4 +623,23 @@ test('qr-code-generator example: the rendered HTML shows a real <svg> QR code an
   const html = exampleFor('qr-code-generator');
   assert.ok(html.includes('<svg'));
   assert.ok(html.includes(`Encoding: ${QR_FIXTURE_TEXT}`));
+});
+
+test('image-resize-compress example: the fixture height is computed by the same real aspect-ratio math the live tool uses, not hand-typed', () => {
+  // 4000x3000 (4:3) resized to a 1200-wide target must land on exactly
+  // 900 -- the real lockedCounterpart() computation, not a copied number.
+  assert.equal(IMAGE_RESIZE_SRC_WIDTH, 4000);
+  assert.equal(IMAGE_RESIZE_SRC_HEIGHT, 3000);
+  assert.equal(IMAGE_RESIZE_TARGET_WIDTH, 1200);
+  assert.equal(imageResizeTargetHeight(), 900);
+});
+
+test('image-resize-compress example: the rendered HTML shows the before/after photo diagram with the real computed dimensions in its caption', () => {
+  const html = exampleFor('image-resize-compress');
+  assert.ok(html.includes('<svg'));
+  assert.ok(html.includes('Before'));
+  assert.ok(html.includes('After'));
+  const note = noteFor('image-resize-compress');
+  assert.ok(note.includes('4,000×3,000'));
+  assert.ok(note.includes('1,200×900'));
 });

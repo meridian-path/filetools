@@ -133,6 +133,23 @@ function devMotif() {
   return brackets + slash;
 }
 
+/**
+ * The image family's plate motif (Image Resize/Compress, this repo's first
+ * image-*manipulation* tool): a sun-and-mountains silhouette, the same
+ * "standard image-placeholder convention" shape
+ * src/pageStripDiagrams.mjs's photo() already draws for tools whose real
+ * output can't be computed at build time -- reused here (recolored to
+ * this plate's own knockout-white fill instead of that diagram's
+ * currentColor stroke) so the site's two different "this represents a
+ * photo" drawings agree with each other rather than inventing a second
+ * unrelated image glyph.
+ */
+function imageMotif() {
+  const sun = `<circle cx="9.5" cy="11" r="2" fill="${SURFACE}"/>`;
+  const mountains = `<path d="M5.5 21 10 14.5 13 18 17.5 11 19.5 21Z" fill="${SURFACE}" opacity="0.85"/>`;
+  return sun + mountains;
+}
+
 const PLATE_MOTIFS = {
   pdf: pdfMotif,
   csv: csvMotif,
@@ -140,6 +157,7 @@ const PLATE_MOTIFS = {
   sheet: sheetMotif,
   text: textMotif,
   dev: devMotif,
+  image: imageMotif,
 };
 
 function pipRing() {
@@ -163,6 +181,12 @@ const VERB_PATHS = {
   // shortest last -- the same shape the tool's own frequency table has
   // (most-frequent word first).
   count: `<path ${PIP_STROKE} d="M22 27V21.7M25 27V24M28 27V25.8"/>`,
+  // Image Resize/Compress's verb: a diagonal resize-handle arrow -- a
+  // straight line between two opposite corners with an L-shaped corner
+  // bracket at each end pointing away from center, the same "drag this
+  // corner to resize" affordance convention as a real OS window/image
+  // editor's own resize handle.
+  resize: `<path ${PIP_STROKE} d="M22 27 27 22M22 24.5V27H24.5M27 24.5V22H24.5"/>`,
 };
 
 /**

@@ -9,15 +9,15 @@ test('sitemapPathsFor lists the root, how-this-works, privacy, one path per fold
   ];
   assert.deepEqual(sitemapPathsFor(tools), [
     '', 'how-this-works/', 'privacy/',
-    'pdf/', 'spreadsheets/', 'data-formats/', 'text/', 'developer/',
+    'pdf/', 'spreadsheets/', 'data-formats/', 'text/', 'developer/', 'image/',
     'pdf/merge-pdf/', 'data/base64-encode-decode/',
   ]);
 });
 
-test('sitemapPathsFor returns the static paths plus the 5 folder paths for an empty tool list', () => {
+test('sitemapPathsFor returns the static paths plus the 6 folder paths for an empty tool list', () => {
   assert.deepEqual(sitemapPathsFor([]), [
     '', 'how-this-works/', 'privacy/',
-    'pdf/', 'spreadsheets/', 'data-formats/', 'text/', 'developer/',
+    'pdf/', 'spreadsheets/', 'data-formats/', 'text/', 'developer/', 'image/',
   ]);
 });
 

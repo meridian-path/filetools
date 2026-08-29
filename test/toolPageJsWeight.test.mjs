@@ -84,14 +84,15 @@ test('every text-folder tool (Phase 3(e), the last folder) also states its real 
   }
 });
 
-test('with all 5 folders now rolled out, every single tool on the site states its real JS weight', () => {
-  // Phase 3(e) (text) was the last folder in the taxonomy -- SPEED_FEATURE_FOLDERS
-  // now covers developer/data-formats/spreadsheets/pdf/text, i.e. every real
-  // folder. This is the strongest version of the earlier per-folder tests:
-  // it iterates the live TOOLS registry directly rather than a hand-copied
-  // slug list, so it can never itself go stale the way a hardcoded list
-  // would. If a 6th folder is ever added without extending
-  // SPEED_FEATURE_FOLDERS, this is the test that catches it.
+test('with every folder now rolled out, every single tool on the site states its real JS weight', () => {
+  // Phase 3(e) (text) covered developer/data-formats/spreadsheets/pdf/text;
+  // 'image' (the 6th folder, added 2026-08-29) was folded into
+  // SPEED_FEATURE_FOLDERS the same pass it was introduced. This is the
+  // strongest version of the earlier per-folder tests: it iterates the
+  // live TOOLS registry directly rather than a hand-copied slug list, so
+  // it can never itself go stale the way a hardcoded list would. If a
+  // future folder is ever added without extending SPEED_FEATURE_FOLDERS,
+  // this is the test that catches it.
   for (const tool of TOOLS) {
     assertHasWeightSentence(tool.slug);
   }

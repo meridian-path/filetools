@@ -124,6 +124,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
     { label: 'JSON & Data Formats', count: '6', rows: 6 },
     { label: 'Text', count: '6', rows: 6 },
     { label: 'Developer', count: '10', rows: 10 },
+    { label: 'Image', count: '1', rows: 1 },
   ]);
   await page.close();
 });
@@ -176,7 +177,7 @@ test('path bar: never wraps or causes horizontal scroll at 360px, even on the lo
   await page.close();
 });
 
-test('footer: reorganized into the 5 folders (not the old 2 categories), each folder heading links to its own folder page', async () => {
+test('footer: reorganized into the 6 folders (not the old 2 categories), each folder heading links to its own folder page', async () => {
   const page = await browser.newPage();
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   const headings = await page.$$eval('.footer-group h3 a', (els) => els.map((e) => ({ text: e.textContent.trim(), href: e.getAttribute('href') })));
@@ -186,6 +187,7 @@ test('footer: reorganized into the 5 folders (not the old 2 categories), each fo
     { text: 'JSON & Data Formats', href: '/data-formats/' },
     { text: 'Text', href: '/text/' },
     { text: 'Developer', href: '/developer/' },
+    { text: 'Image', href: '/image/' },
   ]);
   await page.close();
 });

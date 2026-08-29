@@ -31,7 +31,7 @@ const { familyOf } = require('../families.js');
  * as "Dev" instead of sharing plain-text tools' "Text" chip.
  */
 const FAMILY_KIND_LABELS = {
-  pdf: 'PDF', csv: 'CSV', json: 'JSON', sheet: 'Sheet', text: 'Text', dev: 'Dev',
+  pdf: 'PDF', csv: 'CSV', json: 'JSON', sheet: 'Sheet', text: 'Text', dev: 'Dev', image: 'Image',
 };
 
 /**

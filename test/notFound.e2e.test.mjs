@@ -67,11 +67,11 @@ test('404: real noindex meta, "~ / not found" path bar, and h1 "File not found"'
   await page.close();
 });
 
-test('404: the window lists all five folders as rows, and the status bar names the real total tool count', async () => {
+test('404: the window lists all six folders as rows, and the status bar names the real total tool count', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}404.html`, { waitUntil: 'networkidle' });
   const labels = await page.$$eval('.window-sidebar-row .window-sidebar-label', (els) => els.map((e) => e.textContent.trim()));
-  assert.deepEqual(labels, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer']);
+  assert.deepEqual(labels, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer', 'Image']);
   const statusText = await page.locator('[data-window-status]').textContent();
   assert.match(statusText, /^0 of \d+ files at this path$/);
   await page.close();
