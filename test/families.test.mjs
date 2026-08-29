@@ -93,14 +93,16 @@ test('the taxonomy is exactly the spec\'s 7-family (5 format families + \'dev\' 
     'uuid-generator': 'dev',
     'regex-tester': 'dev',
     'sql-formatter': 'dev',
-    'heic-to-jpg-png': 'dev',
     'unix-timestamp-converter': 'dev',
     'qr-code-generator': 'dev',
     'jwt-decoder': 'dev',
 
     // 'image' -- this repo's first image-*manipulation* tool (soak-backlog
     // pass 1, item 5's own taxonomy flag). Distinct from the
-    // image-*conversion* tools above (folded into 'dev').
+    // image-*conversion* tools above (folded into 'dev'). heic-to-jpg-png
+    // moved here from 'dev' in a 2026-08-29 craft-audit fix -- see its own
+    // src/tools/heic-to-jpg-png.js comment on this field for why.
     'image-resize-compress': 'image',
+    'heic-to-jpg-png': 'image',
   });
 });

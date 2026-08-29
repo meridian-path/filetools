@@ -74,13 +74,13 @@ const FOLDER_PAGE_CONTENT = {
     title: 'Developer Tools - Free, In Your Browser | filetools',
     h1: 'Developer tools',
     metaDescription: 'Generate hashes and UUIDs, test regex, or format SQL - free, runs in your browser, nothing uploaded.',
-    intro: 'Seven developer utilities: encode or decode Base64, URLs, and HTML entities, generate cryptographic hashes or UUIDs, test a regular expression with live match highlighting, and format or minify SQL queries. Every one of these runs entirely client-side, with nothing sent to a server.',
+    intro: 'Ten developer utilities: encode or decode Base64, URLs, and HTML entities, decode a JWT, generate cryptographic hashes, UUIDs, or QR codes, test a regular expression with live match highlighting, convert Unix timestamps, and format or minify SQL queries. Every one of these runs entirely client-side, with nothing sent to a server.',
   },
   image: {
     title: 'Image Tools - Free, In Your Browser | filetools',
     h1: 'Image tools',
-    metaDescription: 'Resize or compress a JPG, PNG, or WebP image - free, runs in your browser, nothing uploaded.',
-    intro: 'One tool for working with images: resize a JPG, PNG, or WebP photo and compress it with a live quality preview as you adjust the settings. It runs entirely in your browser - your photo is never uploaded.',
+    metaDescription: 'Resize or compress a JPG, PNG, or WebP image, or convert an iPhone HEIC photo - free, runs in your browser, nothing uploaded.',
+    intro: 'Two tools for working with images: resize or compress a JPG, PNG, or WebP photo with a live quality preview, or convert an iPhone HEIC photo to JPG or PNG. Both run entirely in your browser - your photo is never uploaded.',
   },
 };
 

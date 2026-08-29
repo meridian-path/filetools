@@ -11,14 +11,19 @@ module.exports = {
   deck: 'Drop one or more HEIC photos from your iPhone and convert them to JPG or PNG, right in your browser. Nothing is uploaded, so there’s no daily limit and no account.',
   clientEntry: 'heicToImages',
   // Registration fragment -- see pdf-merge.js's comment above its own
-  // `family` field for what these mean and how they're assembled. 'dev'
-  // (not a new 'image' family): the same encoding/format-conversion shape
-  // as base64/url-encode/html-entity, which already live here despite not
-  // being classic developer tools -- see hash-generator.js's own comment
-  // on this field. No PDF is involved, so this isn't the `pdf` family
-  // jpg-png-to-pdf/pdf-to-jpg-png use.
-  family: 'dev',
-  folder: 'developer',
+  // `family` field for what these mean and how they're assembled.
+  // 'image' (craft-audit fix, 2026-08-29 reference-library audit):
+  // originally filed under 'dev' as the same encoding/format-conversion
+  // shape as base64/url-encode/html-entity, but this tool's own real
+  // audience is an iPhone photo owner, not a developer, and its own deck
+  // already says so ("Drop one or more HEIC photos from your iPhone...") -
+  // a visitor scanning folders for an image tool was never going to open
+  // Developer to find it. Moved alongside image-resize-compress.js, this
+  // site's other genuine image-manipulation tool. Display/breadcrumb only -
+  // the page's own URL (/data/heic-to-jpg-png/) is unchanged, no redirect
+  // risk.
+  family: 'image',
+  folder: 'image',
   mark: { verb: 'convert' },
   // HEIC's whole point is efficient compression, so a real iPhone photo is
   // usually well under this -- same generous single-image ceiling

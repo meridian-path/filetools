@@ -67,8 +67,8 @@ test('the taxonomy is exactly the spec\'s 6-folder, 43-slug assignment (folder t
     spreadsheets: ['compare-csv', 'csv-to-json', 'csv-to-sql-insert', 'csv-to-xlsx', 'html-table-to-csv', 'merge-csv', 'split-csv', 'transpose-csv', 'xlsx-to-csv', 'xlsx-to-json'].sort(),
     'data-formats': ['flatten-json', 'json-diff', 'json-minify-beautify', 'json-to-csv', 'json-to-yaml', 'xml-to-json', 'yaml-to-json'].sort(),
     text: ['remove-duplicate-lines', 'sort-lines', 'text-case-converter', 'text-diff', 'word-frequency-counter', 'word-character-counter'].sort(),
-    developer: ['base64-encode-decode', 'hash-generator', 'heic-to-jpg-png', 'html-entity-encode-decode', 'jwt-decoder', 'regex-tester', 'sql-formatter', 'url-encode-decode', 'uuid-generator', 'unix-timestamp-converter', 'qr-code-generator'].sort(),
-    image: ['image-resize-compress'],
+    developer: ['base64-encode-decode', 'hash-generator', 'html-entity-encode-decode', 'jwt-decoder', 'regex-tester', 'sql-formatter', 'url-encode-decode', 'uuid-generator', 'unix-timestamp-converter', 'qr-code-generator'].sort(),
+    image: ['image-resize-compress', 'heic-to-jpg-png'].sort(),
   });
 });
 
