@@ -45,7 +45,7 @@ test('familyOf() falls back to the default family for an unrecognized slug, neve
   assert.equal(familyOf(undefined), DEFAULT_FAMILY);
 });
 
-test('the taxonomy is exactly the spec\'s 7-family (5 format families + \'dev\' + \'image\'), 42-slug assignment', () => {
+test('the taxonomy is exactly the spec\'s 7-family (5 format families + \'dev\' + \'image\'), 43-slug assignment', () => {
   assert.deepEqual(FAMILY_BY_SLUG, {
     'merge-pdf': 'pdf',
     'split-pdf': 'pdf',
@@ -96,6 +96,7 @@ test('the taxonomy is exactly the spec\'s 7-family (5 format families + \'dev\' 
     'heic-to-jpg-png': 'dev',
     'unix-timestamp-converter': 'dev',
     'qr-code-generator': 'dev',
+    'jwt-decoder': 'dev',
 
     // 'image' -- this repo's first image-*manipulation* tool (soak-backlog
     // pass 1, item 5's own taxonomy flag). Distinct from the

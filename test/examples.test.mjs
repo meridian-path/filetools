@@ -36,6 +36,7 @@ import { qrFixture, FIXTURE_TEXT as QR_FIXTURE_TEXT } from '../src/examples/qr-c
 import { diffFixture as textDiffFixture } from '../src/examples/text-diff.mjs';
 import { diffFixture as jsonDiffFixture } from '../src/examples/json-diff.mjs';
 import { diffStats } from '../src/pure/jsonDiff.mjs';
+import { decodeFixture as jwtDecodeFixture, FIXTURE_JWT as JWT_DECODE_FIXTURE_JWT } from '../src/examples/jwt-decoder.mjs';
 import {
   fixtureTargetHeight as imageResizeTargetHeight, FIXTURE_SRC_WIDTH as IMAGE_RESIZE_SRC_WIDTH,
   FIXTURE_SRC_HEIGHT as IMAGE_RESIZE_SRC_HEIGHT, FIXTURE_TARGET_WIDTH as IMAGE_RESIZE_TARGET_WIDTH,
@@ -632,6 +633,24 @@ test('json-diff example: the rendered HTML shows the real diff tree with the cha
   assert.ok(html.includes('data-status="added">      &quot;reviewer&quot;'));
   assert.ok(html.includes('1 changed'));
   assert.ok(html.includes('1 added'));
+});
+
+test('jwt-decoder example: the fixture decodes the real header and an already-expired exp claim', () => {
+  const result = jwtDecodeFixture();
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.header, { alg: 'HS256', typ: 'JWT' });
+  assert.deepEqual(result.payload, { sub: 'user-42', name: 'Ada Lovelace', exp: 1704067200 });
+  assert.equal(result.timeClaims.length, 1);
+  assert.equal(result.timeClaims[0].key, 'exp');
+  assert.equal(result.timeClaims[0].isPast, true);
+});
+
+test('jwt-decoder example: the rendered HTML shows the raw token and the real decoded header/payload/expiry', () => {
+  const html = exampleFor('jwt-decoder');
+  assert.ok(html.includes(JWT_DECODE_FIXTURE_JWT), 'expected the raw fixture token in the Input block');
+  assert.ok(html.includes('HS256'));
+  assert.ok(html.includes('Ada Lovelace'));
+  assert.ok(html.includes('expired'));
 });
 
 test('qr-code-generator example: the fixture encodes the real URL as a 25x25-module QR code', () => {

@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 42-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 43-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -105,6 +105,7 @@ test('MARKS is exactly the fixed 42-row plate/verb/ink table, no more, no fewer'
     'heic-to-jpg-png': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'unix-timestamp-converter': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'qr-code-generator': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'jwt-decoder': { plate: 'dev', verb: 'convert', ink: 'dev' },
     // 'image' plate/ink (2026-08-29 Image Resize/Compress taxonomy
     // addition) -- see families.test.mjs's own comment on this same
     // taxonomy change.
