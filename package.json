@@ -31,9 +31,11 @@
     "heic2any": "^0.0.4",
     "js-yaml": "4.3.1",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.10.38"
+    "pdfjs-dist": "^4.10.38",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
+    "jsqr": "^1.4.0",
     "lighthouse": "^13.4.1",
     "playwright": "^1.62.1"
   },

@@ -32,6 +32,7 @@ import { matchFixture as regexMatchFixture, FIXTURE_TEST_STRING as REGEX_FIXTURE
 import { beautifyFixture as sqlFormatterFixture } from '../src/examples/sql-formatter.mjs';
 import { countFixture as wordCharacterCountFixture, FIXTURE_TEXT as WORD_CHARACTER_FIXTURE_TEXT } from '../src/examples/word-character-counter.mjs';
 import { convertFixture as unixTimestampFixture, FIXTURE_JSON as UNIX_TIMESTAMP_FIXTURE_JSON } from '../src/examples/unix-timestamp-converter.mjs';
+import { qrFixture, FIXTURE_TEXT as QR_FIXTURE_TEXT } from '../src/examples/qr-code-generator.mjs';
 import { diffFixture as textDiffFixture } from '../src/examples/text-diff.mjs';
 import { SITE_CSS } from '../src/css.js';
 
@@ -607,4 +608,15 @@ test('text-diff example: the rendered HTML shows the two-pane grid with the real
   assert.ok(html.includes('This line will be removed.'));
   assert.ok(html.includes('A brand new line goes here.'));
   assert.ok(html.includes('data-diff-status="empty"'));
+});
+
+test('qr-code-generator example: the fixture encodes the real URL as a 25x25-module QR code', () => {
+  const qr = qrFixture();
+  assert.equal(qr.getModuleCount(), 25);
+});
+
+test('qr-code-generator example: the rendered HTML shows a real <svg> QR code and the encoded text caption', () => {
+  const html = exampleFor('qr-code-generator');
+  assert.ok(html.includes('<svg'));
+  assert.ok(html.includes(`Encoding: ${QR_FIXTURE_TEXT}`));
 });

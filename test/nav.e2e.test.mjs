@@ -123,7 +123,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
     { label: 'CSV & Spreadsheets', count: '10', rows: 10 },
     { label: 'JSON & Data Formats', count: '6', rows: 6 },
     { label: 'Text', count: '6', rows: 6 },
-    { label: 'Developer', count: '9', rows: 9 },
+    { label: 'Developer', count: '10', rows: 10 },
   ]);
   await page.close();
 });
@@ -195,7 +195,7 @@ test('folder page: renders a real, populated tool list matching its own folder',
   await page.goto(`${baseUrl}developer/`, { waitUntil: 'networkidle' });
   await expectH1(page, 'Developer tools');
   const rowNames = await page.$$eval('.tool-list .tool-row-name', (els) => els.map((e) => e.textContent.trim()));
-  assert.equal(rowNames.length, 9);
+  assert.equal(rowNames.length, 10);
   assert.ok(rowNames.includes('Hash Generator'));
   assert.ok(rowNames.includes('Regex Tester'));
   await page.close();

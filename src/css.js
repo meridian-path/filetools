@@ -710,6 +710,30 @@ ${designTokensCss(DESIGN_TOKENS)}
     min-height: 36px;
   }
 
+  /* -------------------------------------------------------------------
+     QR code generator (src/browser/qrCodeGenerator.client.js) -- the
+     rendered preview canvas plus its "Encoding: ..." caption, centered
+     in the same table-block panel every customPanelMode tool uses.
+     ------------------------------------------------------------------- */
+  .qr-preview-canvas {
+    display: block;
+    margin: var(--space-4) auto 0;
+    max-width: 100%;
+    height: auto;
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+  /* Same shape as .qr-preview-canvas above, sized for the example panel's
+     smaller fixed-width worked-example context rather than the live
+     tool's own full-width result area. */
+  .qr-example-figure {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  .qr-example-caption {
+    text-align: center;
+  }
+
   .page-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
