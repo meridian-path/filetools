@@ -244,9 +244,18 @@ function renderToolPage(tool, example = {}) {
   // taxonomy/nav spec section 1.4/3.4): Home -> folder -> tool. The folder segment
   // links to that folder's own index page even for a /data/-hosted tool
   // (the display folder never mirrors the physical URL category) -- this
-  // display path deliberately diverges from the physical URL, which
-  // Google's breadcrumb documentation explicitly prefers over mirroring
-  // URL structure (cited in full in src/pages/folder.js).
+  // display path deliberately diverges from the physical URL. Google's own
+  // breadcrumb structured-data guidance supports a curated hierarchy that
+  // doesn't have to mirror URL segments (developers.google.com/search/docs/
+  // appearance/structured-data/breadcrumb), which is what this site's real,
+  // deliberately-built 5-folder taxonomy is: every non-PDF tool lives at
+  // the flat /data/<slug>/ URL, but the breadcrumb shows its real family
+  // (spreadsheets/data-formats/text/developer/image) instead of a
+  // meaningless "data" segment. Re-audited 2026-08-29 specifically for
+  // this mismatch and kept deliberately: migrating the 35 live indexed
+  // URLs to match the breadcrumb instead was ruled out, since this site
+  // deploys to GitHub Pages, which has no server-side 301 redirect layer
+  // to migrate them safely.
   const folder = FOLDER_BY_KEY[folderOf(tool.slug)];
   const folderUrl = url(`${folder.slug}/`);
 
