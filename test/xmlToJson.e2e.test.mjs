@@ -151,7 +151,7 @@ test('xml-to-json: pasting whitespace-only text shows a friendly status, not a b
   // `.dz-status` the unrelated file drop-zone owns.
   await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
   const msg = await page.locator('.paste-status').textContent();
-  assert.match(msg, /paste some/i);
+  assert.match(msg, /paste some xml first/i);
   await page.close();
 });
 

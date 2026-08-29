@@ -158,6 +158,6 @@ test('csv-to-xlsx: pasting whitespace-only text shows a friendly error, not a ra
   // `.dz-status` the unrelated file drop-zone owns.
   await page.waitForFunction(() => (document.querySelector('.paste-status')?.textContent || '').length > 0);
   const msg = await page.locator('.paste-status').textContent();
-  assert.match(msg, /paste some/i);
+  assert.match(msg, /paste some csv first/i);
   await page.close();
 });

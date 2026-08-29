@@ -195,7 +195,7 @@ test('json-minify-beautify: pasting whitespace-only text shows a friendly status
   // regression this replaces.
   await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
   const msg = await page.locator('.paste-status').textContent();
-  assert.match(msg, /paste some/i);
+  assert.match(msg, /paste some json first/i);
   await page.close();
 });
 

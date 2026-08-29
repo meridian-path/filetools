@@ -186,7 +186,7 @@ test('html-table-to-csv: clicking convert with an empty textarea shows an error 
     return el && el.textContent && el.textContent.trim().length > 0;
   });
   const statusText = await page.locator('.paste-status').textContent();
-  assert.match(statusText, /paste some markup/i);
+  assert.match(statusText, /paste some html markup first/i);
   await page.close();
 });
 

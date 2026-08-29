@@ -145,7 +145,7 @@ test('remove-duplicate-lines: clicking convert with an empty textarea shows an e
     return el && el.textContent && el.textContent.trim().length > 0;
   });
   const statusText = await page.locator('.paste-status').textContent();
-  assert.match(statusText, /paste some/i);
+  assert.match(statusText, /paste a list first/i);
   await page.close();
 });
 
