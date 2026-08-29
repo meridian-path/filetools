@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert a Bank or Card Statement PDF to CSV',
   title: 'Bank Statement PDF to CSV - In Your Browser | filetools',
   metaDescription: 'Turn a bank or card statement PDF into a CSV of transactions, free and in your browser. No upload, no sign-up - your financial data never leaves your device.',
-  deck: 'Reads the transaction table out of a statement PDF, including ones that span several pages, and combines it into a single CSV. Nothing is uploaded, ever.',
+  deck: 'Reads the transaction table out of a statement PDF, including ones that span several pages, and combines it into a single CSV.',
   clientEntry: 'statementToCsv',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

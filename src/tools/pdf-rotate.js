@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Rotate a PDF',
   title: 'Rotate PDF Pages Free - In Your Browser | filetools',
   metaDescription: 'Rotate all or individual pages in a PDF, free, with no upload and no sign-up. Your files never leave your device.',
-  deck: 'Rotate every page, or just the ones that need it. Nothing is uploaded.',
+  deck: 'Rotate every page, or just the ones that need it.',
   clientEntry: 'pdfPages',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

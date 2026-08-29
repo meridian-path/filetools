@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Count Words & Characters',
   title: 'Word & Character Counter - Free Text Counter | filetools',
   metaDescription: 'Paste any text and watch word count, character count, sentence count, and reading time update live as you type, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste or type any text and watch the word count, character count, sentence count, and reading time update on every keystroke. Nothing is sent anywhere.',
+  deck: 'Paste or type any text and watch the word count, character count, sentence count, and reading time update on every keystroke.',
   clientEntry: 'wordCharacterCounter',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

@@ -10,7 +10,7 @@ module.exports = {
   h1: 'HTML Entity Encoder and Decoder',
   title: 'HTML Entity Encoder and Decoder | filetools',
   metaDescription: 'Encode text to HTML entities or decode HTML entities back to plain text, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste text or entity-encoded markup and convert it either direction: escape the characters that are meaningful in HTML, or decode named and numeric entities back to plain text. Nothing is sent anywhere.',
+  deck: 'Paste text or entity-encoded markup and convert it either direction: escape the characters that are meaningful in HTML, or decode named and numeric entities back to plain text.',
   clientEntry: 'htmlEntity',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

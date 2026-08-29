@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert YAML to JSON',
   title: 'Convert YAML to JSON - In Your Browser | filetools',
   metaDescription: 'Paste a YAML document or drop a .yaml/.yml file and get JSON back, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste YAML, or drop a .yaml/.yml file, and download it as pretty-printed JSON. Nothing is sent anywhere.',
+  deck: 'Paste YAML, or drop a .yaml/.yml file, and download it as pretty-printed JSON.',
   clientEntry: 'yamlToJson',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

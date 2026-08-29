@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert Excel (.xlsx) to CSV',
   title: 'Convert Excel XLSX to CSV - In Your Browser | filetools',
   metaDescription: 'Turn an .xlsx spreadsheet into a CSV file for every sheet it contains, free and in your browser. No upload, no sign-up, no Excel needed.',
-  deck: 'Drop an .xlsx workbook and get a real, correctable preview of every sheet it contains, then download each one as CSV. Nothing is sent anywhere.',
+  deck: 'Drop an .xlsx workbook and get a real, correctable preview of every sheet it contains, then download each one as CSV.',
   clientEntry: 'xlsxToCsv',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

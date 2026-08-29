@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Split a PDF',
   title: 'Split a PDF - Extract or Separate Pages | filetools',
   metaDescription: 'Pull specific pages out of a PDF, or split every page into its own file, free and in your browser. No upload, no sign-up.',
-  deck: 'Pick the pages you want, or split every page into its own file. Nothing is uploaded.',
+  deck: 'Pick the pages you want, or split every page into its own file.',
   clientEntry: 'pdfPages',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

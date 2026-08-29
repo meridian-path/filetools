@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Test Regular Expressions',
   title: 'Regex Tester and Debugger - Live Matches | filetools',
   metaDescription: 'Test JavaScript regular expressions with live match highlighting and a capture-group breakdown, updated as you type, free and in your browser.',
-  deck: 'Type a pattern and a test string, and see every match highlighted live, with each capture group broken out. Nothing is sent anywhere.',
+  deck: 'Type a pattern and a test string, and see every match highlighted live, with each capture group broken out.',
   clientEntry: 'regexTester',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

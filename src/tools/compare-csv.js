@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Compare Two CSV Files',
   title: 'Compare Two CSV Files (Diff) - In Your Browser | filetools',
   metaDescription: 'Compare two CSV files free, cell by cell, with no upload and no sign-up. Added, removed, and changed rows are highlighted, even when row order differs.',
-  deck: 'Drop two CSV files and see exactly what changed, cell by cell - added rows, removed rows, and edited values, all highlighted. Pick a unique column and reordered rows still match up correctly. Nothing is uploaded.',
+  deck: 'Drop two CSV files and see exactly what changed, cell by cell - added rows, removed rows, and edited values, all highlighted. Pick a unique column and reordered rows still match up correctly.',
   clientEntry: 'csvDiff',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

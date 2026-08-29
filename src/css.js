@@ -566,12 +566,6 @@ ${designTokensCss(DESIGN_TOKENS)}
     color: var(--color-muted);
     margin: 0;
   }
-  .dz-proof {
-    text-align: center;
-    font-size: var(--text-sm);
-    color: var(--color-muted);
-    margin: var(--space-3) 0 0;
-  }
   .dz-status {
     text-align: center;
     font-size: var(--text-sm);

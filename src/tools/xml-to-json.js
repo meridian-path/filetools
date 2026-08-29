@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert XML to JSON',
   title: 'Convert XML to JSON - In Your Browser | filetools',
   metaDescription: 'Paste an XML document or drop a .xml file and get JSON back, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste XML, or drop a .xml file, and download it as pretty-printed JSON. Nothing is sent anywhere.',
+  deck: 'Paste XML, or drop a .xml file, and download it as pretty-printed JSON.',
   clientEntry: 'xmlToJson',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

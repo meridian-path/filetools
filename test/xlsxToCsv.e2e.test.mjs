@@ -225,7 +225,7 @@ test('xlsx-to-csv: a file that isn\'t a real zip/workbook gets a clear error, ne
 test('the word "upload" never appears inside the dropzone control itself (design-standard language rule)', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/xlsx-to-csv/`, { waitUntil: 'networkidle' });
-  const dzText = await page.locator('#tool .dropzone, #tool .dz-caption, #tool .dz-proof').allTextContents();
+  const dzText = await page.locator('#tool .dropzone, #tool .dz-caption').allTextContents();
   assert.ok(!dzText.join(' ').toLowerCase().includes('upload'));
   await page.close();
 });

@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Minify and Beautify JSON',
   title: 'Minify and Beautify JSON Online | filetools',
   metaDescription: 'Paste JSON or drop a .json file and get both the minified and beautified (pretty-printed) versions instantly, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste any JSON, or drop a .json file, and see the minified and beautified versions side by side, updated instantly. Nothing is sent anywhere.',
+  deck: 'Paste any JSON, or drop a .json file, and see the minified and beautified versions side by side, updated instantly.',
   clientEntry: 'jsonMinifyBeautify',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

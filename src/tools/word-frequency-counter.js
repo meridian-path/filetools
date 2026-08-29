@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Count Word Frequency in Text',
   title: 'Word Frequency Counter and Analyzer | filetools',
   metaDescription: 'Paste or drop a text file and get every word ranked by how often it appears, plus quick stats, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste any text, or drop a .txt file, and see every word ranked by how often it appears, plus quick stats on length and repetition. Nothing is sent anywhere.',
+  deck: 'Paste any text, or drop a .txt file, and see every word ranked by how often it appears, plus quick stats on length and repetition.',
   clientEntry: 'wordFrequency',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

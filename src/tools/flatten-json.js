@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Flatten Nested JSON to a Flat Object or CSV',
   title: 'Flatten Nested JSON to CSV or a Flat Object | filetools',
   metaDescription: 'Paste nested JSON or drop a .json file and get it back flattened to dot-notation keys, downloadable as JSON or CSV, free and in your browser.',
-  deck: 'Paste nested JSON, or drop a .json file, and download it flattened to dot-notation keys (or your own delimiter), as JSON or CSV. Nothing is sent anywhere.',
+  deck: 'Paste nested JSON, or drop a .json file, and download it flattened to dot-notation keys (or your own delimiter), as JSON or CSV.',
   clientEntry: 'flattenJson',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

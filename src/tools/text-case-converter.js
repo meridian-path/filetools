@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert Text Case',
   title: 'Text Case Converter Online | filetools',
   metaDescription: 'Paste text or drop a .txt file and get UPPERCASE, lowercase, Title Case, camelCase, snake_case, and kebab-case all at once, free and in your browser.',
-  deck: 'Paste any text, or drop a .txt file, and get all six cases at once: UPPERCASE, lowercase, Title Case, camelCase, snake_case, and kebab-case. Nothing is sent anywhere.',
+  deck: 'Paste any text, or drop a .txt file, and get all six cases at once: UPPERCASE, lowercase, Title Case, camelCase, snake_case, and kebab-case.',
   clientEntry: 'textCaseConverter',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

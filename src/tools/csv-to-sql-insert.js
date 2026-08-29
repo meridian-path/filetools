@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert CSV to SQL INSERT Statements',
   title: 'CSV to SQL INSERT Generator | filetools',
   metaDescription: 'Paste CSV or drop a .csv file and get ready-to-run SQL INSERT statements for MySQL, PostgreSQL, SQL Server, or Oracle, free and in your browser.',
-  deck: 'Paste CSV data, or drop a .csv file, and get ready-to-run SQL INSERT statements for the database of your choice. Nothing is sent anywhere.',
+  deck: 'Paste CSV data, or drop a .csv file, and get ready-to-run SQL INSERT statements for the database of your choice.',
   clientEntry: 'csvToSqlInsert',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

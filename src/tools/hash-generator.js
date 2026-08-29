@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Generate File and Text Hashes',
   title: 'MD5, SHA-1, SHA-256, SHA-512 Hash Generator | filetools',
   metaDescription: 'Paste text or drop one or more files and get MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes instantly, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste text, or drop one or more files, and get MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes for each one. Nothing is sent anywhere.',
+  deck: 'Paste text, or drop one or more files, and get MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes for each one.',
   clientEntry: 'hashGenerator',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

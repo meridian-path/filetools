@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Format and Minify SQL',
   title: 'SQL Formatter and Beautifier Online | filetools',
   metaDescription: 'Paste a SQL query or drop a .sql file and get both a beautified (indented, readable) and a minified version instantly, free and in your browser.',
-  deck: 'Paste any SQL query, or drop a .sql file, and see the beautified and minified versions side by side, updated instantly. Nothing is sent anywhere.',
+  deck: 'Paste any SQL query, or drop a .sql file, and see the beautified and minified versions side by side, updated instantly.',
   clientEntry: 'sqlFormatter',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

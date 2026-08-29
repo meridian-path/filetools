@@ -159,8 +159,7 @@ function renderToolPage(tool, example = {}) {
         <p class="dz-caption">Up to ${formatMb(MAX_BYTES_BY_CLIENT[tool.clientEntry] || DEFAULT_MAX_BYTES)} per file. Stays on this device.</p>
         <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
         <button type="button" class="btn-secondary dz-cancel">Cancel</button>
-      </div>
-      <p class="dz-proof">Nothing is sent anywhere. Turn off your Wi-Fi and this page still works - try it.</p>`;
+      </div>`;
 
   // Real, generated (not drawn) live output example -- fills the empty
   // right half of the page at >=1024px. A tool with no example module yet

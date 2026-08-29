@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Sort a List or CSV by Column',
   title: 'Sort a Text List or CSV File by Column | filetools',
   metaDescription: 'Paste a list or drop a .txt/.csv file and get it back sorted by any column, ascending or descending, free and in your browser.',
-  deck: 'Paste a list, or drop a .txt or .csv file, and download it back sorted - pick the column, numeric or alphabetic, ascending or descending. Nothing is sent anywhere.',
+  deck: 'Paste a list, or drop a .txt or .csv file, and download it back sorted - pick the column, numeric or alphabetic, ascending or descending.',
   clientEntry: 'sortLines',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.
