@@ -22,7 +22,7 @@ export const slug = 'json-diff';
 
 export const ariaLabel = 'Example comparison of two JSON objects showing one changed key, one added array element, and unchanged siblings, with key order ignored';
 
-export const note = 'One field changed, one array element added, one nested field unchanged - a small sample of every status this tool reports. Notice "meta" and "user" swap position between the two inputs below and still compare as identical.';
+export const note = 'One field changed, one array element added, one nested field unchanged - a small sample of every status this tool reports. The "meta" and "user" keys swap position between the fixture’s original and changed values and still compare as identical.';
 
 export const FIXTURE_JSON_A = {
   user: {
