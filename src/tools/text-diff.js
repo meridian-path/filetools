@@ -32,7 +32,7 @@ module.exports = {
   howSteps: [
     'Paste the original text into the left box and the changed version into the right box (or start from the pre-filled example).',
     'The comparison updates as you type - no button to click. Lines that were added, removed, or changed are highlighted, with the exact words that changed underlined within a changed line.',
-    'Toggle "Ignore whitespace" or "Ignore case" if the comparison should treat those differences as unimportant, then copy the result as plain diff text.',
+    'Toggle “Ignore whitespace” or “Ignore case” if the comparison should treat those differences as unimportant, then copy the result as plain diff text.',
   ],
   faqs: [
     {
@@ -45,23 +45,23 @@ module.exports = {
     },
     {
       q: 'Does word order matter?',
-      answerHtml: 'Yes. The comparison is order-sensitive at both the line and word level, the same way a code diff tool works - "the cat sat" and "sat the cat" are reported as a real change, not treated as a match just because they share the same words. This also means a paragraph that got reordered will show as removed-and-re-added lines rather than "unchanged," which is the honest read.',
+      answerHtml: 'Yes. The comparison is order-sensitive at both the line and word level, the same way a code diff tool works - “the cat sat” and “sat the cat” are reported as a real change, not treated as a match just because they share the same words. This also means a paragraph that got reordered will show as removed-and-re-added lines rather than “unchanged,” which is the honest read.',
     },
     {
       q: 'Can it diff code?',
-      answerHtml: 'Yes - code is just text with meaningful line breaks and indentation, and this tool compares both. Leave "Ignore whitespace" off to catch indentation-only changes (the kind that break some languages), or turn it on to compare logic while ignoring formatting differences.',
+      answerHtml: 'Yes - code is just text with meaningful line breaks and indentation, and this tool compares both. Leave “Ignore whitespace” off to catch indentation-only changes (the kind that break some languages), or turn it on to compare logic while ignoring formatting differences.',
     },
     {
       q: 'Is there a size limit?',
       answerHtml: 'The line-by-line comparison uses an algorithm whose work grows with both texts’ line counts multiplied together, so an extremely large pair of texts (each in the low thousands of lines or more) may be refused with a message asking for shorter input, rather than freezing the tab. Ordinary pastes - anything from a sentence to a long document - have no practical limit.',
     },
     {
-      q: 'What do "Ignore whitespace" and "Ignore case" actually change?',
-      answerHtml: 'Both only change which lines COUNT as different - the highlighted text always shows exactly what you pasted, unchanged. "Ignore whitespace" treats two lines as equal if they only differ by leading, trailing, or repeated spacing (so re-indented code doesn’t show as changed). "Ignore case" treats "Hello" and "hello" as equal.',
+      q: 'What do “Ignore whitespace” and “Ignore case” actually change?',
+      answerHtml: 'Both only change which lines COUNT as different - the highlighted text always shows exactly what you pasted, unchanged. “Ignore whitespace” treats two lines as equal if they only differ by leading, trailing, or repeated spacing (so re-indented code doesn’t show as changed). “Ignore case” treats “Hello” and “hello” as equal.',
     },
     {
       q: 'How is a changed line different from a removed line plus an added line?',
-      answerHtml: 'A removed-and-inserted line pair is only shown as one "changed" line (with the specific words that differ underlined) when the two lines are similar enough that highlighting a word-level difference is more useful than showing them as unrelated - the same threshold ../pure/csvDiff.mjs’s cell-level diff uses for CSV rows. Two lines that share almost nothing in common are shown as a plain removed line and a plain added line instead.',
+      answerHtml: 'A removed-and-inserted line pair is only shown as one “changed” line (with the specific words that differ underlined) when the two lines are similar enough that highlighting a word-level difference is more useful than showing them as unrelated - the same threshold ../pure/csvDiff.mjs’s cell-level diff uses for CSV rows. Two lines that share almost nothing in common are shown as a plain removed line and a plain added line instead.',
     },
   ],
   relatedSlugs: ['compare-csv', 'remove-duplicate-lines', 'word-frequency-counter'],
