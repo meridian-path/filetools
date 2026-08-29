@@ -123,8 +123,8 @@ test('nav: each folder group shows the real, current tool count', async () => {
     { label: 'CSV & Spreadsheets', count: '10', rows: 10 },
     { label: 'JSON & Data Formats', count: '7', rows: 7 },
     { label: 'Text', count: '6', rows: 6 },
-    { label: 'Developer', count: '11', rows: 11 },
-    { label: 'Image', count: '1', rows: 1 },
+    { label: 'Developer', count: '10', rows: 10 },
+    { label: 'Image', count: '2', rows: 2 },
   ]);
   await page.close();
 });
@@ -197,9 +197,18 @@ test('folder page: renders a real, populated tool list matching its own folder',
   await page.goto(`${baseUrl}developer/`, { waitUntil: 'networkidle' });
   await expectH1(page, 'Developer tools');
   const rowNames = await page.$$eval('.tool-list .tool-row-name', (els) => els.map((e) => e.textContent.trim()));
-  assert.equal(rowNames.length, 11);
+  assert.equal(rowNames.length, 10);
   assert.ok(rowNames.includes('Hash Generator'));
   assert.ok(rowNames.includes('Regex Tester'));
+  assert.ok(!rowNames.includes('HEIC to JPG/PNG'), 'craft-audit fix: HEIC moved to the Image folder, not a developer tool');
+  await page.close();
+});
+
+test('folder page: the Image folder holds both real image-manipulation tools after the HEIC craft-audit move', async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}image/`, { waitUntil: 'networkidle' });
+  const rowNames = await page.$$eval('.tool-list .tool-row-name', (els) => els.map((e) => e.textContent.trim()));
+  assert.deepEqual(rowNames.sort(), ['HEIC to JPG/PNG', 'Image Resize/Compress']);
   await page.close();
 });
 
