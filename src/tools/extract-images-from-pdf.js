@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Extract Images from PDF',
   title: 'Extract Images from PDF Free - In Your Browser | filetools',
   metaDescription: 'Pull every embedded photo or image out of a PDF and download them as PNG files, free, with no upload and no sign-up. Your file never leaves your device.',
-  deck: 'Drop a PDF and every embedded image comes back as its own PNG file, all zipped together. Nothing is uploaded.',
+  deck: 'Drop a PDF and every embedded image comes back as its own thumbnail - pick which ones you want and download them as PNG files, zipped together. Nothing is uploaded.',
   clientEntry: 'pdfImageExtract',
   family: 'pdf',
   folder: 'pdf',
@@ -26,8 +26,8 @@ module.exports = {
   multiple: false,
   howSteps: [
     'Drop or choose a PDF file.',
-    'Wait while every page is scanned for embedded images.',
-    'Select “Download images.zip” to save every extracted image as a PNG.',
+    'Wait while every page is scanned for embedded images - every one found appears as its own thumbnail, checked by default.',
+    'Uncheck any images you don’t want (or use “Select none” and pick a few instead), then download the rest as one zip of PNGs.',
   ],
   faqs: [
     {
@@ -41,6 +41,10 @@ module.exports = {
     {
       q: 'Why does this download one zip instead of separate image files?',
       answerHtml: 'A browser can only trigger a handful of automatic downloads at once before it starts blocking them as spam - packaging every image into one zip sidesteps that limit entirely, no matter how many images the PDF has.',
+    },
+    {
+      q: 'Can I download only some of the images, not all of them?',
+      answerHtml: 'Yes - every image found is shown as its own thumbnail with a checkbox, checked by default. Uncheck the ones you don’t want, or use “Select none” and check just a few, before downloading. The zip only ever contains the images you left checked.',
     },
     {
       q: 'What if a PDF has no embedded images?',
