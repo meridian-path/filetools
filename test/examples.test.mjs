@@ -34,6 +34,8 @@ import { countFixture as wordCharacterCountFixture, FIXTURE_TEXT as WORD_CHARACT
 import { convertFixture as unixTimestampFixture, FIXTURE_JSON as UNIX_TIMESTAMP_FIXTURE_JSON } from '../src/examples/unix-timestamp-converter.mjs';
 import { qrFixture, FIXTURE_TEXT as QR_FIXTURE_TEXT } from '../src/examples/qr-code-generator.mjs';
 import { diffFixture as textDiffFixture } from '../src/examples/text-diff.mjs';
+import { diffFixture as jsonDiffFixture } from '../src/examples/json-diff.mjs';
+import { diffStats } from '../src/pure/jsonDiff.mjs';
 import {
   fixtureTargetHeight as imageResizeTargetHeight, FIXTURE_SRC_WIDTH as IMAGE_RESIZE_SRC_WIDTH,
   FIXTURE_SRC_HEIGHT as IMAGE_RESIZE_SRC_HEIGHT, FIXTURE_TARGET_WIDTH as IMAGE_RESIZE_TARGET_WIDTH,
@@ -612,6 +614,24 @@ test('text-diff example: the rendered HTML shows the two-pane grid with the real
   assert.ok(html.includes('This line will be removed.'));
   assert.ok(html.includes('A brand new line goes here.'));
   assert.ok(html.includes('data-diff-status="empty"'));
+});
+
+test('json-diff example: the fixture reports exactly one changed key, one added array element, four unchanged, ignoring the two objects\' own reversed key order', () => {
+  const node = jsonDiffFixture();
+  assert.equal(node.status, 'changed');
+  assert.deepEqual(diffStats(node), {
+    unchanged: 4, changed: 1, added: 1, removed: 0,
+  });
+});
+
+test('json-diff example: the rendered HTML shows the real diff tree with the changed and added lines highlighted', () => {
+  const html = exampleFor('json-diff');
+  assert.ok(html.includes('class="json-diff-tree"'));
+  assert.ok(html.includes('data-status="removed">    &quot;page&quot;: 1'));
+  assert.ok(html.includes('data-status="added">    &quot;page&quot;: 2'));
+  assert.ok(html.includes('data-status="added">      &quot;reviewer&quot;'));
+  assert.ok(html.includes('1 changed'));
+  assert.ok(html.includes('1 added'));
 });
 
 test('qr-code-generator example: the fixture encodes the real URL as a 25x25-module QR code', () => {

@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 41-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 42-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -80,6 +80,7 @@ test('MARKS is exactly the fixed 41-row plate/verb/ink table, no more, no fewer'
     'json-to-csv': { plate: 'json', verb: 'convert', ink: 'csv' },
     'flatten-json': { plate: 'json', verb: 'flatten', ink: 'json' },
     'json-minify-beautify': { plate: 'json', verb: 'convert', ink: 'json' },
+    'json-diff': { plate: 'json', verb: 'compare', ink: 'json' },
     'yaml-to-json': { plate: 'json', verb: 'convert', ink: 'json' },
     'json-to-yaml': { plate: 'json', verb: 'convert', ink: 'json' },
     'xml-to-json': { plate: 'json', verb: 'convert', ink: 'json', motif: 'xml' },
