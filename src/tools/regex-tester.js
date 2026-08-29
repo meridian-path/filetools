@@ -61,5 +61,5 @@ module.exports = {
       answerHtml: 'Every match that has capture groups gets its own rows in the table below the highlighted text - one row per group, showing the group’s number (or name, for a named group like <code>(?&lt;year&gt;\\d{4})</code>) and the exact text it captured. A group inside an alternative that didn’t match (like the "a" branch of <code>(a)|(b)</code> when "b" is what matched) shows as "no match" rather than a blank or misleading value.',
     },
   ],
-  relatedSlugs: ['text-case-converter', 'word-frequency-counter', 'url-encode-decode'],
+  relatedSlugs: ['unix-timestamp-converter', 'text-case-converter', 'word-frequency-counter', 'url-encode-decode'],
 };

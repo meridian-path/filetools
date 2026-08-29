@@ -30,6 +30,8 @@ import { convertFixture as csvToSqlFixture } from '../src/examples/csv-to-sql-in
 import { generateFixture as uuidV5Fixture, FIXTURE_NAME as UUID_FIXTURE_NAME } from '../src/examples/uuid-generator.mjs';
 import { matchFixture as regexMatchFixture, FIXTURE_TEST_STRING as REGEX_FIXTURE_TEST_STRING } from '../src/examples/regex-tester.mjs';
 import { beautifyFixture as sqlFormatterFixture } from '../src/examples/sql-formatter.mjs';
+import { countFixture as wordCharacterCountFixture, FIXTURE_TEXT as WORD_CHARACTER_FIXTURE_TEXT } from '../src/examples/word-character-counter.mjs';
+import { convertFixture as unixTimestampFixture, FIXTURE_JSON as UNIX_TIMESTAMP_FIXTURE_JSON } from '../src/examples/unix-timestamp-converter.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -421,6 +423,35 @@ test('sql-formatter example: the rendered HTML shows the raw query and the real 
   assert.ok(html.includes('select u.id, u.name from users'), 'expected the raw fixture text in the Input block');
   assert.ok(html.includes('SELECT u.id,'));
   assert.ok(html.includes('JOIN orders o'));
+});
+
+test('word-character-counter example: the fixture computes the real word/character/sentence/reading-time stats', () => {
+  const stats = wordCharacterCountFixture();
+  assert.equal(stats.words, 14);
+  assert.equal(stats.charactersWithSpaces, 73);
+  assert.equal(stats.charactersWithoutSpaces, 60);
+  assert.equal(stats.sentences, 2);
+  assert.equal(stats.readingTime.label, '< 1 min read');
+});
+
+test('word-character-counter example: the rendered HTML shows the raw sample text and every real stat', () => {
+  const html = exampleFor('word-character-counter');
+  assert.ok(html.includes(WORD_CHARACTER_FIXTURE_TEXT), 'expected the raw fixture text in the Input block');
+  assert.ok(html.includes('Words: 14'));
+  assert.ok(html.includes('Sentences: 2'));
+});
+
+test('unix-timestamp-converter example: the fixture converts a real API-response-shaped seconds timestamp to the correct UTC date/time', () => {
+  const result = unixTimestampFixture();
+  assert.equal(result.ok, true);
+  assert.equal(result.utcLabel, '2025-01-01 00:00:00 UTC');
+  assert.equal(result.epochMilliseconds, 1735689600000);
+});
+
+test('unix-timestamp-converter example: the rendered HTML shows the raw sample API response and the real converted date', () => {
+  const html = exampleFor('unix-timestamp-converter');
+  assert.ok(html.includes(UNIX_TIMESTAMP_FIXTURE_JSON.replace(/</g, '&lt;')) || html.includes('1735689600'), 'expected the raw fixture JSON in the Input block');
+  assert.ok(html.includes('2025-01-01 00:00:00 UTC'));
 });
 
 test('html-entity-encode-decode example: the fixture escapes exactly the five reserved characters, using default (named) format', () => {
