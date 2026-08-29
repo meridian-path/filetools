@@ -192,6 +192,10 @@ function findLeakedIds(filePath) {
 // rendered dist/ output rather than source. test/check-commit-message.test.mjs
 // joins for the identical reason, against scripts/check-commit-message.js's
 // own reuse of these same patterns at commit-message-check time.
+// test/pr-metadata-id-leak-guard.test.mjs joins for the same reason again,
+// against scripts/hooks/pr-metadata-id-leak-guard.js's own reuse of these
+// same patterns to scan a "gh pr create"/"gh pr edit" command's --title/
+// --body text before it ever reaches GitHub.
 //
 // scripts/check-copy-tells.js and scripts/check-em-dash.js join this list
 // for a different reason (governing-doc-filename leak audit, 7th
@@ -205,6 +209,7 @@ const EXCLUDED_FILES = [
   path.join(ROOT, 'test', 'check-internal-ids.test.mjs'),
   path.join(ROOT, 'test', 'check-copy-tells.test.mjs'),
   path.join(ROOT, 'test', 'check-commit-message.test.mjs'),
+  path.join(ROOT, 'test', 'pr-metadata-id-leak-guard.test.mjs'),
   path.join(ROOT, 'scripts', 'check-copy-tells.js'),
   path.join(ROOT, 'scripts', 'check-em-dash.js'),
 ].map((f) => path.resolve(f));
