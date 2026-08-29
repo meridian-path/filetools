@@ -164,7 +164,16 @@ ${designTokensCss(DESIGN_TOKENS)}
      role anywhere in this markup (src/shell.js's own comment cites the
      W3C APG disclosure-navigation rationale) -- these are plain
      details/summary and plain links throughout. */
-  .site-nav-disclosure { width: 100%; }
+  /* Craft-audit fix (2026-08-29 reference-library audit): only forced to
+     full width once actually OPEN, so its own panel (.site-nav-tree,
+     below) has room to lay out -- while CLOSED (every page's default
+     state), this stays its own natural content width instead of claiming
+     the whole header row, so it sits on the SAME row as .brand and the
+     quickopen-trigger appended after it (see filter.client.js's own
+     insertQuickOpenTrigger()) instead of forcing both onto their own
+     separate, disconnected-looking lines even on a wide viewport where
+     all three would otherwise fit together easily. */
+  .site-nav-disclosure[open] { width: 100%; }
   .site-nav-summary {
     cursor: pointer;
     list-style: none;
@@ -299,10 +308,16 @@ ${designTokensCss(DESIGN_TOKENS)}
      Page shell / breadcrumb (restyled as a mono file path -- site-wide
      navigation/IA redesign, see the folder taxonomy/nav spec section 1.4)
      ------------------------------------------------------------------- */
+  /* Craft-audit fix (2026-08-29 reference-library audit): top padding
+     tightened from --space-6 (section-turn) to --space-5 (between-group)
+     -- the header and the page content directly below it (breadcrumb, or
+     the homepage's own hero) are a related pair, not two separate
+     sections, so the between-group tier is the right one per this file's
+     own spacing-tier mapping (src/tokens.js). */
   .page-shell {
     max-width: var(--width-page);
     margin: 0 auto;
-    padding: var(--space-6) var(--space-4) var(--space-8);
+    padding: var(--space-5) var(--space-4) var(--space-8);
   }
   .page-shell.page-shell-app { max-width: var(--width-app); }
 
