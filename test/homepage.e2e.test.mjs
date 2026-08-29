@@ -55,13 +55,13 @@ after(async () => {
   await new Promise((resolve) => server.close(resolve));
 });
 
-test('homepage: the explorer window renders a sidebar row and a section for all five folders', async () => {
+test('homepage: the explorer window renders a sidebar row and a section for all six folders', async () => {
   const page = await browser.newPage();
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   const sidebarLabels = await page.$$eval('.window-sidebar-row .window-sidebar-label', (els) => els.map((e) => e.textContent.trim()));
-  assert.deepEqual(sidebarLabels, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer']);
+  assert.deepEqual(sidebarLabels, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer', 'Image']);
   const sectionHeadings = await page.$$eval('.window-section-heading a', (els) => els.map((e) => e.textContent.trim()));
-  assert.deepEqual(sectionHeadings, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer']);
+  assert.deepEqual(sectionHeadings, ['PDF', 'CSV & Spreadsheets', 'JSON & Data Formats', 'Text', 'Developer', 'Image']);
   await page.close();
 });
 

@@ -421,12 +421,14 @@ ${designTokensCss(DESIGN_TOKENS)}
   .mark--sheet { --mark-plate: var(--family-sheet-6); --mark-wash: var(--family-sheet-1); }
   .mark--text  { --mark-plate: var(--family-text-6);  --mark-wash: var(--family-text-1); }
   .mark--dev   { --mark-plate: var(--family-dev-6);   --mark-wash: var(--family-dev-1); }
+  .mark--image { --mark-plate: var(--family-image-6); --mark-wash: var(--family-image-1); }
   .mark-ink--pdf   { --mark-ink: var(--family-pdf-8); }
   .mark-ink--csv   { --mark-ink: var(--family-csv-8); }
   .mark-ink--json  { --mark-ink: var(--family-json-8); }
   .mark-ink--sheet { --mark-ink: var(--family-sheet-8); }
   .mark-ink--text  { --mark-ink: var(--family-text-8); }
   .mark-ink--dev   { --mark-ink: var(--family-dev-8); }
+  .mark-ink--image { --mark-ink: var(--family-image-8); }
 
   /* -------------------------------------------------------------------
      Drop zone (src/browser/dropzone.client.js)
@@ -734,6 +736,43 @@ ${designTokensCss(DESIGN_TOKENS)}
     text-align: center;
   }
 
+  /* -------------------------------------------------------------------
+     Image Resize/Compress (src/browser/imageResizeCompress.client.js) --
+     the live resized/compressed preview canvas, in the same table-block
+     panel every dropzone-driven tool with a result area uses.
+     ------------------------------------------------------------------- */
+  .image-preview-canvas {
+    display: block;
+    margin: var(--space-4) auto 0;
+    max-width: 100%;
+    max-height: 420px;
+    width: auto;
+    height: auto;
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    /* A checkerboard, not a plain background, behind the canvas -- a
+       resized PNG/WebP can carry real transparency, and a plain surface
+       color would silently hide whether that transparency survived the
+       re-encode. Real information the visitor can act on, not decoration. */
+    background-image:
+      linear-gradient(45deg, var(--color-surface-alt) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--color-surface-alt) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--color-surface-alt) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--color-surface-alt) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  }
+  .image-resize-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    justify-content: center;
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .image-resize-stats strong { color: var(--color-text); font-weight: var(--weight-medium); }
+
   .page-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -836,6 +875,24 @@ ${designTokensCss(DESIGN_TOKENS)}
   .table-block-head input[type="number"]:focus-visible {
     outline: var(--border-control) solid var(--color-accent);
     outline-offset: 1px;
+  }
+  /* Image Resize/Compress's quality slider (src/browser/
+     imageResizeCompress.client.js) reuses this same options-row pattern
+     with a range input. accent-color is the standards-based way to theme
+     a native range thumb/track without redrawing either -- no custom
+     track/thumb CSS needed. */
+  .table-block-head input[type="range"] {
+    accent-color: var(--color-accent);
+    min-height: 24px;
+  }
+  /* A hidden control inside .table-block-head (Image Resize/Compress's own
+     quality slider, shown only for a lossy output format) must actually
+     disappear -- without this, the .table-block-head label rule above's
+     own inline-flex display outranks the [hidden] attribute's built-in
+     none display on specificity alone (class+type beats a bare attribute
+     selector), silently showing a supposedly hidden control. */
+  .table-block-head [hidden] {
+    display: none;
   }
   /* Horizontally scrollable inside its OWN container so the page itself
      never scrolls horizontally at 360px, even for a wide extracted table. */

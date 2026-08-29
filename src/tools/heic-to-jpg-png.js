@@ -64,5 +64,5 @@ module.exports = {
       answerHtml: 'This tool converts the single still image in each file. A HEIC file that bundles multiple frames (a burst or the motion part of a Live Photo) only produces its first frame as JPG/PNG - the rest isn’t currently extracted.',
     },
   ],
-  relatedSlugs: ['jpg-png-to-pdf', 'pdf-to-jpg-png'],
+  relatedSlugs: ['jpg-png-to-pdf', 'pdf-to-jpg-png', 'image-resize-compress'],
 };

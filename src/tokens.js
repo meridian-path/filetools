@@ -270,6 +270,25 @@ const DESIGN_TOKENS = {
   '--family-dev-6': 'oklch(47% 0.100 90)',
   '--family-dev-8': 'oklch(30% 0.070 90)',
 
+  // Seventh family (added for the 2026-08-29 Image Resize/Compress tool --
+  // this repo's first image-*manipulation* tool, distinct from the
+  // existing image-*conversion* tools that fold into 'dev'; see
+  // src/tools/image-resize-compress.js's own comment on its `family`
+  // field). Same ladder, hue 200 (cyan/teal) -- distinct from every
+  // existing hue (pdf 27, csv/text 250, json 320, sheet 150, dev 90).
+  // Measured with the same real OKLab/OKLCH -> linear-sRGB -> WCAG
+  // relative-luminance conversion as the CONTRAST comment above (the
+  // conversion code was cross-checked against that comment's own six
+  // figures, plus the dev row's own two, before trusting it here):
+  // plate(6) vs white surface 5.97:1 (need >=3:1, existing range
+  // 6.48-7.39:1 -- this family sits slightly below that range but still
+  // clears with over 2x margin), ink(8) vs wash(1) 11.58:1 (need >=4.5:1,
+  // existing range 12.20-12.95:1, same margin story). No L adjustment
+  // needed.
+  '--family-image-1': 'oklch(97% 0.016 200)',
+  '--family-image-6': 'oklch(47% 0.130 200)',
+  '--family-image-8': 'oklch(30% 0.090 200)',
+
   // Navigation/IA redesign tokens.
   // --font-mono is a third, system-stack-only typeface (zero network
   // cost) used exclusively for the path bar, folder/tool Kind chips, and

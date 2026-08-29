@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 40-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 41-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -104,6 +104,10 @@ test('MARKS is exactly the fixed 40-row plate/verb/ink table, no more, no fewer'
     'heic-to-jpg-png': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'unix-timestamp-converter': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'qr-code-generator': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    // 'image' plate/ink (2026-08-29 Image Resize/Compress taxonomy
+    // addition) -- see families.test.mjs's own comment on this same
+    // taxonomy change.
+    'image-resize-compress': { plate: 'image', verb: 'resize', ink: 'image' },
   });
 });
 
@@ -123,7 +127,7 @@ test('every emitted mark SVG string contains no hex-color literal and no rgb()/r
 
 test('every var(--family-*) referenced anywhere in the stylesheet exists as a design token', () => {
   const refs = [...SITE_CSS.matchAll(/var\((--family-[a-z0-9-]+)\)/g)].map((m) => m[1]);
-  assert.ok(refs.length >= 18, `expected at least the 18 emitted family tokens to be referenced (6 families x 3), found ${refs.length}`);
+  assert.ok(refs.length >= 21, `expected at least the 21 emitted family tokens to be referenced (7 families x 3), found ${refs.length}`);
   for (const ref of refs) {
     assert.ok(ref in DESIGN_TOKENS, `${ref} is referenced in css.js but missing from DESIGN_TOKENS`);
   }
@@ -142,8 +146,9 @@ test('every mark--<family> / mark-ink--<family> class in the stylesheet only eve
   // 'dev' used to be folder-only (no individual tool carried
   // family:'dev') -- craft-audit fix item 7 gave 7 real tools that family
   // too, but the CSS class count itself is unchanged since these classes
-  // already existed for the folder-level color axis.
-  assert.equal(blocks, 12, `expected 6 .mark--<family> + 6 .mark-ink--<family> blocks (5 format families + "dev"), found ${blocks}`);
+  // already existed for the folder-level color axis. 'image' (2026-08-29)
+  // is a genuinely new pair, adding 2 more blocks.
+  assert.equal(blocks, 14, `expected 7 .mark--<family> + 7 .mark-ink--<family> blocks (5 format families + "dev" + "image"), found ${blocks}`);
 });
 
 test('every mark parses as well-formed XML and carries aria-hidden="true" focusable="false"', () => {

@@ -25,12 +25,14 @@ const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
 // Craft-retrofit Phase 3 ("speed as a feature" move) folder rollout list --
 // see renderToolPage()'s own `faqs` comment below for the full rationale.
 // Built up one entry per folder as each one got its own rollout pass, never
-// all at once. As of the
-// `text` folder (Phase 3(e)), this now covers every real folder in
-// src/folders.js's own taxonomy -- kept as an explicit Set rather than
-// collapsed to "always true" so a genuinely new 6th folder still has to be
-// added here deliberately, the same way every prior folder was.
-const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf', 'text']);
+// all at once. Covered every real folder in src/folders.js's own taxonomy
+// as of the `text` folder (Phase 3(e)); 'image' was added deliberately when
+// the 2026-08-29 Image Resize/Compress tool introduced that 6th folder --
+// kept as an explicit Set rather than collapsed to "always true" so the
+// NEXT new folder still has to be added here deliberately too, the same
+// way every prior one was (test/toolPageJsWeight.test.mjs's own
+// TOOLS-registry-driven test is what catches a folder landing here late).
+const SPEED_FEATURE_FOLDERS = new Set(['developer', 'data-formats', 'spreadsheets', 'pdf', 'text', 'image']);
 
 function formatMb(bytes) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;

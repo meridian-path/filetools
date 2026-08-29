@@ -59,7 +59,7 @@ test('FOLDER_BY_KEY resolves every FOLDERS entry by its own key', () => {
   }
 });
 
-test('the taxonomy is exactly the spec\'s 5-folder, 40-slug assignment (folder taxonomy/nav spec section 1.1)', () => {
+test('the taxonomy is exactly the spec\'s 6-folder, 41-slug assignment (folder taxonomy/nav spec section 1.1, extended by the 2026-08-29 image family/folder addition)', () => {
   const byFolder = {};
   for (const f of FOLDERS) byFolder[f.key] = toolsInFolder(f.key).map((t) => t.slug).sort();
   assert.deepEqual(byFolder, {
@@ -68,11 +68,12 @@ test('the taxonomy is exactly the spec\'s 5-folder, 40-slug assignment (folder t
     'data-formats': ['flatten-json', 'json-minify-beautify', 'json-to-csv', 'json-to-yaml', 'xml-to-json', 'yaml-to-json'].sort(),
     text: ['remove-duplicate-lines', 'sort-lines', 'text-case-converter', 'text-diff', 'word-frequency-counter', 'word-character-counter'].sort(),
     developer: ['base64-encode-decode', 'hash-generator', 'heic-to-jpg-png', 'html-entity-encode-decode', 'regex-tester', 'sql-formatter', 'url-encode-decode', 'uuid-generator', 'unix-timestamp-converter', 'qr-code-generator'].sort(),
+    image: ['image-resize-compress'],
   });
 });
 
-test('FOLDERS is exactly the spec\'s ordered 5-folder registry, no more, no fewer', () => {
-  assert.deepEqual(FOLDERS.map((f) => f.key), ['pdf', 'spreadsheets', 'data-formats', 'text', 'developer']);
+test('FOLDERS is exactly the spec\'s ordered 6-folder registry, no more, no fewer', () => {
+  assert.deepEqual(FOLDERS.map((f) => f.key), ['pdf', 'spreadsheets', 'data-formats', 'text', 'developer', 'image']);
   for (const f of FOLDERS) {
     assert.equal(typeof f.slug, 'string');
     assert.equal(typeof f.label, 'string');

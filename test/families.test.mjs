@@ -16,14 +16,18 @@ import { FAMILY_BY_SLUG, familyOf, DEFAULT_FAMILY } from '../src/families.js';
 // developer-utility tools (folders.js's 'developer' folder) get their own
 // family now, distinct from plain-text tools -- see regex-tester.js's own
 // comment on its `family` field for the full rationale.
-const VALID_FAMILIES = new Set(['pdf', 'csv', 'json', 'sheet', 'text', 'dev']);
+// 'image' added for the 2026-08-29 Image Resize/Compress tool -- this
+// repo's first image-*manipulation* tool, distinct from the existing
+// image-*conversion* tools folded into 'dev' -- see
+// src/tools/image-resize-compress.js's own comment on its `family` field.
+const VALID_FAMILIES = new Set(['pdf', 'csv', 'json', 'sheet', 'text', 'dev', 'image']);
 
 test('every tool in the TOOLS registry has an explicit FAMILY_BY_SLUG entry', () => {
   const missing = TOOLS.map((t) => t.slug).filter((slug) => !(slug in FAMILY_BY_SLUG));
   assert.deepEqual(missing, [], `slugs missing an explicit family: ${missing.join(', ')}`);
 });
 
-test('every FAMILY_BY_SLUG value is one of the six known families', () => {
+test('every FAMILY_BY_SLUG value is one of the seven known families', () => {
   for (const [slug, family] of Object.entries(FAMILY_BY_SLUG)) {
     assert.ok(VALID_FAMILIES.has(family), `${slug} maps to unknown family "${family}"`);
   }
@@ -41,7 +45,7 @@ test('familyOf() falls back to the default family for an unrecognized slug, neve
   assert.equal(familyOf(undefined), DEFAULT_FAMILY);
 });
 
-test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\'), 40-slug assignment', () => {
+test('the taxonomy is exactly the spec\'s 7-family (5 format families + \'dev\' + \'image\'), 41-slug assignment', () => {
   assert.deepEqual(FAMILY_BY_SLUG, {
     'merge-pdf': 'pdf',
     'split-pdf': 'pdf',
@@ -91,5 +95,10 @@ test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\')
     'heic-to-jpg-png': 'dev',
     'unix-timestamp-converter': 'dev',
     'qr-code-generator': 'dev',
+
+    // 'image' -- this repo's first image-*manipulation* tool (soak-backlog
+    // pass 1, item 5's own taxonomy flag). Distinct from the
+    // image-*conversion* tools above (folded into 'dev').
+    'image-resize-compress': 'image',
   });
 });
