@@ -215,6 +215,59 @@ test('extract-images-from-pdf: a PDF with no embedded images shows a plain "none
   await page.close();
 });
 
+test('extract-images-from-pdf: unchecking one image excludes it from the real downloaded zip, and every remaining thumbnail is a real image of its own extracted PNG', async () => {
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+  await page.goto(`${baseUrl}pdf/extract-images-from-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'two-pages-with-images.pdf'));
+  await page.waitForSelector('.file-list .file-row', { timeout: 20000 });
+  assert.equal(await page.locator('.file-list .file-row').count(), 2);
+
+  // Every row's thumbnail is a real <img> pointing at a real, decoded blob
+  // URL of that row's own PNG bytes, not a placeholder icon.
+  const thumbSrcs = await page.locator('.file-thumb').evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src')));
+  assert.equal(thumbSrcs.length, 2);
+  for (const src of thumbSrcs) assert.match(src, /^blob:/);
+
+  await page.locator('.file-row').nth(0).click();
+  assert.equal(await page.locator('button:has-text("Download 1 selected image")').count(), 1);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download 1 selected image")').click(),
+  ]);
+  const zipPath = await download.path();
+  const entries = unzipSync(new Uint8Array(fs.readFileSync(zipPath)));
+  assert.deepEqual(Object.keys(entries), ['two-pages-with-images-page-2-image-01.png']);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('extract-images-from-pdf: "Select none" then "Select all" round-trips back to downloading every image, and the download button disables at zero selected', async () => {
+  const page = await browser.newPage({ acceptDownloads: true });
+  await page.goto(`${baseUrl}pdf/extract-images-from-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('#file-input').setInputFiles(path.join(TMP, 'two-pages-with-images.pdf'));
+  await page.waitForSelector('.file-list .file-row', { timeout: 20000 });
+
+  const selectAllBtn = page.locator('button:has-text("Select none")');
+  await selectAllBtn.click();
+  assert.equal(await page.locator('.file-row input[type="checkbox"]:checked').count(), 0);
+  assert.equal(await page.locator('button:has-text("Download")').first().isDisabled(), true);
+
+  await page.locator('button:has-text("Select all")').click();
+  assert.equal(await page.locator('.file-row input[type="checkbox"]:checked').count(), 2);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download two-pages-with-images-images.zip")').click(),
+  ]);
+  assert.equal(download.suggestedFilename(), 'two-pages-with-images-images.zip');
+  const zipPath = await download.path();
+  const entries = unzipSync(new Uint8Array(fs.readFileSync(zipPath)));
+  assert.equal(Object.keys(entries).length, 2);
+  await page.close();
+});
+
 test('extract-images-from-pdf: a corrupt/invalid PDF gets a clear error, never a raw exception', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}pdf/extract-images-from-pdf/`, { waitUntil: 'networkidle' });

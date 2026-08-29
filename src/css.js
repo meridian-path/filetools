@@ -664,6 +664,26 @@ ${designTokensCss(DESIGN_TOKENS)}
     font-variant-numeric: tabular-nums;
   }
   .file-row .file-actions { display: flex; gap: var(--space-1); }
+  /* Extract Images from PDF's own selectable rows (src/browser/
+     pdfImageExtract.client.js) -- the whole row is a <label> wrapping a
+     checkbox, so clicking anywhere in it (not just the small native
+     checkbox) toggles selection. */
+  .file-row.file-row-selectable { cursor: pointer; }
+  .file-row .file-thumb {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-image:
+      linear-gradient(45deg, var(--color-surface-alt) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--color-surface-alt) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--color-surface-alt) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--color-surface-alt) 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  }
 
   /* One row per algorithm inside a hash-result block (Hash Generator --
      src/browser/hashGenerator.client.js). The hash itself is a fixed-width

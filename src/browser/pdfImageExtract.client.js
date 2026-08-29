@@ -208,17 +208,48 @@ export async function run(ctx) {
   badge.className = 'page-badge';
   badge.textContent = `${imageCount} image${imageCount === 1 ? '' : 's'} found`;
   head.appendChild(badge);
+
+  // Select all / none -- a real toggle, not just individually-clickable
+  // rows, since checking through dozens of found images one at a time
+  // to keep most of them would be tedious for no reason.
+  const selectAllBtn = document.createElement('button');
+  selectAllBtn.type = 'button';
+  selectAllBtn.className = 'btn-secondary';
+  selectAllBtn.textContent = 'Select none';
+  head.appendChild(selectAllBtn);
   block.appendChild(head);
 
   const list = document.createElement('ul');
   list.className = 'file-list';
-  Object.keys(entries).forEach((name) => {
+  const checkboxes = [];
+  Object.entries(entries).forEach(([name, pngBytes]) => {
     const li = document.createElement('li');
-    li.className = 'file-row';
+    const label = document.createElement('label');
+    label.className = 'file-row file-row-selectable';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = true;
+    checkbox.setAttribute('aria-label', `Include ${name} in the download`);
+    checkbox.addEventListener('change', updateDownloadState);
+    checkboxes.push(checkbox);
+    label.appendChild(checkbox);
+
+    // A real thumbnail of the actual extracted image, not a generic file
+    // icon -- built from the same PNG bytes the zip will contain, so what
+    // the visitor sees here is exactly what they'd get.
+    const thumb = document.createElement('img');
+    thumb.className = 'file-thumb';
+    thumb.src = URL.createObjectURL(new Blob([pngBytes], { type: 'image/png' }));
+    thumb.alt = '';
+    label.appendChild(thumb);
+
     const nameSpan = document.createElement('span');
     nameSpan.className = 'file-name';
     nameSpan.textContent = name;
-    li.appendChild(nameSpan);
+    label.appendChild(nameSpan);
+
+    li.appendChild(label);
     list.appendChild(li);
   });
   block.appendChild(list);
@@ -229,19 +260,41 @@ export async function run(ctx) {
   downloadBtn.type = 'button';
   downloadBtn.className = 'btn-primary';
   const zipName = `${baseName}-images.zip`;
-  downloadBtn.textContent = `Download ${zipName}`;
+
+  function selectedNames() {
+    return Object.keys(entries).filter((_, i) => checkboxes[i].checked);
+  }
+
+  function updateDownloadState() {
+    const selectedCount = selectedNames().length;
+    downloadBtn.disabled = selectedCount === 0;
+    downloadBtn.textContent = selectedCount === imageCount
+      ? `Download ${zipName}`
+      : `Download ${selectedCount} selected image${selectedCount === 1 ? '' : 's'}`;
+    selectAllBtn.textContent = selectedCount === imageCount ? 'Select none' : 'Select all';
+  }
+
+  selectAllBtn.addEventListener('click', () => {
+    const selectAll = selectAllBtn.textContent === 'Select all';
+    checkboxes.forEach((cb) => { cb.checked = selectAll; });
+    updateDownloadState();
+  });
+
   downloadBtn.addEventListener('click', async () => {
     downloadBtn.disabled = true;
     try {
       const { zipSync } = await import('../vendor/fflate/browser.js');
-      downloadBlob(new Blob([zipSync(entries, { level: 6 })], { type: 'application/zip' }), zipName);
-    } catch (err) {
-      downloadBtn.disabled = false;
-      throw err;
+      const selected = selectedNames();
+      const selectedEntries = Object.fromEntries(selected.map((name) => [name, entries[name]]));
+      downloadBlob(new Blob([zipSync(selectedEntries, { level: 6 })], { type: 'application/zip' }), zipName);
+    } finally {
+      updateDownloadState();
     }
   });
   btnRow.appendChild(downloadBtn);
   block.appendChild(btnRow);
+
+  updateDownloadState();
 
   appendSupportNote(block);
   resultEl.appendChild(block);
