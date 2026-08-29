@@ -60,5 +60,5 @@ module.exports = {
       answerHtml: 'Practically, yes. A v4 UUID has 122 random bits - even generating billions of them, the odds of two ever matching are negligible. v1 and v7 add a real timestamp on top of similar randomness. v5 is the one deliberate exception: it’s a hash, so the exact same namespace and name always produce the exact same UUID on purpose, which is the point of using it.',
     },
   ],
-  relatedSlugs: ['hash-generator', 'base64-encode-decode', 'url-encode-decode'],
+  relatedSlugs: ['hash-generator', 'base64-encode-decode', 'url-encode-decode', 'qr-code-generator'],
 };

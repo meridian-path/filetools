@@ -117,6 +117,24 @@ function copyVendor() {
     path.join(VENDOR, 'heic2any', 'LICENSE.md')
   );
 
+  // qrcode-generator -- MIT (verified: node_modules/qrcode-generator/
+  // package.json's own `license` field, plus the MIT header comment
+  // embedded directly in dist/qrcode.mjs itself, copied verbatim below --
+  // this package ships no separate top-level LICENSE file to also copy,
+  // unlike every other entry above). Self-contained ESM build with zero
+  // further imports of its own. Only the core encoder is vendored --
+  // qrcode_UTF8.mjs (the library's optional UTF-8 stringToBytes override)
+  // is NOT vendored; src/pure/qrCodeGenerator.mjs implements that same
+  // conversion itself (real, unit-tested UTF-8 byte encoding), both
+  // because it needs to be unit-testable without a browser and because
+  // this package's own package.json `exports` field does not expose that
+  // subpath for a Node-side import (verified: importing it throws
+  // ERR_PACKAGE_PATH_NOT_EXPORTED).
+  copy(
+    path.join(nm, 'qrcode-generator', 'dist', 'qrcode.mjs'),
+    path.join(VENDOR, 'qrcode-generator', 'qrcode.mjs')
+  );
+
   // Space Grotesk (display typeface) -- SIL OFL 1.1 (verified:
   // node_modules/@fontsource-variable/space-grotesk/LICENSE). Latin subset
   // only, variable weight -- see src/css.js's @font-face block.
@@ -129,7 +147,7 @@ function copyVendor() {
     path.join(VENDOR, 'fonts', 'space-grotesk', 'LICENSE')
   );
 
-  console.log('vendor/ populated from node_modules (pdf-lib, pdfjs-dist, exceljs, fflate, js-yaml, heic2any, space-grotesk).');
+  console.log('vendor/ populated from node_modules (pdf-lib, pdfjs-dist, exceljs, fflate, js-yaml, heic2any, qrcode-generator, space-grotesk).');
 }
 
 if (require.main === module) {
