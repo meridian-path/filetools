@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 35-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 38-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -89,6 +89,7 @@ test('MARKS is exactly the fixed 35-row plate/verb/ink table, no more, no fewer'
     'sort-lines': { plate: 'text', verb: 'sort', ink: 'text' },
     'word-frequency-counter': { plate: 'text', verb: 'count', ink: 'text' },
     'text-case-converter': { plate: 'text', verb: 'convert', ink: 'text' },
+    'word-character-counter': { plate: 'text', verb: 'count', ink: 'text' },
     // 'dev' plate/ink (craft-audit fix, item 7) -- see families.test.mjs's
     // own comment on this same taxonomy change.
     'url-encode-decode': { plate: 'dev', verb: 'convert', ink: 'dev' },
@@ -100,6 +101,7 @@ test('MARKS is exactly the fixed 35-row plate/verb/ink table, no more, no fewer'
     'regex-tester': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'sql-formatter': { plate: 'dev', verb: 'convert', ink: 'dev' },
     'heic-to-jpg-png': { plate: 'dev', verb: 'convert', ink: 'dev' },
+    'unix-timestamp-converter': { plate: 'dev', verb: 'convert', ink: 'dev' },
   });
 });
 
