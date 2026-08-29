@@ -41,7 +41,7 @@ module.exports = {
     },
     {
       q: 'Does key order matter?',
-      answerHtml: 'No, and this is the main reason to use a JSON-aware diff instead of a plain text diff on the same content: two objects with identical keys and values in a different order compare as identical here. A plain-text diff (this site’s own `text-diff` tool) would report every line as changed just because the keys moved - genuinely useful for comparing source code or prose, genuinely misleading for comparing two JSON documents that happen to serialize their keys in a different order.',
+      answerHtml: 'No, and this is the main reason to use a JSON-aware diff instead of a plain text diff on the same content: two objects with identical keys and values in a different order compare as identical here. A plain-text diff (this site’s own <a href="/data/text-diff/">Text Diff / Compare</a> tool) would report every line as changed just because the keys moved - genuinely useful for comparing source code or prose, genuinely misleading for comparing two JSON documents that happen to serialize their keys in a different order.',
     },
     {
       q: 'How are elements added to or removed from an array shown?',
