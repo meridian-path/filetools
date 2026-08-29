@@ -161,7 +161,7 @@ test('html-entity-encode-decode: clicking convert with an empty textarea shows a
     return el && el.textContent && el.textContent.trim().length > 0;
   });
   const statusText = await page.locator('.paste-status').textContent();
-  assert.match(statusText, /paste some/i);
+  assert.match(statusText, /paste some text or markup first/i);
   await page.close();
 });
 

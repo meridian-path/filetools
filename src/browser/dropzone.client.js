@@ -28,6 +28,7 @@
 // newly merged tool adds its own src/tools/<slug>.js; this file (the
 // hand-authored controller logic) never changes.
 import { PROCESSORS, MAX_BYTES_BY_CLIENT, PASTE_FILE } from './dropzone.registry.generated.js';
+import { pasteEmptyErrorMessage } from '../pure/pasteEmptyError.mjs';
 
 const toolSection = document.getElementById('tool');
 if (toolSection) {
@@ -383,11 +384,21 @@ if (toolSection) {
   // click -- currently json-minify-beautify only, see that tool's own
   // comment for why. The button stays as a manual fallback either way.
   const pasteLive = !!(pasteContainer && pasteContainer.dataset.live === 'true');
+  // Craft-audit fix: this used to hardcode "Paste some markup first" for
+  // every tool with a paste box, calling a JSON/CSV/SQL paste "markup" even
+  // though only html-table-to-csv's own input actually is markup. Read
+  // straight off the tool's own visible paste-box label (toolPage.js's
+  // `pasteInput.label`, rendered as this same container's own <label>) --
+  // the exact noun a visitor already sees printed above the box, so the
+  // error can never drift out of sync with what the label says. See
+  // ../pure/pasteEmptyError.mjs for the actual message-building logic.
+  const pasteLabelEl = pasteContainer && pasteContainer.querySelector('label');
+  const pasteLabelText = (pasteLabelEl && pasteLabelEl.textContent) || '';
 
   function runPasteConvert(text, { reportEmptyAsError }) {
     if (!text.trim()) {
       if (reportEmptyAsError) {
-        reportStatus('paste', 'Paste some markup first, or choose a file instead.', 'error');
+        reportStatus('paste', pasteEmptyErrorMessage(pasteLabelText), 'error');
       } else {
         // Live mode with nothing typed (yet): a silent reset, not an
         // error -- an empty box mid-typing isn't a mistake to flag.

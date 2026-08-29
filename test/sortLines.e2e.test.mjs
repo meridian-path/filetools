@@ -169,7 +169,7 @@ test('sort-lines: clicking sort with an empty textarea shows an error instead of
     return el && el.textContent && el.textContent.trim().length > 0;
   });
   const statusText = await page.locator('.paste-status').textContent();
-  assert.match(statusText, /paste some/i);
+  assert.match(statusText, /paste a list first/i);
   await page.close();
 });
 
