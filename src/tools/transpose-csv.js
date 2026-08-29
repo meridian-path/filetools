@@ -40,7 +40,7 @@ module.exports = {
     },
     {
       q: 'What does "transpose" actually mean here?',
-      answerHtml: 'Every row in your file becomes one column in the output, and every column becomes one row - the same operation as a spreadsheet\'s "Paste Special &gt; Transpose". A 3-row, 5-column table comes back as a 5-row, 3-column table, with the same values, just flipped along the diagonal.',
+      answerHtml: 'Every row in your file becomes one column in the output, and every column becomes one row - the same operation as a spreadsheet’s "Paste Special &gt; Transpose". A 3-row, 5-column table comes back as a 5-row, 3-column table, with the same values, just flipped along the diagonal.',
     },
     {
       q: 'What happens if rows have different numbers of columns (a ragged CSV)?',

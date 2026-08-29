@@ -37,7 +37,7 @@ module.exports = {
   howSteps: [
     'Type or paste a regular expression pattern, and choose which flags apply (g for every match, i for case-insensitive, and so on).',
     'Paste the text you want to test it against. Every match highlights immediately as you type either field - no button to click.',
-    'If your pattern has capture groups, each match\'s groups are broken out into their own table below, by number or name.',
+    'If your pattern has capture groups, each match’s groups are broken out into their own table below, by number or name.',
   ],
   faqs: [
     {
@@ -46,19 +46,19 @@ module.exports = {
     },
     {
       q: 'Why does matching run in a background thread instead of instantly?',
-      answerHtml: 'A regular expression can be written (often by accident) in a way that makes a single match attempt take an extremely long time against certain text - this is called catastrophic backtracking, and a pattern like <code>(a+)+b</code> against a long run of "a"s with no trailing "b" is a classic example. That single match call can\'t be interrupted from JavaScript once it starts. Running it in a background thread means this tool can forcibly stop a stuck match after a few seconds and tell you what happened, instead of freezing the whole page.',
+      answerHtml: 'A regular expression can be written (often by accident) in a way that makes a single match attempt take an extremely long time against certain text - this is called catastrophic backtracking, and a pattern like <code>(a+)+b</code> against a long run of "a"s with no trailing "b" is a classic example. That single match call can’t be interrupted from JavaScript once it starts. Running it in a background thread means this tool can forcibly stop a stuck match after a few seconds and tell you what happened, instead of freezing the whole page.',
     },
     {
       q: 'What regex flavor does this use?',
-      answerHtml: 'Your browser\'s own native JavaScript RegExp engine - the exact same engine that runs a regex literal like <code>/foo/gi</code> in any JavaScript code, so a pattern that works here will behave identically in your own JavaScript.',
+      answerHtml: 'Your browser’s own native JavaScript RegExp engine - the exact same engine that runs a regex literal like <code>/foo/gi</code> in any JavaScript code, so a pattern that works here will behave identically in your own JavaScript.',
     },
     {
       q: 'What do the flag checkboxes do?',
-      answerHtml: '<code>g</code> (global) finds every match instead of stopping at the first. <code>i</code> ignores case. <code>m</code> (multiline) makes <code>^</code> and <code>$</code> match at the start/end of each line, not just the whole string. <code>s</code> (dotAll) makes <code>.</code> match newline characters too, which it otherwise doesn\'t. <code>u</code> enables full Unicode handling (correct matching of characters outside the Basic Multilingual Plane, and stricter pattern validation).',
+      answerHtml: '<code>g</code> (global) finds every match instead of stopping at the first. <code>i</code> ignores case. <code>m</code> (multiline) makes <code>^</code> and <code>$</code> match at the start/end of each line, not just the whole string. <code>s</code> (dotAll) makes <code>.</code> match newline characters too, which it otherwise doesn’t. <code>u</code> enables full Unicode handling (correct matching of characters outside the Basic Multilingual Plane, and stricter pattern validation).',
     },
     {
       q: 'How are capture groups shown?',
-      answerHtml: 'Every match that has capture groups gets its own rows in the table below the highlighted text - one row per group, showing the group\'s number (or name, for a named group like <code>(?&lt;year&gt;\\d{4})</code>) and the exact text it captured. A group inside an alternative that didn\'t match (like the "a" branch of <code>(a)|(b)</code> when "b" is what matched) shows as "no match" rather than a blank or misleading value.',
+      answerHtml: 'Every match that has capture groups gets its own rows in the table below the highlighted text - one row per group, showing the group’s number (or name, for a named group like <code>(?&lt;year&gt;\\d{4})</code>) and the exact text it captured. A group inside an alternative that didn’t match (like the "a" branch of <code>(a)|(b)</code> when "b" is what matched) shows as "no match" rather than a blank or misleading value.',
     },
   ],
   relatedSlugs: ['text-case-converter', 'word-frequency-counter', 'url-encode-decode'],
