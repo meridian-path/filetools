@@ -7,12 +7,15 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 /**
- * End-to-end test for src/browser/newsletter.client.js: the sitewide
- * newsletter signup slot in the footer must NOT fetch the third-party
- * Substack iframe on initial page load (that regressed this site's whole
- * Lighthouse Performance score, since the footer renders on every page --
- * see docs/CHANGELOG.md), but it must load it once the slot scrolls into
- * view, and it must degrade to a real link with JS disabled.
+ * End-to-end test for the footer's newsletter signup (src/shell.js's
+ * renderNewsletterSignup): a craft-audit fix (2026-08-29 reference-library
+ * audit) removed the third-party Substack iframe this used to lazy-load on
+ * scroll (it rendered that provider's own dark avatar tile, publication
+ * name, and orange "Subscribe" button on every one of this site's pages,
+ * clashing with the site's own one-accent-per-view design rule). The signup is now
+ * a plain, always-rendered outbound link with no JS dependency at all --
+ * these tests prove no third-party request ever fires from this link
+ * merely being on the page.
  */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,7 +65,21 @@ after(async () => {
   await new Promise((resolve) => server.close(resolve));
 });
 
-test('newsletter embed: no request to substack.com fires before the footer slot is scrolled into view', async () => {
+test('newsletter signup: renders a real, visible link immediately, no iframe, no JS dependency', async () => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(baseUrl);
+
+  const link = page.locator('.newsletter-signup a[href="https://builtittheycome.substack.com"]');
+  await assert.doesNotReject(link.waitFor({ state: 'visible' }));
+  assert.equal(await link.textContent(), 'Subscribe on Substack');
+  assert.equal(await page.locator('.newsletter-signup iframe').count(), 0);
+
+  await page.close();
+  await context.close();
+});
+
+test('newsletter signup: no request to substack.com ever fires merely from loading and scrolling the page -- the link is outbound-only', async () => {
   const page = await browser.newPage({ viewport: { width: 1024, height: 400 } });
   const substackRequests = [];
   page.on('request', (req) => {
@@ -70,39 +87,11 @@ test('newsletter embed: no request to substack.com fires before the footer slot 
   });
 
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
-  // Confirm the slot exists but has not been replaced with an iframe yet.
-  await page.waitForSelector('[data-newsletter-slot]');
+  await page.locator('.newsletter-signup').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(200);
+
   assert.equal(await page.locator('.newsletter-signup iframe').count(), 0);
   assert.deepEqual(substackRequests, []);
 
   await page.close();
-});
-
-test('newsletter embed: scrolling the footer into view replaces the slot with the real Substack iframe', async () => {
-  const page = await browser.newPage({ viewport: { width: 1024, height: 400 } });
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
-
-  await page.locator('.newsletter-signup').scrollIntoViewIfNeeded();
-  await page.waitForSelector('.newsletter-signup iframe', { timeout: 5000 });
-
-  const src = await page.locator('.newsletter-signup iframe').getAttribute('src');
-  assert.equal(src, 'https://builtittheycome.substack.com/embed');
-
-  await page.close();
-});
-
-test('newsletter embed: degrades to a real, visible link when JavaScript is disabled (D1 fix -- the slot never renders as an empty styled box)', async () => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
-  const page = await context.newPage();
-  await page.goto(baseUrl);
-
-  const link = page.locator('.newsletter-slot a[href^="https://builtittheycome.substack.com"]');
-  await assert.doesNotReject(link.waitFor({ state: 'visible' }));
-  // Since there is no JS to swap it, the slot must still be the plain,
-  // unstyled link -- never the iframe (which never loads without JS) and
-  // never an empty box.
-  assert.equal(await page.locator('.newsletter-signup iframe').count(), 0);
-
-  await page.close();
-  await context.close();
 });

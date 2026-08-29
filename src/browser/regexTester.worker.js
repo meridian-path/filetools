@@ -13,7 +13,7 @@
 // Copied into dist/js/ by src/build.js's ALWAYS_COPY_CLIENT_FILES list
 // (not the per-tool CLIENT_FILES list -- it's never referenced by a
 // <script> tag, only by regexTester.client.js's own `new Worker(...)`
-// call), same fixed-file treatment as dropzone.client.js/newsletter.client.js.
+// call), same fixed-file treatment as dropzone.client.js.
 
 import { findMatches } from '../pure/regexTester.mjs';
 

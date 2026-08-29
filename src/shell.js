@@ -218,16 +218,20 @@ function renderBreadcrumb(crumbs) {
   return `<nav class="breadcrumb" aria-label="Breadcrumb">${items}</nav>`;
 }
 
-// Newsletter signup: wired to the project's Substack publication. The
-// embed URL below is the exact value Substack's own "embed a subscribe
-// widget" panel generates for that publication (Settings -> Growth), so
-// it is the one verified pointer to the right destination -- if the
-// provider is ever swapped, replace this one constant. Loaded lazily by
-// js/newsletter.client.js (only once its footer slot nears the viewport)
-// rather than unconditionally on every page -- an eagerly-loaded iframe
-// here cost the whole site's Lighthouse Performance budget, since the
-// footer this renders into is sitewide.
-const NEWSLETTER_FORM_ACTION = 'https://builtittheycome.substack.com/embed';
+// Newsletter signup: a plain outbound link to the project's Substack
+// publication, styled as a normal footer link -- no embedded iframe.
+// Craft-audit follow-up (2026-08-29 reference-library audit): this used to
+// lazy-load Substack's own hosted subscribe widget once its footer slot
+// scrolled into view, which rendered that provider's own dark avatar tile,
+// publication name, and orange "Subscribe" button on every one of this
+// site's 54 pages -- three brand elements that are not filetools' own,
+// competing with this site's single teal accent (this design system's own
+// "exactly ONE accent-filled action per view" rule) directly under a
+// footer whose accent is teal. Removed entirely rather than restyled: the
+// iframe's interior is cross-origin content this stylesheet has no access
+// to restyle, so containment had already hit its ceiling (see the CSS
+// comment this replaced). A plain link loses no real capability at this
+// site's current subscriber volume and needs no lazy-load machinery at all.
 const SUBSTACK_PUBLICATION_URL = 'https://builtittheycome.substack.com';
 
 /**
@@ -235,32 +239,9 @@ const SUBSTACK_PUBLICATION_URL = 'https://builtittheycome.substack.com';
  * appears on every page.
  */
 function renderNewsletterSignup() {
-  if (!NEWSLETTER_FORM_ACTION) {
-    return `<div class="newsletter-signup newsletter-signup--pending">
-      <h2 class="newsletter-heading">Hear about new tools</h2>
-      <p class="newsletter-description">Email sign-up isn&rsquo;t live yet. Check back soon, or follow the <a href="${escapeHtml(url('feed.xml'))}">RSS feed</a> in the meantime.</p>
-    </div>`;
-  }
-  const embedTitle = 'Email signup for filetools updates';
-  // D1 fix: this slot used to render EMPTY by default -- styled with a
-  // visible border/background (see .newsletter-embed in src/css.js) but no
-  // content, because the Substack iframe only arrives via
-  // IntersectionObserver (src/browser/newsletter.client.js) once the
-  // footer nears the viewport. Any load failure, or JS not running fast
-  // enough, rendered as a large empty bordered box, and the <noscript>
-  // fallback below was unreachable whenever JS ran but the iframe didn't
-  // load. Fix: the slot's DEFAULT content is now the same visible working
-  // link the <noscript> fallback used to be the only path to -- so every
-  // failure mode (slow load, failed load, JS disabled) degrades to a real
-  // link, never an empty box. newsletter.client.js replaces this whole
-  // element with the iframe only once it actually loads.
   return `<div class="newsletter-signup">
       <h2 class="newsletter-heading">Hear about new tools</h2>
-      <p class="newsletter-description">One email when a new tool ships. No spam, unsubscribe anytime.</p>
-      <div class="newsletter-slot" data-newsletter-slot data-newsletter-src="${escapeHtml(NEWSLETTER_FORM_ACTION)}" data-newsletter-title="${escapeHtml(embedTitle)}">
-        <a href="${escapeHtml(SUBSTACK_PUBLICATION_URL)}" target="_blank" rel="noopener noreferrer">Subscribe on Substack</a>
-      </div>
-      <p class="newsletter-provider-note">Signups are handled by Substack, our email provider - you&rsquo;ll see their subscribe box below.</p>
+      <p class="newsletter-description">One email when a new tool ships. No spam, unsubscribe anytime. <a href="${escapeHtml(SUBSTACK_PUBLICATION_URL)}" target="_blank" rel="noopener noreferrer">Subscribe on Substack</a>.</p>
     </div>`;
 }
 
@@ -341,7 +322,6 @@ ${mainHtml}
   </main>
   ${renderFooter()}
   ${toolIndexScript()}
-  <script type="module" src="${escapeHtml(url('js/newsletter.client.js'))}"></script>
   <script type="module" src="${escapeHtml(url('js/filter.client.js'))}"></script>
 </body>
 </html>

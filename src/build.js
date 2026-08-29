@@ -128,9 +128,8 @@ async function build() {
   // fs.copyFileSync line each; now derived from CLIENT_FILES, itself
   // assembled from every tool's own `clientEntry` field --
   // src/browserClients.js. dropzone.client.js (the page-agnostic
-  // controller) and newsletter.client.js (unrelated to any tool -- footer
-  // signup) are the only two files that are NOT per-tool, so they stay a
-  // fixed pair here rather than living in any tool's fragment.
+  // controller) is not per-tool, so it stays fixed here rather than living
+  // in any tool's fragment.
   const jsDir = path.join(OUT_DIR, 'js');
   fs.mkdirSync(jsDir, { recursive: true });
   const { CLIENT_FILES, MAX_BYTES_BY_CLIENT, PASTE_FILE } = assembleBrowserClients();
@@ -139,7 +138,7 @@ async function build() {
   // not a per-tool `<slug>.client.js` CLIENT_FILES already copies (it's
   // never referenced by a <script> tag, only by regexTester.client.js's
   // own `new Worker(...)` call), so it needs the same fixed-list treatment
-  // dropzone.client.js/newsletter.client.js get.
+  // dropzone.client.js gets.
   // batchProgress.js: the shared determinate-batch-progress formatter/
   // reporter (src/browser/batchProgress.js's own header comment) -- plain
   // ES-module `import`ed by name from a handful of per-tool client files
@@ -153,7 +152,7 @@ async function build() {
   // loaded by its own fixed <script> tag (src/pages/toolPage.js's
   // proFeatureHtml) rather than routed through dropzone.client.js's
   // PROCESSORS map by clientEntry/maxBytes.
-  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'newsletter.client.js', 'regexTester.worker.js', 'filter.client.js', 'batchProgress.js', 'compareCsvPro.client.js'];
+  const ALWAYS_COPY_CLIENT_FILES = ['dropzone.client.js', 'regexTester.worker.js', 'filter.client.js', 'batchProgress.js', 'compareCsvPro.client.js'];
   for (const file of [...ALWAYS_COPY_CLIENT_FILES, ...CLIENT_FILES]) {
     fs.copyFileSync(path.join(ROOT, 'src', 'browser', file), path.join(jsDir, file));
   }
