@@ -184,10 +184,26 @@ test('json-minify-beautify: uploading a .json file minifies/beautifies its conte
   await page.close();
 });
 
+// This tool is the one `pasteInput.live` tool on the site (auto-converts
+// 250ms after typing stops -- see dropzone.client.js's own liveDebounceTimer
+// comment), and its own live path treats empty input as a SILENT reset
+// (reportEmptyAsError: false), unlike the button-click path used below
+// (reportEmptyAsError: true). `page.fill()` dispatches a real `input`
+// event, which arms that 250ms live-debounce timer -- if it's still
+// pending when this test's own explicit button click sets the real error
+// message, the live timer's later silent reset clobbers it back to empty,
+// racing this test's own `waitForFunction` (this is exactly what made this
+// test flaky under full-suite CPU load: 2026-08-29 audit). Waiting out the
+// live-debounce's own window before clicking guarantees no pending timer
+// is left to interfere -- the button click is then the only thing that can
+// still change `.paste-status`.
+const LIVE_DEBOUNCE_SETTLE_MS = 400;
+
 test('json-minify-beautify: pasting whitespace-only text shows a friendly status, not a blank result', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '   ');
+  await page.waitForTimeout(LIVE_DEBOUNCE_SETTLE_MS);
   await page.locator('#paste-convert').click();
   // Craft-audit fix (item 5): a paste-triggered status lives in this
   // paste box's OWN `.paste-status` line now, never the shared file
@@ -203,6 +219,7 @@ test('json-minify-beautify: an empty paste never flips the unrelated file drop-z
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/json-minify-beautify/`, { waitUntil: 'networkidle' });
   await page.fill('#paste-textarea', '   ');
+  await page.waitForTimeout(LIVE_DEBOUNCE_SETTLE_MS);
   await page.locator('#paste-convert').click();
   await page.waitForFunction(() => document.querySelector('.paste-status')?.textContent.trim().length > 0);
   assert.equal(await page.locator('.dropzone').getAttribute('data-state'), 'idle');
