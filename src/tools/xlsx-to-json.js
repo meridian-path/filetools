@@ -34,7 +34,7 @@ module.exports = {
     },
     {
       q: 'What does a converted sheet look like?',
-      answerHtml: 'By default, the first row becomes each record\'s field names and every row after it becomes one JSON object, the same shape <code>json-to-csv</code>\'s output has in reverse. If a sheet\'s first row isn\'t really a header, turn the toggle off and every column instead gets a name like <code>column_1</code>, <code>column_2</code>.',
+      answerHtml: 'By default, the first row becomes each record’s field names and every row after it becomes one JSON object, the same shape <code>json-to-csv</code>’s output has in reverse. If a sheet’s first row isn’t really a header, turn the toggle off and every column instead gets a name like <code>column_1</code>, <code>column_2</code>.',
     },
     {
       q: 'Does it keep numbers and dates as their real types, or turn everything into text?',
@@ -42,7 +42,7 @@ module.exports = {
     },
     {
       q: 'What about formulas and merged cells?',
-      answerHtml: 'A formula cell exports its last-calculated result, not the formula text itself - open the file in Excel first if you need it recalculated. A merged cell\'s value is only present in its top-left cell; the other cells the merge covers export as empty, matching how the file stores them.',
+      answerHtml: 'A formula cell exports its last-calculated result, not the formula text itself - open the file in Excel first if you need it recalculated. A merged cell’s value is only present in its top-left cell; the other cells the merge covers export as empty, matching how the file stores them.',
     },
     {
       q: 'Does this handle every sheet in the workbook?',

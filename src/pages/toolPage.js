@@ -85,7 +85,7 @@ function renderToolPage(tool, example = {}) {
   })();
   const faqs = (SPEED_FEATURE_FOLDERS.has(tool.folder) && tool.faqs.length)
     ? tool.faqs.map((f, i) => (i === privacyFaqIndex
-      ? { ...f, answerHtml: `${f.answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser's network tab will show for this page's own scripts.` }
+      ? { ...f, answerHtml: `${f.answerHtml} This page loads ${escapeHtml(realPageJsWeightKbLabel(tool))} of JavaScript, gzipped - about what your browser’s network tab will show for this page’s own scripts.` }
       : f))
     : tool.faqs;
 
