@@ -1673,35 +1673,7 @@ ${designTokensCss(DESIGN_TOKENS)}
   .newsletter-description {
     color: var(--color-muted);
     font-size: var(--text-xs);
-    margin: 0 0 var(--space-3);
-  }
-  .newsletter-signup--pending .newsletter-description { margin-bottom: 0; }
-  /* D1 fix: the styled box (border/background/fixed height) now belongs
-     ONLY to the loaded iframe -- the default slot (.newsletter-slot,
-     src/shell.js) renders as a plain link with no box at all, so a load
-     that never happens degrades to a real link, not an empty rectangle. */
-  .newsletter-slot a { font-weight: var(--weight-medium); }
-  /* Craft-audit fix (item 9): the loaded iframe is Substack's own hosted
-     subscribe widget -- its internal avatar/title/"Powered by Substack"
-     wordmark/ToS links are cross-origin content this stylesheet has no
-     access to restyle. Rather than let that appear as an unexplained seam
-     ("two different products stitched together"), one small labeled line
-     names the hand-off before it happens, the same way GOV.UK's error
-     pattern states plainly what's about to happen rather than leaving a
-     visitor to infer it. */
-  .newsletter-provider-note {
-    margin: var(--space-2) 0 0;
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-  }
-  .newsletter-embed {
-    display: block;
-    width: 100%;
-    max-width: 480px;
-    height: 320px;
-    border: var(--border-hairline) solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg);
+    margin: 0;
   }
 
   /* -------------------------------------------------------------------
