@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Extract Images from PDF',
   title: 'Extract Images from PDF Free - In Your Browser | filetools',
   metaDescription: 'Pull every embedded photo or image out of a PDF and download them as PNG files, free, with no upload and no sign-up. Your file never leaves your device.',
-  deck: 'Drop a PDF and every embedded image comes back as its own thumbnail - pick which ones you want and download them as PNG files, zipped together. Nothing is uploaded.',
+  deck: 'Drop a PDF and every embedded image comes back as its own thumbnail - pick which ones you want and download them as PNG files, zipped together.',
   clientEntry: 'pdfImageExtract',
   family: 'pdf',
   folder: 'pdf',

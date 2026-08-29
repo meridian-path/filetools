@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Generate UUIDs',
   title: 'UUID / GUID Generator - v1, v4, v5, v7 | filetools',
   metaDescription: 'Generate UUID v1, v4, v5, and v7 identifiers, one at a time or up to 1,000 at once, free and in your browser. No upload, no sign-up.',
-  deck: 'Pick a UUID version and how many you need, and get ready-to-use UUIDs instantly - one at a time or up to 1,000 at once. Nothing is sent anywhere.',
+  deck: 'Pick a UUID version and how many you need, and get ready-to-use UUIDs instantly - one at a time or up to 1,000 at once.',
   clientEntry: 'uuidGenerator',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

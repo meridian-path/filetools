@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Remove Duplicate Lines from a List or CSV',
   title: 'Remove Duplicate Lines or CSV Rows | filetools',
   metaDescription: 'Paste a list or drop a .txt/.csv file and get it back with duplicate lines removed, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste a list, or drop a .txt or .csv file, and download it back with every duplicate line removed. Nothing is sent anywhere.',
+  deck: 'Paste a list, or drop a .txt or .csv file, and download it back with every duplicate line removed.',
   clientEntry: 'dedupeLines',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

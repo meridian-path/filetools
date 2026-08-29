@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Convert Unix Timestamps',
   title: 'Unix Timestamp / Epoch Converter | filetools',
   metaDescription: 'Convert a Unix timestamp to a human-readable date and back, in seconds or milliseconds, with explicit UTC and local time, free and in your browser.',
-  deck: 'Convert a Unix/epoch timestamp to a readable date, or a date back to a timestamp, in seconds or milliseconds, with both UTC and your local time shown explicitly. Nothing is sent anywhere.',
+  deck: 'Convert a Unix/epoch timestamp to a readable date, or a date back to a timestamp, in seconds or milliseconds, with both UTC and your local time shown explicitly.',
   clientEntry: 'unixTimestampConverter',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

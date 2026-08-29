@@ -10,7 +10,7 @@ module.exports = {
   h1: 'URL Encode and Decode',
   title: 'URL Encode and Decode Online - In Your Browser | filetools',
   metaDescription: 'Paste text or a URL and get both the percent-encoded and decoded versions instantly, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste any text, query string, or URL and see the percent-encoded and decoded versions side by side, updated instantly. Nothing is sent anywhere.',
+  deck: 'Paste any text, query string, or URL and see the percent-encoded and decoded versions side by side, updated instantly.',
   clientEntry: 'urlEncode',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

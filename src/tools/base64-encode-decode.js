@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Base64 Encode and Decode',
   title: 'Base64 Encode and Decode - In Your Browser | filetools',
   metaDescription: 'Paste text or Base64, or drop a file, and encode or decode it, free and in your browser. No upload, no sign-up.',
-  deck: 'Paste text or Base64, or drop a file, and switch between encode and decode instantly. Nothing is sent anywhere.',
+  deck: 'Paste text or Base64, or drop a file, and switch between encode and decode instantly.',
   clientEntry: 'base64',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

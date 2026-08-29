@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Convert CSV to Excel (XLSX)',
   title: 'Convert CSV to Excel (XLSX) - In Your Browser | filetools',
   metaDescription: 'Paste a CSV or drop a .csv file and download a real .xlsx workbook - numeric columns become real Excel numbers, free and in your browser.',
-  deck: 'Paste CSV data, or drop a .csv file, and download it as a genuine .xlsx workbook, opens directly in Excel or Sheets. Nothing is sent anywhere.',
+  deck: 'Paste CSV data, or drop a .csv file, and download it as a genuine .xlsx workbook, opens directly in Excel or Sheets.',
   clientEntry: 'csvToXlsx',
   family: 'csv',
   folder: 'spreadsheets',

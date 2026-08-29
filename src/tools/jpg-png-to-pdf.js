@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Convert JPG/PNG to PDF',
   title: 'Convert JPG/PNG to PDF Free - In Your Browser | filetools',
   metaDescription: 'Combine JPG and PNG images into a single PDF, free, with no upload and no sign-up. Reorder images before converting. Your files never leave your device.',
-  deck: 'Choose or drop one or more JPG/PNG images, put them in order, and download a single PDF - one page per image. Nothing is uploaded.',
+  deck: 'Choose or drop one or more JPG/PNG images, put them in order, and download a single PDF - one page per image.',
   clientEntry: 'imagesToPdf',
   // Registration fragment -- see src/tools/pdf-merge.js's comment above
   // its own `family` field for what these mean.

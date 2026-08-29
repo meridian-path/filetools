@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Split a CSV Into Multiple Files',
   title: 'Split a CSV Into Multiple Files | filetools',
   metaDescription: 'Split a large CSV into smaller files of a set number of rows each, free, with no upload and no sign-up. Downloads as one zip.',
-  deck: 'Drop a large CSV and download it split into smaller files of however many rows you choose - the header row repeated in each one, packaged as a single zip. Nothing is uploaded.',
+  deck: 'Drop a large CSV and download it split into smaller files of however many rows you choose - the header row repeated in each one, packaged as a single zip.',
   clientEntry: 'splitCsv',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

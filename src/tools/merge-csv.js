@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Merge Multiple CSV Files',
   title: 'Merge CSV Files Free - In Your Browser | filetools',
   metaDescription: 'Combine two or more CSV files into one, free, with no upload and no sign-up. Files with different columns still line up, with blanks filled in.',
-  deck: 'Drop two or more CSV files and download them combined into one - mismatched columns line up by name, with blanks filled in rather than data shifted into the wrong column. Nothing is uploaded.',
+  deck: 'Drop two or more CSV files and download them combined into one - mismatched columns line up by name, with blanks filled in rather than data shifted into the wrong column.',
   clientEntry: 'csvMerge',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

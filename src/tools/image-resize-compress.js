@@ -10,7 +10,7 @@ module.exports = {
   h1: 'Resize or Compress an Image',
   title: 'Resize & Compress Images Free - In Your Browser | filetools',
   metaDescription: 'Resize a JPG, PNG, or WebP image and compress it with a live quality preview, free and in your browser. No upload, no sign-up required.',
-  deck: 'Drop a JPG, PNG, or WebP image, set a new width or height, and adjust the output quality - the preview and file size update live as you go. Nothing is uploaded.',
+  deck: 'Drop a JPG, PNG, or WebP image, set a new width or height, and adjust the output quality - the preview and file size update live as you go.',
   clientEntry: 'imageResizeCompress',
   // Registration fragment -- see pdf-merge.js's comment above its own
   // `family` field for what these mean and how they're assembled.

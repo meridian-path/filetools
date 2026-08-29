@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Convert JSON to YAML',
   title: 'Convert JSON to YAML - In Your Browser | filetools',
   metaDescription: 'Paste JSON or drop a .json file and get YAML back, free and in your browser - the reverse of this site’s own YAML to JSON tool.',
-  deck: 'Paste JSON, or drop a .json file, and download it as YAML. Nothing is sent anywhere.',
+  deck: 'Paste JSON, or drop a .json file, and download it as YAML.',
   clientEntry: 'jsonToYaml',
   family: 'json',
   folder: 'data-formats',

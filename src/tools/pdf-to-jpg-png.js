@@ -8,7 +8,7 @@ module.exports = {
   h1: 'Convert PDF to JPG/PNG',
   title: 'Convert PDF to JPG/PNG Free - In Your Browser | filetools',
   metaDescription: 'Turn every page of a PDF into a JPG or PNG image, free, with no upload and no sign-up. Download all pages as one zip. Your file never leaves your device.',
-  deck: 'Drop a PDF and render every page as a JPG or PNG image, previewed before you download. All pages come back together in one zip file. Nothing is uploaded.',
+  deck: 'Drop a PDF and render every page as a JPG or PNG image, previewed before you download. All pages come back together in one zip file.',
   clientEntry: 'pdfToImages',
   family: 'pdf',
   folder: 'pdf',
