@@ -61,7 +61,7 @@ module.exports = {
       answerHtml: 'A one-time $3 unlock (no subscription) for two things: batch mode, comparing many file pairs in one pass instead of one at a time, and a combined Excel report - one workbook, one sheet per pair, with changed/added/removed rows highlighted. Everything above stays free and unaffected either way.',
     },
   ],
-  relatedSlugs: ['merge-csv', 'sort-lines', 'remove-duplicate-lines'],
+  relatedSlugs: ['merge-csv', 'sort-lines', 'remove-duplicate-lines', 'text-diff'],
   // Compare-CSV Pro: a one-time $3 unlock adding
   // batch multi-pair compare + a combined Excel diff report. See
   // src/pages/toolPage.js's proFeatureHtml and

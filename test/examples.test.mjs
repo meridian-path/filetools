@@ -32,6 +32,7 @@ import { matchFixture as regexMatchFixture, FIXTURE_TEST_STRING as REGEX_FIXTURE
 import { beautifyFixture as sqlFormatterFixture } from '../src/examples/sql-formatter.mjs';
 import { countFixture as wordCharacterCountFixture, FIXTURE_TEXT as WORD_CHARACTER_FIXTURE_TEXT } from '../src/examples/word-character-counter.mjs';
 import { convertFixture as unixTimestampFixture, FIXTURE_JSON as UNIX_TIMESTAMP_FIXTURE_JSON } from '../src/examples/unix-timestamp-converter.mjs';
+import { diffFixture as textDiffFixture } from '../src/examples/text-diff.mjs';
 import { SITE_CSS } from '../src/css.js';
 
 /**
@@ -588,4 +589,22 @@ test('base64-encode-decode example: the rendered HTML shows the input text and t
   const html = exampleFor('base64-encode-decode');
   assert.ok(html.includes('filetools: caf'));
   assert.ok(html.includes('ZmlsZXRvb2xzOiBjYWbDqSBlZGl0aW9u'));
+});
+
+test('text-diff example: the fixture reports exactly one changed, one removed, one added, two unchanged lines', () => {
+  const outcome = textDiffFixture();
+  assert.deepEqual(outcome.stats, {
+    unchanged: 2, changed: 1, added: 1, removed: 1,
+  });
+  assert.deepEqual(outcome.rows.map((r) => r.status), ['changed', 'unchanged', 'removed', 'added', 'unchanged']);
+});
+
+test('text-diff example: the rendered HTML shows the two-pane grid with the real word-level highlight and the removed/added lines', () => {
+  const html = exampleFor('text-diff');
+  assert.ok(html.includes('class="text-diff-grid"'));
+  assert.ok(html.includes('<mark class="text-diff-del">jumps</mark>'));
+  assert.ok(html.includes('<mark class="text-diff-ins">leaps</mark>'));
+  assert.ok(html.includes('This line will be removed.'));
+  assert.ok(html.includes('A brand new line goes here.'));
+  assert.ok(html.includes('data-diff-status="empty"'));
 });

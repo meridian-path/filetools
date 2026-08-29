@@ -122,7 +122,7 @@ test('nav: each folder group shows the real, current tool count', async () => {
     { label: 'PDF', count: '8', rows: 8 },
     { label: 'CSV & Spreadsheets', count: '10', rows: 10 },
     { label: 'JSON & Data Formats', count: '6', rows: 6 },
-    { label: 'Text', count: '5', rows: 5 },
+    { label: 'Text', count: '6', rows: 6 },
     { label: 'Developer', count: '9', rows: 9 },
   ]);
   await page.close();

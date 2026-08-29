@@ -60,7 +60,7 @@ test('every slug in the TOOLS registry resolves to an explicit MARKS entry (fall
   assert.deepEqual(missing, [], `slugs missing an explicit mark: ${missing.join(', ')}`);
 });
 
-test('MARKS is exactly the fixed 38-row plate/verb/ink table, no more, no fewer', () => {
+test('MARKS is exactly the fixed 39-row plate/verb/ink table, no more, no fewer', () => {
   assert.deepEqual(MARKS, {
     'merge-pdf': { plate: 'pdf', verb: 'merge', ink: 'pdf' },
     'split-pdf': { plate: 'pdf', verb: 'split', ink: 'pdf' },
@@ -90,6 +90,7 @@ test('MARKS is exactly the fixed 38-row plate/verb/ink table, no more, no fewer'
     'word-frequency-counter': { plate: 'text', verb: 'count', ink: 'text' },
     'text-case-converter': { plate: 'text', verb: 'convert', ink: 'text' },
     'word-character-counter': { plate: 'text', verb: 'count', ink: 'text' },
+    'text-diff': { plate: 'text', verb: 'compare', ink: 'text' },
     // 'dev' plate/ink (craft-audit fix, item 7) -- see families.test.mjs's
     // own comment on this same taxonomy change.
     'url-encode-decode': { plate: 'dev', verb: 'convert', ink: 'dev' },

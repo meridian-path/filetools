@@ -41,7 +41,7 @@ test('familyOf() falls back to the default family for an unrecognized slug, neve
   assert.equal(familyOf(undefined), DEFAULT_FAMILY);
 });
 
-test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\'), 38-slug assignment', () => {
+test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\'), 39-slug assignment', () => {
   assert.deepEqual(FAMILY_BY_SLUG, {
     'merge-pdf': 'pdf',
     'split-pdf': 'pdf',
@@ -76,6 +76,7 @@ test('the taxonomy is exactly the spec\'s 6-family (5 format families + \'dev\')
     'word-frequency-counter': 'text',
     'text-case-converter': 'text',
     'word-character-counter': 'text',
+    'text-diff': 'text',
 
     // 'dev' -- genuine developer-utility tools (folders.js's 'developer'
     // folder), craft-audit fix item 7. Distinct from the genuine
