@@ -1183,6 +1183,42 @@ ${designTokensCss(DESIGN_TOKENS)}
   }
 
   /* -------------------------------------------------------------------
+     JSON diff / compare tree (src/browser/jsonDiff.client.js). A single
+     indented monospace tree (unlike text-diff's two-pane grid above) --
+     a JSON document's varying nesting depth doesn't line up cell-for-cell
+     the way flat text lines do, so this renders one column, git-diff-
+     style: an unchanged line is plain, a changed value becomes a removed
+     line directly followed by an added line (same "-"/"+" pairing
+     convention as text-diff's own "Copy as diff text" unified format),
+     and a wholesale added/removed subtree tints every line inside it, not
+     just its own top line. Reuses .json-preview's own monospace/wrap
+     convention (src/browser/yamlToJson.client.js) and the same success/
+     danger color tokens text-diff-ins/text-diff-del already use above,
+     as block-level line backgrounds instead of inline <mark> spans.
+     ------------------------------------------------------------------- */
+  .json-diff-tree {
+    max-height: 480px;
+    overflow: auto;
+    margin: var(--space-4) 0 0;
+    padding: var(--space-3);
+    background: var(--color-surface-alt);
+    border: var(--border-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--color-text);
+    white-space: pre;
+  }
+  .json-diff-line {
+    display: block;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+  .json-diff-line[data-status="added"] { background: var(--color-success-bg); color: var(--color-success); }
+  .json-diff-line[data-status="removed"] { background: var(--color-danger-bg); color: var(--color-danger); }
+
+  /* -------------------------------------------------------------------
      Second input path: "paste markup" (html-table-to-csv today; toolPage.js
      only renders this block when a tool config sets pasteInput)
      ------------------------------------------------------------------- */

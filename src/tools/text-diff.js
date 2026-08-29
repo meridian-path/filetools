@@ -64,5 +64,5 @@ module.exports = {
       answerHtml: 'A removed-and-inserted line pair is only shown as one “changed” line (with the specific words that differ underlined) when the two lines are similar enough that highlighting a word-level difference is more useful than showing them as unrelated - the same threshold ../pure/csvDiff.mjs’s cell-level diff uses for CSV rows. Two lines that share almost nothing in common are shown as a plain removed line and a plain added line instead.',
     },
   ],
-  relatedSlugs: ['compare-csv', 'remove-duplicate-lines', 'word-frequency-counter'],
+  relatedSlugs: ['compare-csv', 'json-diff', 'remove-duplicate-lines', 'word-frequency-counter'],
 };
