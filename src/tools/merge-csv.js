@@ -22,6 +22,17 @@ module.exports = {
   fileTypeLabel: 'CSV',
   accepts: '.csv,text/csv',
   multiple: true,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. The two files have deliberately mismatched columns
+  // (Email vs Phone) so clicking the sample shows this tool's real
+  // union-by-header-name merge, not just two identical-shape files stacked.
+  sampleInput: {
+    label: 'sample CSVs',
+    files: [
+      { filename: 'sample-a.csv', mimeType: 'text/csv' },
+      { filename: 'sample-b.csv', mimeType: 'text/csv' },
+    ],
+  },
   howSteps: [
     'Choose or drop two or more .csv files.',
     'Review the preview - each file’s row count and any column differences are listed above the table.',

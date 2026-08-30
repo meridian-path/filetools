@@ -24,6 +24,12 @@ module.exports = {
   fileTypeLabel: 'PDF',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field.
+  sampleInput: {
+    label: 'sample PDF',
+    files: [{ filename: 'sample-with-images.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Drop or choose a PDF file.',
     'Wait while every page is scanned for embedded images - every one found appears as its own thumbnail, checked by default.',

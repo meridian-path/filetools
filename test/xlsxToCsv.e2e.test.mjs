@@ -204,6 +204,42 @@ test('xlsx-to-csv: downloaded CSV has the correct values -- shared string, numbe
   await page.close();
 });
 
+test('xlsx-to-csv: clicking "Try sample workbook" loads the real bundled fixture and downloads a correct CSV', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writeXlsxSamples(), a real ExcelJS workbook) has one
+  // "Orders" sheet with 3 rows including a boolean cell, so this only
+  // passes if the click actually fetched it and ran it through the same
+  // real xlsx-parsing path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/xlsx-to-csv/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  const badgeText = await page.locator('.page-badge').first().textContent();
+  assert.match(badgeText, /Orders/);
+  const headerTexts = await page.locator('.table-block .extracted-table thead th').allTextContents();
+  assert.deepEqual(headerTexts, ['Name', 'Price', 'InStock']);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download CSV")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-xlsx-out.csv');
+  await download.saveAs(outPath);
+  const csvBytes = fs.readFileSync(outPath);
+  assert.deepEqual([...csvBytes.subarray(0, 3)], [0xef, 0xbb, 0xbf], 'CSV should start with a UTF-8 BOM');
+  assert.equal(
+    csvBytes.subarray(3).toString('utf8'),
+    'Name,Price,InStock\r\nCoffee,4.5,TRUE\r\nTea,3.25,FALSE\r\nCocoa,5.75,TRUE\r\n'
+  );
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('xlsx-to-csv: a file that isn\'t a real zip/workbook gets a clear error, never a raw exception', async () => {
   const page = await browser.newPage();
   const errors = [];

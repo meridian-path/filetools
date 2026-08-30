@@ -151,6 +151,36 @@ test('split-pdf: a typed page range extracts exactly those pages', async () => {
   await page.close();
 });
 
+test('split-pdf: clicking "Try sample PDF" loads the real bundled 4-page fixture and extracts a real range from it', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writePdfSplitSample()) is a real 4-page PDF, so this only
+  // passes if the click actually fetched it and ran it through the same
+  // real split path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/split-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.page-grid .page-card');
+  assert.equal(await page.locator('.page-grid .page-card').count(), 4);
+
+  await page.fill('#page-range-input', '1-2');
+  await page.locator('#page-range-input').dispatchEvent('change');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Split PDF")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-split-out.pdf');
+  await download.saveAs(outPath);
+  const doc = await PDFDocument.load(fs.readFileSync(outPath));
+  assert.equal(doc.getPageCount(), 2);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('rotate-pdf: rotating one page writes that rotation into the saved file', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   const errors = collectPageErrors(page);
@@ -166,6 +196,34 @@ test('rotate-pdf: rotating one page writes that rotation into the saved file', a
     page.locator('button:has-text("Save rotated PDF")').click(),
   ]);
   const outPath = path.join(TMP, 'rotate-out.pdf');
+  await download.saveAs(outPath);
+  const doc = await PDFDocument.load(fs.readFileSync(outPath));
+  assert.equal(doc.getPage(0).getRotation().angle, 90);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('rotate-pdf: clicking "Try sample PDF" loads the real bundled fixture and rotates a real page in it', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writePdfRotateSample()) is a real 2-page PDF, so this only
+  // passes if the click actually fetched it and ran it through the same
+  // real rotate path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/rotate-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.page-grid .page-card');
+
+  await page.locator('.page-grid .page-card').first().locator('button[aria-label$="right"]').click();
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Save rotated PDF")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-rotate-out.pdf');
   await download.saveAs(outPath);
   const doc = await PDFDocument.load(fs.readFileSync(outPath));
   assert.equal(doc.getPage(0).getRotation().angle, 90);

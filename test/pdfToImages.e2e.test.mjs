@@ -122,6 +122,30 @@ test('pdf-to-jpg-png: uploading a 3-page PDF previews 3 pages and downloads a zi
   await page.close();
 });
 
+test('pdf-to-jpg-png: clicking "Try sample PDF" loads the real bundled fixture and renders its 2 real colored pages', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writePdfToImagesSample()) is a real 2-page colored PDF, so
+  // this only passes if the click actually fetched it and ran it through
+  // the same real page-render path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/pdf-to-jpg-png/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForFunction(() => document.querySelectorAll('.page-grid .page-card').length === 2);
+
+  const { entries, suggested } = await downloadZip(page, 'Convert to images');
+  assert.equal(suggested, 'sample-images.zip');
+  assert.deepEqual(Object.keys(entries).sort(), ['sample-page-1.jpg', 'sample-page-2.jpg']);
+  for (const bytes of Object.values(entries)) {
+    assert.deepEqual([...bytes.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+  }
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('pdf-to-jpg-png: selecting PNG downloads a zip of real PNGs instead', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}pdf/pdf-to-jpg-png/`, { waitUntil: 'networkidle' });

@@ -25,6 +25,13 @@ module.exports = {
   fileTypeLabel: 'PDF',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. The bundled fixture's 2 pages are different solid
+  // colors, so the resulting images are obviously not one page repeated.
+  sampleInput: {
+    label: 'sample PDF',
+    files: [{ filename: 'sample.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Drop or choose a PDF file.',
     'Preview every page, then pick JPG or PNG as the output format.',

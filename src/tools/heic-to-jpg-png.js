@@ -38,6 +38,15 @@ module.exports = {
   // extension.
   accepts: 'image/heic,image/heif,.heic,.heif',
   multiple: true,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. The bundled fixture is a copy of test/fixtures/
+  // testsrc.heic (see that directory's own README for its real,
+  // already-vetted provenance/license) -- there's no practical way to
+  // generate a fresh HEIC file from Node or a browser.
+  sampleInput: {
+    label: 'sample photo',
+    files: [{ filename: 'sample-photo.heic', mimeType: 'image/heic' }],
+  },
   howSteps: [
     'Drop or choose one or more .heic/.heif photos.',
     'Pick JPG or PNG as the output format.',

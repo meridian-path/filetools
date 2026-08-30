@@ -133,6 +133,36 @@ test('merge-csv: the per-file summary reports the new column', async () => {
   await page.close();
 });
 
+test('merge-csv: clicking "Try sample CSVs" loads the two real bundled fixtures and merges their mismatched columns', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixtures (scripts/generate-sample-
+  // assets.js's writeMergeCsvSamples()) have deliberately mismatched
+  // columns (Email vs Phone), so this only passes if the click actually
+  // fetched both files and ran them through the same real union-merge path
+  // a drop takes.
+  const page = await browser.newPage();
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/merge-csv/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  const headerTexts = await page.locator('.table-block .extracted-table thead th').allTextContents();
+  assert.deepEqual(headerTexts, ['Name', 'Email', 'Phone']);
+  const rows = await page.locator('.table-block .extracted-table tbody tr').evaluateAll(
+    (trs) => trs.map((tr) => Array.from(tr.querySelectorAll('td')).map((td) => td.textContent))
+  );
+  assert.deepEqual(rows, [
+    ['Alice', 'alice@example.com', ''],
+    ['Bob', 'bob@example.com', ''],
+    ['Carol', '', '555-0101'],
+    ['Dave', '', '555-0102'],
+  ]);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('merge-csv: turning off "each file has a header row" merges positionally', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/merge-csv/`, { waitUntil: 'networkidle' });

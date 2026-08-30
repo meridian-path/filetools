@@ -21,6 +21,12 @@ module.exports = {
   mode: 'rotate',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field.
+  sampleInput: {
+    label: 'sample PDF',
+    files: [{ filename: 'sample.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Choose or drop one PDF file.',
     'Rotate individual pages left or right, or use “Rotate all” to turn every page at once.',
