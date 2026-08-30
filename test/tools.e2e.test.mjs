@@ -102,6 +102,31 @@ test('merge-pdf: combines two files into one, in order, with no console errors',
   await page.close();
 });
 
+test('merge-pdf: clicking "Try sample PDFs" loads the two real bundled fixtures and merges them, with no console errors', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site, not a mocked fetch -- clicking the button should
+  // reach the exact same file-list/state/processor path a real drop does.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/merge-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.file-list .file-row');
+  assert.equal(await page.locator('.file-list .file-row').count(), 2, 'both bundled sample PDFs should be picked up');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Merge PDFs")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-merged-out.pdf');
+  await download.saveAs(outPath);
+  const doc = await PDFDocument.load(fs.readFileSync(outPath));
+  assert.equal(doc.getPageCount(), 4, 'the two bundled 2-page sample PDFs should merge into 4 real pages');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('split-pdf: a typed page range extracts exactly those pages', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   const errors = collectPageErrors(page);
