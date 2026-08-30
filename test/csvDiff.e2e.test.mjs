@@ -123,6 +123,33 @@ test('compare-csv: a changed cell shows the old and new value', async () => {
   await page.close();
 });
 
+test('compare-csv: clicking "Try sample CSVs" loads the two real bundled fixtures and shows a real diff', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixtures (scripts/generate-sample-
+  // assets.js's writeCompareCsvSamples()) have 1 unchanged, 1 changed, 1
+  // removed, and 1 added row by design, so this only passes if the click
+  // actually fetched both files and ran them through the same real diff
+  // path a drop takes.
+  const page = await browser.newPage();
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/compare-csv/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  const badgeText = await page.locator('.page-badge').textContent();
+  assert.match(badgeText, /1 changed/);
+  assert.match(badgeText, /1 added/);
+  assert.match(badgeText, /1 removed/);
+  const statuses = await page.locator('.table-block .extracted-table tbody tr').evaluateAll(
+    (trs) => trs.map((tr) => tr.getAttribute('data-diff-status'))
+  );
+  assert.deepEqual(statuses.sort(), ['added', 'changed', 'removed']);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('compare-csv: selecting only one file shows a clear "exactly two files" error', async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}data/compare-csv/`, { waitUntil: 'networkidle' });

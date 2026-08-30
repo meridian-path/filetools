@@ -142,6 +142,30 @@ test('pdf-to-csv: finds the table, treats the first row as a header, and downloa
   await page.close();
 });
 
+test('pdf-to-csv: clicking "Try sample PDF" loads the real bundled fixture and extracts its real table', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writePdfTablesSample()) is the same Fruit Inventory table
+  // shape this file's own buildTablePdf() builds, so this only passes if
+  // the click actually fetched it and ran it through the same real
+  // table-extraction path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/pdf-to-csv/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  assert.equal(await page.locator('.table-block').count(), 1, 'should find exactly one table');
+  const headerTexts = await page.locator('.table-block .extracted-table thead th:not(.sr-only)').allTextContents();
+  assert.deepEqual(headerTexts, ['Name', 'Qty', 'Price']);
+  const bodyRows = await page.locator('.table-block .extracted-table tbody tr').count();
+  assert.equal(bodyRows, 3, 'three data rows (Apples/Bananas/Cherries) should render under the header');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('pdf-to-csv: editing a column boundary recomputes the table cells live', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}pdf/pdf-to-csv/`, { waitUntil: 'networkidle' });

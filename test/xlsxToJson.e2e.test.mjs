@@ -122,6 +122,42 @@ test('xlsx-to-json: uploading a single-sheet workbook previews it and downloads 
   await page.close();
 });
 
+test('xlsx-to-json: clicking "Try sample workbook" loads the real bundled fixture and downloads matching, typed JSON', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writeXlsxSamples(), a real ExcelJS workbook) has one
+  // "Orders" sheet with 3 rows including a boolean cell, so this only
+  // passes if the click actually fetched it and ran it through the same
+  // real xlsx-parsing path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/xlsx-to-json/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  const headerTexts = await page.locator('.table-block .extracted-table thead th').allTextContents();
+  assert.deepEqual(headerTexts, ['Name', 'Price', 'InStock']);
+  const bodyRowCount = await page.locator('.table-block .extracted-table tbody tr').count();
+  assert.equal(bodyRowCount, 3);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download JSON")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-orders-out.json');
+  await download.saveAs(outPath);
+  const records = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+  assert.deepEqual(records, [
+    { Name: 'Coffee', Price: 4.5, InStock: true },
+    { Name: 'Tea', Price: 3.25, InStock: false },
+    { Name: 'Cocoa', Price: 5.75, InStock: true },
+  ]);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('xlsx-to-json: turning off "first row is a header" produces column_N keys instead', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}data/xlsx-to-json/`, { waitUntil: 'networkidle' });

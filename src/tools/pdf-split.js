@@ -21,6 +21,13 @@ module.exports = {
   mode: 'split',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. The bundled fixture has 4 pages so a typed range like
+  // "1-2" is meaningful, not a 1-page file with nothing to split.
+  sampleInput: {
+    label: 'sample PDF',
+    files: [{ filename: 'sample.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Choose or drop one PDF file.',
     'Check the pages you want (or type a range like “1-3, 7, 9-12”), and choose whether you want them as one file or as separate files.',

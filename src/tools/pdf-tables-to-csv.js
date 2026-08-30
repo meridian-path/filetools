@@ -21,6 +21,12 @@ module.exports = {
   mode: 'tables',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field.
+  sampleInput: {
+    label: 'sample PDF',
+    files: [{ filename: 'sample-table.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Choose or drop one PDF file.',
     'Review the tables it found - each one shown as a real table, with a toggle for whether the first row is a header and controls to fix a column boundary or drop a stray row.',

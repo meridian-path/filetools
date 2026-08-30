@@ -173,6 +173,33 @@ test('extract-images-from-pdf: a two-page PDF with one image per page numbers ea
   await page.close();
 });
 
+test('extract-images-from-pdf: clicking "Try sample PDF" loads the real bundled fixture and extracts its 2 real embedded images', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture (scripts/generate-sample-
+  // assets.js's writeExtractImagesPdfSample()) is a genuine 2-page PDF with
+  // a real embedded JPEG per page, so this only passes if the click
+  // actually fetched it and ran it through the same real image-scan path a
+  // drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  await page.goto(`${baseUrl}pdf/extract-images-from-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.file-list .file-row', { timeout: 20000 });
+  assert.equal(await page.locator('.file-list .file-row').count(), 2);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Download")').click(),
+  ]);
+  const zipPath = await download.path();
+  const entries = unzipSync(new Uint8Array(fs.readFileSync(zipPath)));
+  assert.deepEqual(Object.keys(entries).sort(), [
+    'sample-with-images-page-1-image-01.png',
+    'sample-with-images-page-2-image-01.png',
+  ]);
+  await page.close();
+});
+
 test('extract-images-from-pdf: scanning many pages shows real per-page progress (determinate bar), the same shared pattern its sibling tools use', async () => {
   // Real assertion, not a proxy: this loop already produced real "Scanning
   // page N of M..." text before this pass -- what's new is the determinate

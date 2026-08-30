@@ -152,6 +152,34 @@ test('jpg-png-to-pdf: combines a PNG and a JPG into a two-page PDF, one page per
   await page.close();
 });
 
+test('jpg-png-to-pdf: clicking "Try sample images" loads the two real bundled fixtures (one JPG, one PNG) and converts them into a real 2-page PDF', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixtures (scripts/generate-sample-
+  // assets.js's writeJpgPngToPdfSamples()) are a real 320x240 JPEG and a
+  // real 320x240 PNG, so this only passes if the click actually fetched
+  // both and ran them through the same real image-to-PDF path a drop
+  // takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  await page.goto(`${baseUrl}pdf/jpg-png-to-pdf/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.file-list .file-row');
+  assert.equal(await page.locator('.file-list .file-row').count(), 2);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 15000 }),
+    page.locator('button:has-text("Convert to PDF")').click(),
+  ]);
+  const outPath = path.join(TMP, 'sample-combined-out.pdf');
+  await download.saveAs(outPath);
+  const doc = await PDFDocument.load(fs.readFileSync(outPath));
+  assert.equal(doc.getPageCount(), 2);
+  // 320x240 pixels at 144 DPI (0.5 points per pixel) = 160x120 points.
+  assert.deepEqual(doc.getPage(0).getSize(), { width: 160, height: 120 });
+  assert.deepEqual(doc.getPage(1).getSize(), { width: 160, height: 120 });
+  await page.close();
+});
+
 test('jpg-png-to-pdf: the up/down reorder controls actually change page order in the downloaded PDF', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}pdf/jpg-png-to-pdf/`, { waitUntil: 'networkidle' });

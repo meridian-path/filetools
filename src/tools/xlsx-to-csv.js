@@ -22,6 +22,12 @@ module.exports = {
   fileTypeLabel: '.xlsx file',
   accepts: '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   multiple: false,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field.
+  sampleInput: {
+    label: 'sample workbook',
+    files: [{ filename: 'sample.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }],
+  },
   howSteps: [
     'Drop or choose an .xlsx workbook.',
     'Review each sheet it found: a real preview, with a toggle for whether the first row is a header.',

@@ -24,6 +24,16 @@ module.exports = {
   fileTypeLabel: 'JPG or PNG image',
   accepts: 'image/jpeg,image/png,.jpg,.jpeg,.png',
   multiple: true,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. One of each format on purpose, per this tool's own
+  // "can I mix JPG and PNG" FAQ.
+  sampleInput: {
+    label: 'sample images',
+    files: [
+      { filename: 'sample-a.jpg', mimeType: 'image/jpeg' },
+      { filename: 'sample-b.png', mimeType: 'image/png' },
+    ],
+  },
   howSteps: [
     'Choose or drop one or more JPG/PNG images.',
     'Drag the images (or use the up/down buttons) to set the order they should appear as pages.',

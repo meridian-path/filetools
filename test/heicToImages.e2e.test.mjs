@@ -98,6 +98,32 @@ test('heic-to-jpg-png: uploading one HEIC photo downloads a real JPG directly, n
   await page.close();
 });
 
+test('heic-to-jpg-png: clicking "Try sample photo" loads the real bundled fixture and converts it to a real JPG', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site - the bundled fixture is a copy of this same
+  // test file's own testsrc.heic (see scripts/generate-sample-assets.js's
+  // writeHeicSample() and test/fixtures/README.md for its provenance), so
+  // this only passes if the click actually fetched it and ran it through
+  // the same real heic2any decode path a drop takes.
+  const page = await browser.newPage({ acceptDownloads: true });
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/heic-to-jpg-png/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForFunction(() => (document.querySelector('.dz-status')?.textContent || '').includes('ready'));
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 20000 }),
+    page.locator('button:has-text("Convert")').click(),
+  ]);
+  assert.equal(download.suggestedFilename(), 'sample-photo.jpg');
+  const bytes = fs.readFileSync(await download.path());
+  assert.deepEqual([...bytes.subarray(0, 3)], JPEG_SOI);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('heic-to-jpg-png: selecting PNG downloads a real PNG instead', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}data/heic-to-jpg-png/`, { waitUntil: 'networkidle' });

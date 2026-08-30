@@ -22,6 +22,18 @@ module.exports = {
   fileTypeLabel: 'CSV',
   accepts: '.csv,text/csv',
   multiple: true,
+  // sampleInput: see src/tools/pdf-merge.js's comment above its own
+  // `family` field. The two files differ on purpose (1 unchanged, 1
+  // changed, 1 removed, 1 added row, matched by the unique ID column) so
+  // clicking the sample shows this tool's real diff highlighting, not an
+  // all-unchanged table.
+  sampleInput: {
+    label: 'sample CSVs',
+    files: [
+      { filename: 'sample-a.csv', mimeType: 'text/csv' },
+      { filename: 'sample-b.csv', mimeType: 'text/csv' },
+    ],
+  },
   howSteps: [
     'Choose or drop exactly two .csv files together - the first becomes “File A” (the original), the second “File B” (the changed version). Use the “Swap A ↔ B” button if you picked them in the wrong order.',
     'If a column has a unique value in every row (an ID, an email, an order number), it’s auto-detected as the match key, so rows still line up correctly even if their order changed between the two files. Override it under “Match rows by” if the wrong one was picked, or force plain row-position comparison.',
