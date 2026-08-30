@@ -626,6 +626,32 @@ ${designTokensCss(DESIGN_TOKENS)}
     transform: none;
   }
 
+  /* Squoosh-pattern sample button: a plain underlined text control,
+     deliberately NOT .btn-secondary's bordered box -- the "Choose files"
+     label above already holds this view's one accent-filled primary
+     action, so the sample affordance stays link-styled, secondary at a
+     glance. */
+  .dz-sample {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: var(--space-1) 0;
+    background: none;
+    border: none;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+  .dz-sample:hover { color: var(--color-accent-hover); }
+  .dz-sample:disabled { opacity: 0.5; cursor: not-allowed; text-decoration: none; }
+  .dz-sample:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
   .dz-cancel {
     display: none;
     margin-top: var(--space-1);

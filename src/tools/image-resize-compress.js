@@ -36,6 +36,11 @@ module.exports = {
   fileTypeLabel: 'image',
   accepts: 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp',
   multiple: false,
+  // sampleInput: see pdf-merge.js's comment above its own `family` field.
+  sampleInput: {
+    label: 'sample photo',
+    files: [{ filename: 'sample-photo.jpg', mimeType: 'image/jpeg' }],
+  },
   howSteps: [
     'Drop or choose a JPG, PNG, or WebP image.',
     'Set a new width or height (locked to the original aspect ratio by default), pick an output format, and adjust the quality slider.',

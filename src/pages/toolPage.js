@@ -148,6 +148,17 @@ function renderToolPage(tool, example = {}) {
       </div>`
     : '';
 
+  // Squoosh-pattern sample button (see this tool's own `sampleInput` field
+  // comment in src/tools/pdf-merge.js): fetches the
+  // listed dist/samples/<slug>/<filename> fixture(s) client-side and hands
+  // them to dropzone.client.js's handleFileList() through the exact same
+  // path a real drop/choose takes -- data-sample-* stays plain
+  // comma-joined strings (not JSON) since no filename/label here ever
+  // contains a comma. Omitted entirely for a tool with no sampleInput.
+  const sampleHtml = tool.sampleInput
+    ? `<button type="button" class="dz-sample" data-sample-urls="${escapeHtml(tool.sampleInput.files.map((f) => url(`samples/${tool.slug}/${f.filename}`)).join(','))}" data-sample-names="${escapeHtml(tool.sampleInput.files.map((f) => f.filename).join(','))}" data-sample-types="${escapeHtml(tool.sampleInput.files.map((f) => f.mimeType).join(','))}">Try ${escapeHtml(tool.sampleInput.label)}</button>`
+    : '';
+
   const dropzoneHtml = isCustomPanel ? '' : `<div class="dropzone" data-state="idle">
         <div class="dz-icon-wrap mark--${escapeHtml(familyOf(tool.slug))}">
           ${markFor(tool.slug, 'dz-icon')}
@@ -157,6 +168,7 @@ function renderToolPage(tool, example = {}) {
         <label class="btn-primary" for="file-input">${escapeHtml(chooseLabel)}</label>
         <input id="file-input" type="file" class="sr-only" accept="${escapeHtml(tool.accepts)}"${tool.multiple ? ' multiple' : ''}>
         <p class="dz-caption">Up to ${formatMb(MAX_BYTES_BY_CLIENT[tool.clientEntry] || DEFAULT_MAX_BYTES)} per file. Stays on this device.</p>
+        ${sampleHtml}
         <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
         <button type="button" class="btn-secondary dz-cancel">Cancel</button>
       </div>`;

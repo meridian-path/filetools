@@ -43,6 +43,17 @@ module.exports = {
   //   pasteFile: only present on a tool with `pasteInput` below --
   //     name/type of the synthetic File a pasted submission is wrapped
   //     in before it reaches this clientEntry's processor.
+  //   sampleInput: optional (the Squoosh "try a sample" pattern). `label`
+  //     names the sample in the button's own text ("Try a sample PDF"); `files`
+  //     lists the fixture(s) fetched from dist/samples/<this tool's own
+  //     slug>/<filename> (see scripts/generate-sample-assets.js, which
+  //     writes the real committed files under assets/samples/, and
+  //     src/build.js's plain recursive copy into dist/samples/) and handed
+  //     to dropzone.client.js's handleFileList() exactly the way a real
+  //     drop/choose selection is -- same validation, same processor path.
+  //     Present only on the first few highest-traffic upload-only tools
+  //     this task shipped (see its own scope note); a tool with no
+  //     sampleInput renders no sample button at all.
   family: 'pdf',
   folder: 'pdf',
   mark: { verb: 'merge', ink: 'pdf' },
@@ -50,6 +61,13 @@ module.exports = {
   mode: 'merge',
   accepts: 'application/pdf',
   multiple: true,
+  sampleInput: {
+    label: 'sample PDFs',
+    files: [
+      { filename: 'sample-a.pdf', mimeType: 'application/pdf' },
+      { filename: 'sample-b.pdf', mimeType: 'application/pdf' },
+    ],
+  },
   howSteps: [
     'Choose or drop two or more PDF files.',
     'Drag the files (or use the up/down buttons) to set the order they should appear in the merged file.',

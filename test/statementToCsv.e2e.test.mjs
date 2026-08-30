@@ -163,6 +163,30 @@ test('bank-statement-to-csv: merges a two-page statement into one table, drops t
   await page.close();
 });
 
+test('bank-statement-to-csv: clicking "Try sample statement" loads the real bundled fixture and extracts its real transaction table', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site -- the bundled PDF is a genuine two-page statement
+  // (scripts/generate-sample-assets.js's writeStatementSample(), same
+  // header-de-duplication shape buildStatementPdf() above builds), so this
+  // only passes if the click actually fetched it and ran it through the
+  // same real pdf.js table-extraction path a drop takes.
+  const page = await browser.newPage();
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}pdf/bank-statement-to-csv/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.table-block');
+
+  assert.equal(await page.locator('.table-block').count(), 1, 'should render exactly one merged table block');
+  const headerTexts = await page.locator('.table-block .extracted-table thead th').allTextContents();
+  assert.deepEqual(headerTexts, ['Date', 'Description', 'Amount']);
+  const bodyRowCount = await page.locator('.table-block .extracted-table tbody tr').count();
+  assert.equal(bodyRowCount, 6, 'six transaction rows across both sample pages, with the repeated header row removed');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('bank-statement-to-csv: dropping a row before download removes it from the exported CSV', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}pdf/bank-statement-to-csv/`, { waitUntil: 'networkidle' });

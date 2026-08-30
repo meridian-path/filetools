@@ -413,6 +413,37 @@ if (toolSection) {
     handleFileList([file], 'paste');
   }
 
+  // Squoosh-pattern sample button (see this tool's own `sampleInput` field
+  // comment in src/tools/pdf-merge.js): fetches the
+  // bundled dist/samples/<slug>/<filename> fixture(s) named by the
+  // button's own data-sample-* attributes (src/pages/toolPage.js) and hands
+  // them to handleFileList() with no `source` argument, so a sample click
+  // goes through the exact same validation/state/processor path as a real
+  // drop or choose -- never a shortcut around it.
+  const sampleBtn = toolSection.querySelector('.dz-sample');
+  if (sampleBtn) {
+    const sampleUrls = (sampleBtn.dataset.sampleUrls || '').split(',').filter(Boolean);
+    const sampleNames = (sampleBtn.dataset.sampleNames || '').split(',');
+    const sampleTypes = (sampleBtn.dataset.sampleTypes || '').split(',');
+    sampleBtn.addEventListener('click', async () => {
+      sampleBtn.disabled = true;
+      try {
+        const files = await Promise.all(sampleUrls.map(async (sampleUrl, i) => {
+          const res = await fetch(sampleUrl);
+          if (!res.ok) throw new Error('Could not load the sample file - try again in a moment.');
+          const blob = await res.blob();
+          return new File([blob], sampleNames[i] || 'sample', { type: sampleTypes[i] || blob.type });
+        }));
+        await handleFileList(files);
+      } catch (err) {
+        setState('error');
+        setStatus(err && err.message ? err.message : 'Could not load the sample file - try again in a moment.', 'error');
+      } finally {
+        sampleBtn.disabled = false;
+      }
+    });
+  }
+
   if (pasteTextarea && pasteButton) {
     pasteButton.addEventListener('click', () => {
       runPasteConvert(pasteTextarea.value, { reportEmptyAsError: true });

@@ -121,6 +121,26 @@ test('image-resize-compress: dropping an image fills the width/height fields wit
   await page.close();
 });
 
+test('image-resize-compress: clicking "Try sample photo" loads the real bundled fixture and fills in its real natural dimensions', async () => {
+  // Covers the sample-input affordance (src/pages/toolPage.js's
+  // sampleInput field / dropzone.client.js's .dz-sample handler) through
+  // the real built site -- the bundled JPEG is a genuine 640x480 file
+  // (scripts/generate-sample-assets.js), so this only passes if the click
+  // actually fetched it and ran it through the same real image-decode path
+  // a drop takes, not a stub.
+  const page = await browser.newPage();
+  const errors = collectPageErrors(page);
+
+  await page.goto(`${baseUrl}data/image-resize-compress/`, { waitUntil: 'networkidle' });
+  await page.locator('.dz-sample').click();
+  await page.waitForSelector('.image-resize-stats span');
+
+  assert.equal(await page.locator('#resize-width').inputValue(), '640');
+  assert.equal(await page.locator('#resize-height').inputValue(), '480');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
 test('image-resize-compress: with aspect ratio locked, editing width recomputes height, and the real downloaded PNG matches those exact dimensions', async () => {
   const page = await browser.newPage({ acceptDownloads: true });
   await page.goto(`${baseUrl}data/image-resize-compress/`, { waitUntil: 'networkidle' });

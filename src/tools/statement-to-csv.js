@@ -21,6 +21,11 @@ module.exports = {
   mode: 'statement',
   accepts: 'application/pdf',
   multiple: false,
+  // sampleInput: see pdf-merge.js's comment above its own `family` field.
+  sampleInput: {
+    label: 'sample statement',
+    files: [{ filename: 'sample-statement.pdf', mimeType: 'application/pdf' }],
+  },
   howSteps: [
     'Choose or drop one statement PDF.',
     'This tool finds the transaction table on every page and combines them into one table, removing the repeated header row that most statements print on each page.',
